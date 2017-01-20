@@ -26,8 +26,8 @@ module.exports = function(devMode) {
 	else {
 		// load the keys
 		var keys = {
-			key: fs.readFileSync(path.join(__dirname, "./cert/key.pem")),
-			cert: fs.readFileSync(path.join(__dirname, "./cert/cert.pem"))
+			key: fs.readFileSync(path.join(__dirname, "../cert/key.pem")),
+			cert: fs.readFileSync(path.join(__dirname, "../cert/cert.pem"))
 		};
 
 		server = https.createServer(keys, reqHandler);
