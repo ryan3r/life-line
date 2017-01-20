@@ -38,21 +38,6 @@ lifeLine.makeDom.register("content", {
 			{
 				classes: "content",
 				name: "content"
-			},
-			// add a sign in flyover or logging in
-			{
-				classes: ["flyover", "hidden"],
-				children: [
-					{
-						classes: "g-signin2",
-						attrs: {
-							"data-onsuccess": "glogin"
-						}
-					}
-				]
-			},
-			{
-				classes: ["shade", "hidden"]
 			}
 		];
 	},

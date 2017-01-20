@@ -320,3 +320,26 @@ a:hover {
 .hidden {
 	display: none;
 }
+
+/**
+ * Login styles
+ */
+
+.fancy-button {
+	border: none;
+	background-color: inherit;
+	color: inherit;
+	padding: 10px;
+	float: right;
+	margin-right: 15px;
+	border-radius: 5px;
+	outline: none;
+}
+
+.fancy-button:hover {
+	background-color: #444;
+}
+
+.error-msg {
+	color: #f55;
+}

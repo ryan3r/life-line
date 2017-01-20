@@ -2,15 +2,7 @@
  * The central handler for authentication based stuff
  */
 
-var GoogleAuth = require("google-auth-library");
 var dataStore = require("./data-store");
-
-// the client id for this app
-var CLIENT_ID = "226388429304-m3vsqoc28c927j9c1q6k6umqvemsc7ej.apps.googleusercontent.com";
-
-// create the auth instance
-var auth = new GoogleAuth();
-var client = new auth.OAuth2(CLIENT_ID, "", "");
 
 // data stores for tracking users
 var users = dataStore.store("users");
@@ -19,28 +11,31 @@ var sessions = dataStore.store("sessions");
 exports.handle = function(url, req) {
 	// login with a google account
 	if(url == "login") {
-		return req.body()
-
-		// verify the login token
-		.then(verifyToken)
+		return req.json()
 
 		// get the user
 		.then(login => {
-			return users.get(login.id)
+			return users.get(login.username)
 
 			.then(user => {
-				// create the user
+				// no such user
 				if(!user) {
-					return users.set(login.id, login);
+					return lifeLine.jsend.fail();
 				}
-			})
 
-			.then(() => {
+				// verify the password
+				// TODO: Hash passwords
+				if(user.password != login.password) {
+					return lifeLine.jsend.fail();
+				}
+
 				// generate the session
-				var {session, cookie, id} = generateSession(login.id);
+				var {session, cookie, id} = generateSession(login.username);
 
+				// save the session
 				return sessions.set(id, session)
 
+				// send the cookie and success response
 				.then(() => new lifeLine.Response({
 					cookie,
 					extension: ".json",
@@ -49,10 +44,7 @@ exports.handle = function(url, req) {
 					})
 				}));
 			});
-		})
-
-		// the login failed
-		.catch(() => lifeLine.jsend.fail());
+		});
 	}
 	// log the current user out
 	else if(url == "logout") {
@@ -94,31 +86,12 @@ exports.getLoggedInUser = function(req) {
 		// no session matching the sessionId
 		if(!session) return;
 
-		return users.get(session.uid);
-	});
-};
-
-// verify a login token
-var verifyToken = function(token) {
-	return new Promise((resolve, reject) => {
-		client.verifyIdToken(token, CLIENT_ID, function(err, login) {
-			// login failed
-			if(err) reject(err);
-
-			var payload = login.getPayload();
-
-			// get the important parts
-			resolve({
-				id: payload.sub,
-				icon: payload.picture,
-				name: payload.given_name
-			});
-		});
+		return users.get(session.username);
 	});
 };
 
 // generate a session token
-var generateSession = function(uid) {
+var generateSession = function(username) {
 	// valid chars for a session token
 	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	var id = "";
@@ -137,7 +110,7 @@ var generateSession = function(uid) {
 
 	// generate the session
 	var session = {
-		uid
+		username
 	};
 
 	return {session, cookie, id};

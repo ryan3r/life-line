@@ -11,7 +11,7 @@ require("./widgets/link");
 var listViews = require("./views/lists");
 require("./views/item");
 require("./views/edit");
-require("./login");
+require("./views/login");
 
 // set up the data store
 var {store} = require("./data-store");
