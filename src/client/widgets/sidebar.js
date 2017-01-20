@@ -4,26 +4,35 @@
 
 lifeLine.makeDom.register("sidebar", {
 	make() {
-		return {
-			classes: "sidebar",
-			name: "sidebar",
-			children: [
-				{
-					classes: ["sidebar-actions", "hidden"],
-					name: "actions",
-					children: [
-						{
-							classes: "sidebar-heading",
-							text: "Page actions"
-						}
-					]
-				},
-				{
-					classes: "sidebar-heading",
-					text: "More actions"
+		return [
+			{
+				classes: "sidebar",
+				name: "sidebar",
+				children: [
+					{
+						classes: ["sidebar-actions", "hidden"],
+						name: "actions",
+						children: [
+							{
+								classes: "sidebar-heading",
+								text: "Page actions"
+							}
+						]
+					},
+					{
+						classes: "sidebar-heading",
+						text: "More actions"
+					}
+				]
+			},
+			{
+				classes: "shade",
+				on: {
+					// close the sidebar
+					click: () => document.body.classList.remove("sidebar-open")
 				}
-			]
-		};
+			}
+		];
 	},
 
 	bind(opts, {actions, sidebar}) {
