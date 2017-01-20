@@ -1,0 +1,322 @@
+/**
+ * Page layout styles
+ */
+
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	color: #fff;
+	background-color: #555;
+	user-select: none;
+}
+
+.sidebar {
+	top: 50px;
+	left: 0px;
+	width: 250px;
+	height: calc(100% - 50px);
+	position: fixed;
+	transition: transform 300ms;
+	background-color: #333;
+	overflow-y: auto;
+}
+
+.content {
+	margin-left: 250px;
+	margin-top: 50px;
+	height: calc(100% - 50px);
+	overflow-y: auto;
+	background-color: #555;
+}
+
+.toolbar {
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 50px;
+	position: fixed;
+	background-color: #222;
+	display: flex;
+	align-items: center;
+}
+
+/**
+ * Snap the sidebar over on small screens
+ */
+
+@media all and (max-width: 650px) {
+	.sidebar {
+		transform: translateX(-100%);
+	}
+
+	.content {
+		margin-left: 0px;
+	}
+
+	/**
+	 * Open the sidebar
+	 */
+	.sidebar-open .sidebar {
+		transform: translateX(0%);
+	}
+}
+
+/**
+ * Sidebar styles
+ */
+
+.sidebar-item {
+	padding: 15px 10px;
+}
+
+.sidebar-item:hover {
+	background-color: #444;
+}
+
+.sidebar-heading {
+	background-color: #666;
+	padding: 3px 5px;
+}
+
+.sidebar-actions.hidden {
+	display: none;
+}
+
+/**
+ * Hide actions on large screens
+ */
+
+@media all and (min-width: 700px) {
+	.sidebar-actions {
+		display: none;
+	}
+}
+
+/**
+ * Toolbar styles
+ */
+
+.toolbar-title {
+	margin: 10px;
+	font-size: 23px;
+	font-weight: bold;
+	flex-grow: 1;
+}
+
+.toolbar-buttons {
+	margin: 0px 15px;
+	display: none;
+}
+
+.toolbar-button {
+	padding: 10px;
+	background-color: inherit;
+	color: inherit;
+	border: none;
+	outline: none;
+}
+
+.toolbar-button:hover {
+	background-color: #555;
+}
+
+.menu-icon {
+	stroke: #ccc;
+	stroke-width: 5px;
+	margin-left: 10px;
+	margin-right: 5px;
+	display: none;
+}
+
+.menu-icon:hover {
+	stroke: #fff;
+}
+
+@media all and (max-width: 650px) {
+	.menu-icon {
+		display: block;
+	}
+}
+
+/**
+ * Hide actions on small and medium screens
+ */
+@media all and (min-width: 700px) {
+	.toolbar-buttons {
+		display: block;
+	}
+}
+
+/**
+ * List item styles
+ */
+
+.list-item {
+	padding: 15px;
+	display: flex;
+}
+
+.list-item:hover {
+	background-color: #666;
+}
+
+.list-item-name {
+	flex-grow: 10;
+	font-weight: bold;
+}
+
+.list-item-due, .list-item-class {
+	flex-grow: 1;
+	text-align: center;
+}
+
+.list-item-class {
+	font-style: italic;
+}
+
+.list-header {
+	background-color: #444;
+	padding: 3px 10px;
+	color: #ddd;
+}
+
+/**
+ * If we are short on space remove the class name
+ */
+
+@media all and (max-width: 300px) {
+	.list-item-class {
+		display: none;
+	}
+}
+
+/**
+ * Print styles
+ */
+
+@media print {
+	.sidebar, .toolbar {
+		display: none;
+	}
+
+	body {
+		color: #000;
+	}
+
+	.list-header {
+		border-bottom: 1px solid #000;
+		color: #000;
+	}
+
+	.list-item-name {
+		font-weight: normal;
+	}
+}
+
+/**
+ * Content styling
+ */
+
+.content-padded {
+	padding: 10px;
+}
+
+a {
+	color: #fff;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+/**
+ * Assignment view tools
+ */
+
+.assignment-info-row {
+	display: flex;
+}
+
+.assignment-info-grow {
+	flex-grow: 1;
+}
+
+.assignment-description {
+	margin: 15px 0px;
+}
+
+.assignment-name {
+	margin-bottom: 15px;
+	font-size: 1.5em;
+}
+
+/* A hacky way to color the done button green */
+[data-name=Done] {
+	color: #0f0;
+}
+
+/**
+ * Styles for the editor
+ */
+
+.editor-row {
+	display: flex;
+}
+
+.input-fill {
+	flex-grow: 1;
+	color: inherit;
+	background-color: inherit;
+	border: none;
+	border-bottom: 1px solid #fff;
+	outline: none;
+	margin: 15px;
+	padding: 5px;
+}
+
+.textarea-fill {
+	background-color: #666;
+	color: #fff;
+	width: 100%;
+	height: 200px;
+}
+
+.textarea-wrapper {
+	padding: 15px;
+}
+
+/**
+ * Signin flyover styles
+ */
+
+.flyover {
+	background-color: #666;
+	top: 25px;
+	right: 25px;
+	width: 150px;
+	height: 80px;
+	position: fixed;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 7px;
+	z-index: 4;
+}
+
+.shade {
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	background-color: #000;
+	z-index: 3;
+	opacity: 0.8;
+}
+
+.hidden {
+	display: none;
+}
