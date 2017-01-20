@@ -2,7 +2,6 @@
  * JSend for the server side
  */
 
-var crypto = require("crypto");
 var Request = require("./request");
 
 // shortcuts for the jsend methods
@@ -27,26 +26,10 @@ exports.jsend = function(status, data) {
 		msg = JSON.stringify(msg);
 	}
 
-	// hash the data
-	var hash = crypto.createHash("sha1")
-		.update(msg)
-		.digest("hex");
-
 	// make the response
 	return new lifeLine.Response({
-		headers: {
-			etag: hash
-		},
 		extension: ".json",
-		body: msg,
-
-		// a hook for just before sending the response
-		$presend(req) {
-			// send not modified
-			if(req.headers.ifNoneMatch == hash) {
-				this.status = 304;
-			}
-		}
+		body: msg
 	});
 };
 
