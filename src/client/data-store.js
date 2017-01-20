@@ -103,7 +103,7 @@ class Store extends lifeLine.EventEmitter {
 
 			// the user is not logged in
 			if(res.status == "fail" && res.data.reason == "logged-out") {
-				lifeLine.login();
+				lifeLine.nav.navigate("/login");
 			}
 		});
 	}
