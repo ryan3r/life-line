@@ -12,7 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "fs-promise": "^1.0.0",
-    "google-auth-library": "^0.10.0",
     "mime-db": "^1.25.0"
   },
   "devDependencies": {
