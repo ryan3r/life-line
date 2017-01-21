@@ -143,7 +143,7 @@ exports.handle = function(url, req) {
 				userPromise = users.get(req.query.username);
 			}
 
-			userPromise.then(targetUser => {
+			return userPromise.then(targetUser => {
 				// if the user did not already exist create them
 				if(!targetUser) {
 					targetUser = { username: req.query.username };
