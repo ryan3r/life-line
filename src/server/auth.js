@@ -97,6 +97,11 @@ exports.handle = function(url, req) {
 				return users.get(req.query.username)
 
 				.then(viewUser => {
+					// no such user
+					if(!viewUser) {
+						return lifeLine.jsend.fail();
+					}
+
 					// remove the password
 					delete viewUser.password;
 
