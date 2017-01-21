@@ -132,51 +132,64 @@ exports.handle = function(url, req) {
 				});
 			}
 
-			// if the user did not already exist create them
-			if(!user) {
-				user = { username: req.query.username };
+			var userPromise;
+
+			// no need to fetch the user
+			if(user.username == req.query.username) {
+				userPromise = Promise.resolve(user);
+			}
+			// load the user we want to edit
+			else {
+				userPromise = users.get(req.query.username);
 			}
 
-			// set the password
-			if(body.password) {
-				// the old password must be supplied if the user is not an admin
-				// changing another users password
-				if(!user.admin || user.username == req.query.username) {
-					// the old password must be supplied
-					if(!body.oldPassword) {
+			userPromise.then(targetUser => {
+				// if the user did not already exist create them
+				if(!targetUser) {
+					targetUser = { username: req.query.username };
+				}
+
+				// set the password
+				if(body.password) {
+					// the old password must be supplied if the user is not an admin
+					// changing another users password
+					if(!user.admin || user.username == req.query.username) {
+						// the old password must be supplied
+						if(!body.oldPassword) {
+							return lifeLine.jsend.fail({
+								msg: "You must enter your old password to change your password"
+							});
+						}
+
+						// check that the passwords match
+						if(body.oldPassword != user.password) {
+							return lifeLine.jsend.fail({
+								msg: "The old password you supplied is not correct"
+							});
+						}
+					}
+
+					targetUser.password = body.password;
+				}
+
+				// make the user an admin or remove admin privilages
+				if("admin" in body) {
+					// the user must be an admin
+					if(!user.admin) {
 						return lifeLine.jsend.fail({
-							msg: "You must enter your old password to change your password"
+							msg: "You must be an admin to change the admin status of a user"
 						});
 					}
 
-					// check that the passwords match
-					if(body.oldPassword != user.password) {
-						return lifeLine.jsend.fail({
-							msg: "The old password you supplied is not correct"
-						});
-					}
+					targetUser.admin = body.admin;
 				}
 
-				user.password = body.password;
-			}
+				// save the changes
+				return users.set(req.query.username, targetUser)
 
-			// make the user an admin or remove admin privilages
-			if("admin" in body) {
-				// the user must be an admin
-				if(!user.admin) {
-					return lifeLine.jsend.fail({
-						msg: "You must be an admin to change the admin status of a user"
-					});
-				}
-
-				user.admin = body.admin;
-			}
-
-			// save the changes
-			return users.set(req.query.username, user)
-
-			// send back a succes response
-			.then(() => lifeLine.jsend.success());
+				// send back a succes response
+				.then(() => lifeLine.jsend.success());
+			});
 		});
 	}
 };
