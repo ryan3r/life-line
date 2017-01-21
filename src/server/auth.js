@@ -8,6 +8,9 @@ var dataStore = require("./data-store");
 var users = dataStore.store("users");
 var sessions = dataStore.store("sessions");
 
+// the amount of time a session should live for (1 month)
+const SESSION_LIFETIME = 30 * 24 * 60 * 60 * 1000;
+
 exports.handle = function(url, req) {
 	// login with a google account
 	if(url == "login") {
@@ -101,11 +104,14 @@ var generateSession = function(username) {
 		id += chars.charAt(Math.floor(Math.random() * chars.length));
 	}
 
+	// generate the end date
+	var endDate = new Date(Date.now() + SESSION_LIFETIME);
+
 	// generate the cookie
 	var cookie = {
 		name: "session",
 		value: id,
-		expires: Date.now() + 10000000000
+		expires: endDate.toUTCString()
 	};
 
 	// generate the session
