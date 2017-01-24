@@ -9,9 +9,24 @@ lifeLine.nav.register({
 		setTitle("All users");
 
 		// load the list of users
-		fetch("/api/auth/info/users")
+		fetch("/api/auth/info/users", {
+			credentials: "include"
+		})
 
-		.then(users => {
+		.then(res => res.json())
+
+		.then(({status, data: users}) => {
+			// not authenticated
+			if(status == "fail") {
+				lifeLine.makeDom({
+					parent: content,
+					classes: "content-padded",
+					text: "You do not have access to the user list"
+				});
+
+				return;
+			}
+
 			// sort by admin status
 			users.sort((a, b) => {
 				// sort admins
@@ -25,32 +40,47 @@ lifeLine.nav.register({
 				return 0;
 			});
 
+			var displayUsers = [];
+
+			displayUsers.push({
+				classes: "list-header",
+				text: "Admins"
+			});
+
+			var adminSectionDone = false;
+
+			// generate the user list
+			users.forEach(user => {
+				// render headers for admin and normal users
+				if(!user.admin && !adminSectionDone) {
+					// only display one users header
+					adminSectionDone = true;
+
+					displayUsers.push({
+						classes: "list-header",
+						text: "Users"
+					});
+				}
+
+				// display the user
+				displayUsers.push({
+					classes: "list-item",
+					children: [
+						{
+							classes: "list-item-name",
+							text: user.username
+						}
+					],
+					on: {
+						click: () => lifeLine.nav.navigate(`/user/${user.username}`)
+					}
+				});
+			});
+
 			// display the user list
 			lifeLine.makeDom({
 				parent: content,
-				// render a single user
-				group: users.map(user => {
-					var userField = [];
-
-					// display the username
-					userField.push({ classes: "list-item-name", text: user.username });
-
-					// mark admins as admins
-					if(user.admin) {
-						userField.push({
-							classes: "list-item-class",
-							text: "Admin"
-						});
-					}
-
-					return {
-						classes: "list-item",
-						children: userField,
-						on: {
-							click: () => lifeLine.nav.navigate(`/user/${user.username}`)
-						}
-					};
-				})
+				group: displayUsers
 			});
 		})
 
