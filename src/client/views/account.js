@@ -40,9 +40,29 @@ lifeLine.nav.register({
 				text: user.username
 			});
 
-			children.push({
-				text: `${match[1] ? user.username + " is" : "You are"} ${user.admin ? "" : "not"} an admin`
-			});
+			// display the admin status of another user
+			if(match[1]) {
+				children.push({
+					text: `${user.username} is ${user.admin ? "" : "not"} an admin`
+				});
+			}
+			// display the admin status of this user
+			else {
+				children.push({
+					text: `You are ${user.admin ? "" : "not"} an admin`
+				});
+
+				// add a link at a list of all users
+				if(user.admin) {
+					children.push({ tag: "br" });
+
+					children.push({
+						widget: "link",
+						href: "/users",
+						text: "View all users"
+					});
+				}
+			}
 
 			children.push({
 				tag: "form",

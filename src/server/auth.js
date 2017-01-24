@@ -192,6 +192,22 @@ exports.handle = function(url, req) {
 			});
 		});
 	}
+	// get a list of all users
+	else if(url == "info/users") {
+		return exports.getLoggedInUser(req)
+
+		.then(user => {
+			// not allowed to access the user list
+			if(!user || !user.admin) {
+				return lifeLine.jsend.fail();
+			}
+
+			// send the user list
+			return users.getAll()
+
+			.then(users => lifeLine.jsend.success(users));
+		});
+	}
 };
 
 // check if a user is logged in

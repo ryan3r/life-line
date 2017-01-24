@@ -13,6 +13,7 @@ require("./views/item");
 require("./views/edit");
 require("./views/login");
 require("./views/account");
+require("./views/users");
 
 // set up the data store
 var {store} = require("./data-store");
