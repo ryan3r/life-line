@@ -3,7 +3,7 @@ var https = require("https");
 var fs = require("fs");
 var path = require("path");
 var reqHandler = require("./src/server/handler").handler;
-var package = require("./package.json")
+var package = require("./package.json");
 
 require("./src/common/global");
 require("./src/server/global");
