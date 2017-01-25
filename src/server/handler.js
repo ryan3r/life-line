@@ -41,8 +41,18 @@ export function handler(req, res) {
 	Promise.resolve(response)
 		// no response returned
 		.then(response => response || (new lifeLine.Response({ status: 500, body: NO_RESPONSE })))
+
 		// there was an internal error
-		.catch(err => new lifeLine.Response({ status: 500, body: err.stack }))
+		.catch(err => {
+			// get the stack if its an error
+			err = typeof err == "string" ? err : err.stack;
+
+			// log the error to the console
+			console.log(err);
+
+			return new lifeLine.jsend.error(err);
+		})
+
 		// send the response
 		.then(response => response.$send(request, res));
 };

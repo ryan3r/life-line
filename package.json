@@ -27,9 +27,10 @@
     "babel-plugin-transform-es2015-shorthand-properties": "^6.18.0",
     "babel-plugin-transform-es2015-spread": "^6.8.0",
     "babel-plugin-transform-es2015-template-literals": "^6.8.0",
+    "babel-register": "^6.22.0",
     "fs-promise": "^1.0.0",
     "mime-db": "^1.25.0",
-    "babel-register": "^6.22.0"
+    "password-hash-and-salt": "^0.1.4"
   },
   "devDependencies": {
     "babelify": "^7.3.0",

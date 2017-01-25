@@ -2,6 +2,8 @@
  * The central handler for authentication based stuff
  */
 
+var passwordLib = require("password-hash-and-salt");
+
 import {store} from "./data-store";
 
 // data stores for tracking users
@@ -27,25 +29,29 @@ export function handle(url, req) {
 				}
 
 				// verify the password
-				// TODO: Hash passwords
-				if(user.password != login.password) {
-					return lifeLine.jsend.fail();
-				}
+				return verifyPassword(login.password, user.password)
 
-				// generate the session
-				var {session, cookie, id} = generateSession(login.username);
+				.then(valid => {
+					// invalid password
+					if(!valid) {
+						return lifeLine.jsend.fail();
+					}
 
-				// save the session
-				return sessions.set(id, session)
+					// generate the session
+					var {session, cookie, id} = generateSession(login.username);
 
-				// send the cookie and success response
-				.then(() => new lifeLine.Response({
-					cookie,
-					extension: ".json",
-					body: JSON.stringify({
-						status: "success"
-					})
-				}));
+					// save the session
+					return sessions.set(id, session)
+
+					// send the cookie and success response
+					.then(() => new lifeLine.Response({
+						cookie,
+						extension: ".json",
+						body: JSON.stringify({
+							status: "success"
+						})
+					}));
+				})
 			});
 		});
 	}
@@ -144,6 +150,8 @@ export function handle(url, req) {
 			}
 
 			return userPromise.then(targetUser => {
+				var response = Promise.resolve();
+
 				// if the user did not already exist create them
 				if(!targetUser) {
 					targetUser = { username: req.query.username };
@@ -162,14 +170,36 @@ export function handle(url, req) {
 						}
 
 						// check that the passwords match
-						if(body.oldPassword != user.password) {
-							return lifeLine.jsend.fail({
-								msg: "The old password you supplied is not correct"
-							});
-						}
+						response = verifyPassword(body.oldPassword, user.password)
+
+						.then(valid => {
+							// not authenticated
+							if(!valid) {
+								return lifeLine.jsend.fail({
+									msg: "The old password you supplied is not correct"
+								});
+							}
+						});
 					}
 
-					targetUser.password = body.password;
+					response = response.then(res => {
+						// login failed
+						if(res) return res;
+
+						return new Promise((resolve, reject) => {
+							// hash the password
+						passwordLib(body.password)
+
+							.hash((err, hash) => {
+								if(err) return reject(err);
+
+								// update the password
+								targetUser.password = hash;
+
+								resolve();
+							});
+						});
+					});
 				}
 
 				// make the user an admin or remove admin privilages
@@ -185,10 +215,14 @@ export function handle(url, req) {
 				}
 
 				// save the changes
-				return users.set(req.query.username, targetUser)
+				var save = () =>
+					users.set(req.query.username, targetUser)
 
-				// send back a succes response
-				.then(() => lifeLine.jsend.success());
+					// send back a succes response
+					.then(() => lifeLine.jsend.success());
+
+				// wait for the password to be checked and changed before saving
+				return response.then(res => res || save());
 			});
 		});
 	}
@@ -208,6 +242,21 @@ export function handle(url, req) {
 			.then(users => lifeLine.jsend.success(users));
 		});
 	}
+};
+
+// wrap verify password
+var verifyPassword = function(password, hash) {
+	return new Promise((resolve, reject) => {
+		// verify the password
+	passwordLib(password)
+
+		.verifyAgainst(hash, (err, valid) => {
+			// an error occured
+			if(err) return reject(err);
+
+			resolve(valid);
+		});
+	});
 };
 
 // check if a user is logged in
