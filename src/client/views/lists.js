@@ -13,7 +13,18 @@ const MIN_LENGTH = 10;
 const LISTS = [
 	{
 		url: "/",
-		title: "Home",
+		title: "Today",
+		// show all at reasonable number of incomplete assignments
+		manualFilter: data => {
+			// todays date
+			var today = new Date();
+
+			return data.filter(item => !item.done && isSameDate(today, item.date));
+		}
+	},
+	{
+		url: "/week",
+		title: "This week",
 		// show all at reasonable number of incomplete assignments
 		manualFilter: data => {
 			var taken = [];
