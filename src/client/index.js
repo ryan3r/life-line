@@ -1,22 +1,22 @@
 // create the global object
-require("../common/global");
-require("./global");
+import "../common/global";
+import "./global";
 
 // load all the widgets
-require("./widgets/sidebar");
-require("./widgets/content");
-require("./widgets/link");
+import "./widgets/sidebar";
+import "./widgets/content";
+import "./widgets/link";
 
 // load all the views
-var listViews = require("./views/lists");
-require("./views/item");
-require("./views/edit");
-require("./views/login");
-require("./views/account");
-require("./views/users");
+import {initNavBar} from "./views/lists";
+import "./views/item";
+import "./views/edit";
+import "./views/login";
+import "./views/account";
+import "./views/users";
 
 // set up the data store
-var {store} = require("./data-store");
+import {store} from "./data-store";
 
 store("assignments").setInit(function(item) {
 	// parse the date
@@ -35,7 +35,7 @@ lifeLine.makeDom({
 });
 
 // add list views to the navbar
-listViews.initNavBar();
+initNavBar();
 
 // create a new assignment
 lifeLine.addCommand("New assignment", () => {

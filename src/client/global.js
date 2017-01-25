@@ -2,7 +2,7 @@
  * Browser specific globals
  */
 
-lifeLine.makeDom = require("./util/dom-maker");
+lifeLine.makeDom = require("./util/dom-maker").default;
 
 // add a function for adding actions
 lifeLine.addAction = function(name, fn) {

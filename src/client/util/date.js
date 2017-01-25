@@ -3,21 +3,21 @@
  */
 
  // check if the dates are the same day
- var isSameDate = exports.isSameDate = function(date1, date2) {
+ export function isSameDate(date1, date2) {
  	return date1.getFullYear() == date2.getFullYear() &&
  		date1.getMonth() == date2.getMonth() &&
  		date1.getDate() == date2.getDate();
  };
 
  // check if a date is less than another
- var isSoonerDate = exports.isSoonerDate = function(date1, date2) {
+ export function isSoonerDate(date1, date2) {
  	return date1.getFullYear() <= date2.getFullYear() &&
  		date1.getMonth() <= date2.getMonth() &&
  		date1.getDate() < date2.getDate();
  };
 
  // get the date days from now
- var daysFromNow = exports.daysFromNow = function(days) {
+ export function daysFromNow(days) {
  	var date = new Date();
 
  	// advance the date
@@ -29,7 +29,7 @@
  const STRING_DAYS = ["Sunday", "Monday", "Tuesday", "Wedensday", "Thursday", "Friday", "Saturday"];
 
  // convert a date to a string
- var stringifyDate = exports.stringifyDate = function(date, opts = {}) {
+ export function stringifyDate(date, opts = {}) {
 	 var strDate, strTime = "";
 
      // check if the date is before today
@@ -60,14 +60,14 @@
  };
 
 // check if this is one of the given skip times
-var isSkipTime = (date, skips = []) => {
+export function isSkipTime(date, skips = []) {
 	return skips.find(skip => {
 		return skip.hour === date.getHours() && skip.minute === date.getMinutes();
 	});
 };
 
 // convert a time to a string
-var stringifyTime = function(date) {
+export function stringifyTime(date) {
 	var hour = date.getHours();
 
 	// get the am/pm time

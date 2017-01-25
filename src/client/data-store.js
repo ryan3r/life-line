@@ -9,7 +9,7 @@ const DATA_STORE_ROOT = "/api/data/";
 var stores = {};
 
 // get/create a datastore
-exports.store = function(name) {
+export function store(name) {
 	// use the cached store
 	if(name in stores) {
 		return stores[name];

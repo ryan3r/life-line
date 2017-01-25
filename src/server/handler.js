@@ -2,15 +2,16 @@
  * Handle routing on the server side
  */
 
-var Request = require("./request");
 var path = require("path");
-var dataStore = require("./data-store");
-var auth = require("./auth");
+
+import Request from "./request";
+import * as dataStore from "./data-store";
+import * as auth from "./auth";
 
 const NO_RESPONSE = "No response returned by the handler";
 
 // route requests to the proper handlers
-exports.handler = function(req, res) {
+export function handler(req, res) {
 	// wrap the request
 	var request = new Request(req);
 	var response;
