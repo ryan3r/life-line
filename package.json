@@ -13,9 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "fs-promise": "^1.0.0",
-    "mime-db": "^1.25.0"
-  },
-  "devDependencies": {
+    "mime-db": "^1.25.0",
     "babel-plugin-check-es2015-constants": "^6.8.0",
     "babel-plugin-transform-es2015-arrow-functions": "^6.8.0",
     "babel-plugin-transform-es2015-block-scoped-functions": "^6.8.0",
@@ -28,7 +26,9 @@
     "babel-plugin-transform-es2015-parameters": "^6.21.0",
     "babel-plugin-transform-es2015-shorthand-properties": "^6.18.0",
     "babel-plugin-transform-es2015-spread": "^6.8.0",
-    "babel-plugin-transform-es2015-template-literals": "^6.8.0",
+    "babel-plugin-transform-es2015-template-literals": "^6.8.0"
+  },
+  "devDependencies": {
     "babelify": "^7.3.0",
     "browserify": "^13.3.0",
     "watchify": "^3.8.0"
