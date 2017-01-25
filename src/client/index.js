@@ -12,6 +12,8 @@ var listViews = require("./views/lists");
 require("./views/item");
 require("./views/edit");
 require("./views/login");
+require("./views/account");
+require("./views/users");
 
 // set up the data store
 var {store} = require("./data-store");
@@ -43,4 +45,4 @@ lifeLine.addCommand("New assignment", () => {
 });
 
 // create the logout button
-lifeLine.addCommand("Logout", () => lifeLine.logout());
+lifeLine.addNavCommand("Account", "/account");

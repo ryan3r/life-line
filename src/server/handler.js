@@ -7,6 +7,8 @@ var path = require("path");
 var dataStore = require("./data-store");
 var auth = require("./auth");
 
+const NO_RESPONSE = "No response returned by the handler";
+
 // route requests to the proper handlers
 exports.handler = function(req, res) {
 	// wrap the request
@@ -36,6 +38,10 @@ exports.handler = function(req, res) {
 
 	// send the response when the promise resolves
 	Promise.resolve(response)
+		// no response returned
+		.then(response => response || (new lifeLine.Response({ status: 500, body: NO_RESPONSE })))
+		// there was an internal error
 		.catch(err => new lifeLine.Response({ status: 500, body: err.stack }))
+		// send the response
 		.then(response => response.$send(request, res));
 };
