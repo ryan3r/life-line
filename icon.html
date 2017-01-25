@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Icon creator</title>
+		<style>
+			canvas {
+				border: 1px dashed;
+			}
+
+			.container {
+				display: flex;
+				flex-direction: column;
+				margin: 5px;
+			}
+
+			.canvases {
+				display: flex;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="canvases"></div>
+		<script>
+			var updateLinks = [];
+			var ctxs = [];
+			var canvases = document.querySelector(".canvases");
+
+			// draw the acutal image
+			var draw = function() {
+				// start top left
+				moveTo(0, .3);
+				// draw top line of trapazoid
+				lineTo(.3, .1);
+				// top line of rectangle
+				lineTo(.6, .1);
+
+				// base of the top prong
+				lineTo(.6, .2);
+				// move to the end of the prong
+				lineTo(.9, .2);
+				// draw the tip of the prong
+				lineTo(.9, .4);
+				// back to the base of the prong
+				lineTo(.6, .4);
+
+				// base of the bottom prong
+				lineTo(.6, .6);
+				// move to the end of the prong
+				lineTo(.9, .6);
+				// draw the tip of the prong
+				lineTo(.9, .8);
+				// back to the base of the prong
+				lineTo(.6, .8);
+
+				// move to the bottom of the rectange
+				lineTo(.6, .9);
+				// draw the bottom of the rectangle
+				lineTo(.3, .9);
+				// draw the bottom of the trapazoid
+				lineTo(0, .7);
+			};
+
+			// draw a line to point (x, y)
+			var lineTo = function(x, y) { ctx.lineTo(x * ctxSize, y * ctxSize); };
+
+			// move to point (x, y)
+			var moveTo = function(x, y) { ctx.moveTo(x * ctxSize, y * ctxSize); };
+
+			// create a canvas
+			var canvas = function(size) {
+				// make the container
+				var container = document.createElement("div");
+
+				container.classList.add("container");
+
+				canvases.appendChild(container);
+
+				var canvas = document.createElement("canvas");
+
+				// set the size
+				canvas.width = canvas.height = size;
+				canvas.style.width = size + "px";
+
+				// save the canvas for drawing
+				ctxs.push([size, canvas.getContext("2d")]);
+
+				container.appendChild(canvas);
+
+				// add the download link when the image is done
+				updateLinks.push(function() {
+					var link = document.createElement("a");
+
+					link.innerText = "Download " + size + "x" + size;
+
+					// name the download
+					link.setAttribute("download", "icon-" + size + ".png");
+
+					link.setAttribute("href", canvas.toDataURL());
+
+					container.appendChild(link);
+				});
+			};
+
+			// create canases
+			canvas(144);
+
+			// draw the image
+			ctxs.forEach(function(pair) {
+				// store the values globaly
+				window.ctxSize = pair[0];
+				window.ctx = pair[1];
+
+				// draw on this canvas
+				draw();
+
+				// fill the drawing
+				ctx.fillStyle = "#00f";
+				ctx.fill();
+			});
+
+			// add download links
+			while(updateLinks.length) {
+				updateLinks.pop()();
+			}
+		</script>
+	</body>
+</html>
