@@ -2,7 +2,7 @@
  * Keep a list of subscriptions to unsubscribe from together
  */
 
-var Disposable = module.exports = class {
+export default class Disposable {
 	constructor() {
 		this._subscriptions = [];
 	}

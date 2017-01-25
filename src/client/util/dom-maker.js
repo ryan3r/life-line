@@ -83,7 +83,7 @@ var makeDom = function(opts = {}) {
 			child.mapped = mapped;
 
 			// build the node or group
-			module.exports(child);
+			make(child);
 		}
 	}
 
@@ -109,7 +109,7 @@ var makeGroup = function(group) {
 		node.mapped = mapped;
 
 		// make the dom
-		module.exports(node);
+		make(node);
 	}
 
 	// call the callback with the mapped names
@@ -128,7 +128,7 @@ var makeGroup = function(group) {
 // a collection of widgets
 var widgets = {};
 
-module.exports = function(opts) {
+export default function make(opts) {
 	// handle a group
 	if(Array.isArray(opts) || opts.group) {
 		return makeGroup(opts);
@@ -159,6 +159,6 @@ module.exports = function(opts) {
 };
 
 // register a widget
-module.exports.register = function(name, widget) {
+make.register = function(name, widget) {
 	widgets[name] = widget;
 };

@@ -5,7 +5,7 @@
  var urlLib = require("url");
  var querystring = require("querystring");
 
-module.exports = class {
+export default class Request {
 	constructor(req) {
 		this._req = req;
 		this.method = req.method;

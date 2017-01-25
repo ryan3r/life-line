@@ -17,15 +17,8 @@ var bundler = browserify("./src/client/index.js", {
 	debug: DEV_BUNDLE
 });
 
-// load all babel plugins from dev deps
-var plugins = Object.getOwnPropertyNames(package.devDependencies)
-	// remove all non-babel plugins
-	.filter(name => name.indexOf("babel-plugin-") === 0)
-	// remove the plugin prefix
-	.map(name => name.substr(13));
-
 // configure babelify
-bundler = bundler.transform("babelify", { plugins });
+bundler = bundler.transform("babelify");
 
 // build the bundle
 var buildBundle = function() {

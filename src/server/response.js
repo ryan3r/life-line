@@ -7,7 +7,7 @@ var fs = require("fs-promise");
 var crypto = require("crypto");
 var path = require("path");
 
-var Response = module.exports = class {
+export default class Response {
 	constructor(opts = {}) {
 		this.status = opts.status || 200;
 		this.headers = opts.headers || {};

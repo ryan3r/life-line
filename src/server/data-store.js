@@ -14,7 +14,7 @@ if(!fs.existsSync(DATA_DIR)) {
 }
 
 // the http handler for data stores
-exports.handle = function(url, req) {
+export function handle(url, req) {
 	var auth = require("./auth");
 
 	// breakdown store/key
@@ -72,7 +72,7 @@ exports.handle = function(url, req) {
 var storeCache = new Map();
 
 // get a data store instance
-exports.store = function(name) {
+export function store(name) {
 	// use the cached version
 	if(storeCache.has(name)) {
 		return storeCache.get(name);
