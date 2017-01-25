@@ -32,16 +32,19 @@
  var stringifyDate = exports.stringifyDate = function(date, opts = {}) {
 	 var strDate, strTime = "";
 
+     // check if the date is before today
+     var beforeNow = date.getTime() < Date.now();
+
  	// Today
  	if(isSameDate(date, new Date()))
  		strDate = "Today";
 
  	// Tomorrow
- 	else if(isSameDate(date, daysFromNow(1)))
+ 	else if(isSameDate(date, daysFromNow(1)) && !beforeNow)
  		strDate = "Tomorrow";
 
  	// day of the week (this week)
- 	else if(isSoonerDate(date, daysFromNow(7)))
+ 	else if(isSoonerDate(date, daysFromNow(7)) && !beforeNow)
  		strDate = STRING_DAYS[date.getDay()];
 
  	// print the date
