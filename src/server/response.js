@@ -95,7 +95,7 @@ export default class Response {
 
 	// serve a static file
 	static sendFile(src, opts = {}) {
-		return fs.readFile(src, "utf8")
+		return fs.readFile(src)
 
 		// send the file
 		.then(file => {
