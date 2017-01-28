@@ -53,15 +53,11 @@ lifeLine.nav.register({
 
 			// save changes
 			var change = () => {
-				// build the new item
-				item = {
-					id: item.id,
-					name: mapped.name.value,
-					class: mapped.class.value,
-					date: new Date(mapped.date.value + " " + mapped.time.value),
-					description: mapped.description.value,
-					modified: Date.now()
-				};
+				// update the modified date
+				item.modified = Date.now();
+
+				// parse the date
+				item.date = new Date(item.date);
 
 				// add a button back to the view
 				if(!actionSub) {
@@ -89,13 +85,10 @@ lifeLine.nav.register({
 						classes: "editor-row",
 						children: [
 							{
-								classes: "input-fill",
-								tag: "input",
-								value: item.name,
-								name: "name",
-								on: {
-									input: change
-								}
+								widget: "input",
+								bind: item,
+								prop: "name",
+								change
 							}
 						]
 					},
@@ -103,13 +96,10 @@ lifeLine.nav.register({
 						classes: "editor-row",
 						children: [
 							{
-								classes: "input-fill",
-								tag: "input",
-								value: item.class,
-								name: "class",
-								on: {
-									input: change
-								}
+								widget: "input",
+								bind: item,
+								prop: "class",
+								change
 							}
 						]
 					},
@@ -117,28 +107,20 @@ lifeLine.nav.register({
 						classes: "editor-row",
 						children: [
 							{
-								classes: "input-fill",
-								tag: "input",
-								attrs: {
-									type: "date"
-								},
+								widget: "input",
+								type: "date",
 								value: `${item.date.getFullYear()}-${pad(item.date.getMonth() + 1)}-${pad(item.date.getDate())}`,
-								name: "date",
-								on: {
-									input: change
-								}
+								bind: item,
+								prop: "date",
+								change
 							},
 							{
-								classes: "input-fill",
-								tag: "input",
-								attrs: {
-									type: "time"
-								},
+								widget: "input",
+								type: "time",
 								value: `${item.date.getHours()}:${pad(item.date.getMinutes())}`,
-								name: "time",
-								on: {
-									input: change
-								}
+								bind: item,
+								prop: "time",
+								change
 							}
 						]
 					},
@@ -146,16 +128,13 @@ lifeLine.nav.register({
 						classes: "textarea-wrapper",
 						children: [
 							{
+								widget: "input",
 								tag: "textarea",
 								classes: "textarea-fill",
-								value: item.description,
-								attrs: {
-									placeholder: "Description"
-								},
-								name: "description",
-								on: {
-									input: change
-								}
+								placeholder: "Description",
+								bind: item,
+								prop: "description",
+								change
 							}
 						]
 					}
