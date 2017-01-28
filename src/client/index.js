@@ -7,6 +7,7 @@ import "./widgets/sidebar";
 import "./widgets/content";
 import "./widgets/link";
 import "./widgets/list";
+import "./widgets/input";
 
 // load all the views
 import {initNavBar} from "./views/lists";
