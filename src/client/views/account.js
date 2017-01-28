@@ -64,6 +64,8 @@ lifeLine.nav.register({
 				}
 			}
 
+			var passwordChange = {};
+
 			children.push({
 				tag: "form",
 				children: [
@@ -71,22 +73,18 @@ lifeLine.nav.register({
 						classes: "editor-row",
 						children: [
 							{
-								tag: "input",
-								classes: "input-fill",
-								attrs: {
-									type: "password",
-									placeholder: "Old password"
-								},
-								name: "oldPassword"
+								widget: "input",
+								type: "password",
+								placeholder: "Old password",
+								bind: passwordChange,
+								prop: "oldPassword"
 							},
 							{
-								tag: "input",
-								classes: "input-fill",
-								attrs: {
-									type: "password",
-									placeholder: "New password"
-								},
-								name: "password"
+								widget: "input",
+								type: "password",
+								placeholder: "New password",
+								bind: passwordChange,
+								prop: "password"
 							}
 						]
 					},
@@ -108,7 +106,7 @@ lifeLine.nav.register({
 						e.preventDefault();
 
 						// no password supplied
-						if(!password.value) {
+						if(!passwordChange.password) {
 							showMsg("Enter a new password");
 							return;
 						}
@@ -117,10 +115,7 @@ lifeLine.nav.register({
 						fetch(`/api/auth/info/set?username=${user.username}`, {
 							credentials: "include",
 							method: "POST",
-							body: JSON.stringify({
-								password: password.value,
-								oldPassword: oldPassword.value
-							})
+							body: JSON.stringify(passwordChange)
 						})
 
 						.then(res => res.json())
@@ -134,10 +129,6 @@ lifeLine.nav.register({
 							if(res.status == "success") {
 								showMsg("Password changed");
 							}
-
-							// clear the fields
-							password.value = "";
-							oldPassword.value = "";
 						});
 					}
 				}
@@ -164,7 +155,7 @@ lifeLine.nav.register({
 				});
 			}
 
-			var {password, oldPassword, msg} = lifeLine.makeDom({
+			var {msg} = lifeLine.makeDom({
 				parent: content,
 				classes: "content-padded",
 				children
