@@ -9,6 +9,9 @@ lifeLine.makeDom.register("input", {
 			value = bind[prop];
 		}
 
+		// done put the literal undefined in if no value is given
+		value || (value = "");
+
 		var input = {
 			tag: tag || "input",
 			classes: classes || `${tag == "textarea" ? "textarea" : "input"}-fill`,
