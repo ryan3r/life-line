@@ -40,47 +40,30 @@ lifeLine.nav.register({
 				return 0;
 			});
 
-			var displayUsers = [];
-
-			displayUsers.push({
-				classes: "list-header",
-				text: "Admins"
-			});
-
-			var adminSectionDone = false;
+			var displayUsers = {
+				Admins: [],
+				Users: []
+			};
 
 			// generate the user list
 			users.forEach(user => {
-				// render headers for admin and normal users
-				if(!user.admin && !adminSectionDone) {
-					// only display one users header
-					adminSectionDone = true;
+				// sort the users into admins and users
+				displayUsers[user.admin ? "Admins" : "Users"]
 
-					displayUsers.push({
-						classes: "list-header",
-						text: "Users"
-					});
-				}
-
-				// display the user
-				displayUsers.push({
-					classes: "list-item",
-					children: [
-						{
-							classes: "list-item-name",
-							text: user.username
-						}
-					],
-					on: {
-						click: () => lifeLine.nav.navigate(`/user/${user.username}`)
-					}
+				.push({
+					href: `/user/${user.username}`,
+					items: [{
+						text: user.username,
+						grow: true
+					}]
 				});
 			});
 
 			// display the user list
 			lifeLine.makeDom({
 				parent: content,
-				group: displayUsers
+				widget: "list",
+				items: displayUsers
 			});
 		})
 
