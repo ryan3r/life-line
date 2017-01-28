@@ -12,36 +12,31 @@ const LISTS = [
 	{
 		url: "/",
 		title: "Today",
+		createCtx: () => new Date(),
 		// show all at reasonable number of incomplete assignments
-		manualFilter: data => {
-			// todays date
-			var today = new Date();
-
-			return data.filter(item => !item.done && isSameDate(today, item.date));
-		}
+		filter: (item, today) => !item.done && isSameDate(today, item.date)
 	},
 	{
 		url: "/week",
 		title: "This week",
-		// show all at reasonable number of incomplete assignments
-		manualFilter: data => {
-			var taken = [];
+		createCtx: () => ({
 			// days to the end of this week
-			var endDate = daysFromNow(7 - (new Date()).getDay());
+			endDate: daysFromNow(7 - (new Date()).getDay()),
+			// todays date
+			today: new Date()
+		}),
+		// show all at reasonable number of incomplete assignments
+		filter: (item, {today, endDate}) => {
+			// already done
+			if(item.done) return;
 
-			for(let item of data) {
-				// already done
-				if(item.done) continue;
+			// check if the item is past this week
+			if(!isSoonerDate(item.date, endDate) && !isSameDate(item.date, endDate)) return;
 
-				// if we have already hit the required length go by date
-				if(!isSoonerDate(item.date, endDate)) {
-					continue;
-				}
+			// check if the date is before today
+			if(isSoonerDate(item.date, today)) return;
 
-				taken.push(item);
-			}
-
-			return taken;
+			return true;
 		}
 	},
 	{
@@ -90,13 +85,15 @@ lifeLine.nav.register({
 					return 0;
 				});
 
-				if(match.manualFilter) {
-					data = match.manualFilter(data);
+				// the context for the filter function
+				var ctx;
+
+				if(match.createCtx) {
+					ctx = match.createCtx();
 				}
-				// remove completed items
-				else {
-					data = data.filter(match.filter);
-				}
+
+				// run the filter function
+				data = data.filter(item => match.filter(item, ctx));
 
 				// make the groups
 				var groups = {};
@@ -124,20 +121,6 @@ lifeLine.nav.register({
 						href: `/item/${item.id}`,
 						items
 					});
-
-					/*
-					// render the item
-					rendering[0].push({
-						parent: content,
-						classes: "list-item",
-						children: [
-							{ classes: "list-item-name", text: item.name },
-							{ classes: "list-item-class", text: item.class }
-						],
-						on: {
-							click: () => lifeLine.nav.navigate("/item/" + item.id)
-						}
-					});*/
 				});
 
 				// display all items
