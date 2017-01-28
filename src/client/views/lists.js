@@ -2,12 +2,10 @@
  * Display a list of upcomming assignments
  */
 
-import {daysFromNow, isSameDate, stringifyDate, isSoonerDate} from "../util/date";
+import {daysFromNow, isSameDate, stringifyDate, stringifyTime, isSoonerDate} from "../util/date";
 import {store} from "../data-store";
 
 var assignments = store("assignments");
-
-const MIN_LENGTH = 10;
 
 // all the different lists
 const LISTS = [
@@ -36,7 +34,7 @@ const LISTS = [
 				if(item.done) continue;
 
 				// if we have already hit the required length go by date
-				if(taken.length >= MIN_LENGTH && !isSoonerDate(item.date, endDate)) {
+				if(!isSoonerDate(item.date, endDate)) {
 					continue;
 				}
 
@@ -100,25 +98,36 @@ lifeLine.nav.register({
 					data = data.filter(match.filter);
 				}
 
-				// the last item rendered
-				var last;
+				// make the groups
+				var groups = {};
 
 				// render the list
 				data.forEach((item, i) => {
-					// render the headers
-					if(i === 0 || !isSameDate(item.date, last.date)) {
-						lifeLine.makeDom({
-							parent: content,
-							classes: "list-header",
-							text: stringifyDate(item.date)
-						});
+					// get the header name
+					var dateStr = stringifyDate(item.date);
+
+					// make sure the header exists
+					groups[dateStr] || (groups[dateStr] = []);
+
+					// add the item to the list
+					var items = [
+						{ text: item.name, grow: true },
+						item.class
+					];
+
+					// show the end time for any non 11:59pm times
+					if(item.date.getHours() != 23 || item.date.getMinutes() != 59) {
+						items.splice(1, 0, stringifyTime(item.date));
 					}
 
-					// make this the last item
-					last = item;
+					groups[dateStr].push({
+						href: `/item/${item.id}`,
+						items
+					});
 
+					/*
 					// render the item
-					lifeLine.makeDom({
+					rendering[0].push({
 						parent: content,
 						classes: "list-item",
 						children: [
@@ -128,7 +137,14 @@ lifeLine.nav.register({
 						on: {
 							click: () => lifeLine.nav.navigate("/item/" + item.id)
 						}
-					});
+					});*/
+				});
+
+				// display all items
+				lifeLine.makeDom({
+					parent: content,
+					widget: "list",
+					items: groups
 				});
 			})
 		);

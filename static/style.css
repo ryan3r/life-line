@@ -180,24 +180,21 @@ html, body {
 	background-color: #666;
 }
 
-.list-item-name {
+.list-item-grow {
 	flex-grow: 10;
-	font-weight: bold;
 }
 
-.list-item-due, .list-item-class {
+.list-item-part {
 	flex-grow: 1;
 	text-align: center;
-}
-
-.list-item-class {
-	font-style: italic;
 }
 
 .list-header {
 	background-color: #444;
 	padding: 3px 10px;
 	color: #ddd;
+	top: 0px;
+	position: sticky;
 }
 
 /**
