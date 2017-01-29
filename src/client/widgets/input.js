@@ -9,17 +9,10 @@ lifeLine.makeDom.register("input", {
 			value = bind[prop];
 		}
 
-		// done put the literal undefined in if no value is given
-		value || (value = "");
-
 		var input = {
 			tag: tag || "input",
 			classes: classes || `${tag == "textarea" ? "textarea" : "input"}-fill`,
-			attrs: {
-				placeholder,
-				type,
-				value
-			},
+			attrs: {},
 			on: {
 				input: e => {
 					// update the property changed
@@ -34,6 +27,11 @@ lifeLine.makeDom.register("input", {
 				}
 			}
 		};
+
+		// attach values if they are given
+		if(type) input.attrs.type = type;
+		if(value) input.attrs.value = value;
+		if(placeholder) input.attrs.placeholder = placeholder;
 
 		// for textareas set innerText
 		if(tag == "textarea") {
