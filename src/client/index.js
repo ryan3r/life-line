@@ -8,6 +8,7 @@ import "./widgets/content";
 import "./widgets/link";
 import "./widgets/list";
 import "./widgets/input";
+import "./widgets/toggle-btns";
 
 // load all the views
 import {initNavBar} from "./views/lists";

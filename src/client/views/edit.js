@@ -79,8 +79,7 @@ lifeLine.nav.register({
 			// render the ui
 			var mapped = lifeLine.makeDom({
 				parent: content,
-				tag: "form",
-				children: [
+				group: [
 					{
 						classes: "editor-row",
 						children: [
@@ -89,6 +88,20 @@ lifeLine.nav.register({
 								bind: item,
 								prop: "name",
 								change
+							}
+						]
+					},
+					{
+						classes: "editor-row",
+						children: [
+							{
+								widget: "toggle-btns",
+								btns: [
+									{ text: "Foo", value: "foo" },
+									{ text: "Bar", value: "bar" },
+									{ text: "Baz", value: "baz" }
+								],
+								change: opt => console.log(opt)
 							}
 						]
 					},
