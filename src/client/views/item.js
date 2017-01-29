@@ -87,7 +87,7 @@ lifeLine.nav.register({
 									text: item.class
 								},
 								{
-									text: stringifyDate(item.date, { includeTime: true, skipTimes })
+									text: item.date && stringifyDate(item.date, { includeTime: true, skipTimes })
 								}
 							]
 						},
