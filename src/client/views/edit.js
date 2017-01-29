@@ -57,7 +57,10 @@ lifeLine.nav.register({
 				item.modified = Date.now();
 
 				// parse the date
-				item.date = new Date(item.date);
+				item.date = new Date(item.date + " " + item.time);
+
+				// remove the extra time field
+				delete item.time;
 
 				// remove assignemnt fields from tasks
 				if(item.type == "task") {
