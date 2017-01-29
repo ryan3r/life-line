@@ -97,11 +97,17 @@ lifeLine.nav.register({
 							{
 								widget: "toggle-btns",
 								btns: [
-									{ text: "Foo", value: "foo" },
-									{ text: "Bar", value: "bar" },
-									{ text: "Baz", value: "baz" }
+									{ text: "Assignment", value: "assignment" },
+									{ text: "Task", value: "task" },
 								],
-								change: opt => console.log(opt)
+								value: item.type,
+								change: type => {
+									// update the item type
+									item.type = type;
+
+									// emit the change
+									change();
+								}
 							}
 						]
 					},
