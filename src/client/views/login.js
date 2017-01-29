@@ -9,6 +9,9 @@ lifeLine.nav.register({
 		// set the page title
 		setTitle("Login");
 
+		// the users credentials
+		var auth = {};
+
 		// create the login form
 		var {username, password, msg} = lifeLine.makeDom({
 			parent: content,
@@ -19,12 +22,10 @@ lifeLine.nav.register({
 					classes: "editor-row",
 					children: [
 						{
-							tag: "input",
-							name: "username",
-							classes: "input-fill",
-							attrs: {
-								placeholder: "Username",
-							}
+							widget: "input",
+							bind: auth,
+							prop: "username",
+							placeholder: "Username"
 						}
 					]
 				},
@@ -32,13 +33,11 @@ lifeLine.nav.register({
 					classes: "editor-row",
 					children: [
 						{
-							tag: "input",
-							name: "password",
-							classes: "input-fill",
-							attrs: {
-								type: "password",
-								placeholder: "Password"
-							}
+							widget: "input",
+							bind: auth,
+							prop: "password",
+							type: "password",
+							placeholder: "Password"
 						}
 					]
 				},
@@ -63,10 +62,7 @@ lifeLine.nav.register({
 					fetch("/api/auth/login", {
 						method: "POST",
 						credentials: "include",
-						body: JSON.stringify({
-							username: username.value,
-							password: password.value
-						})
+						body: JSON.stringify(auth)
 					})
 
 					// parse the json

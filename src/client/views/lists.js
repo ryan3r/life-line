@@ -2,48 +2,41 @@
  * Display a list of upcomming assignments
  */
 
-import {daysFromNow, isSameDate, stringifyDate, isSoonerDate} from "../util/date";
+import {daysFromNow, isSameDate, stringifyDate, stringifyTime, isSoonerDate} from "../util/date";
 import {store} from "../data-store";
 
 var assignments = store("assignments");
-
-const MIN_LENGTH = 10;
 
 // all the different lists
 const LISTS = [
 	{
 		url: "/",
 		title: "Today",
+		createCtx: () => new Date(),
 		// show all at reasonable number of incomplete assignments
-		manualFilter: data => {
-			// todays date
-			var today = new Date();
-
-			return data.filter(item => !item.done && isSameDate(today, item.date));
-		}
+		filter: (item, today) => !item.done && isSameDate(today, item.date)
 	},
 	{
 		url: "/week",
 		title: "This week",
-		// show all at reasonable number of incomplete assignments
-		manualFilter: data => {
-			var taken = [];
+		createCtx: () => ({
 			// days to the end of this week
-			var endDate = daysFromNow(7 - (new Date()).getDay());
+			endDate: daysFromNow(7 - (new Date()).getDay()),
+			// todays date
+			today: new Date()
+		}),
+		// show all at reasonable number of incomplete assignments
+		filter: (item, {today, endDate}) => {
+			// already done
+			if(item.done) return;
 
-			for(let item of data) {
-				// already done
-				if(item.done) continue;
+			// check if the item is past this week
+			if(!isSoonerDate(item.date, endDate) && !isSameDate(item.date, endDate)) return;
 
-				// if we have already hit the required length go by date
-				if(taken.length >= MIN_LENGTH && !isSoonerDate(item.date, endDate)) {
-					continue;
-				}
+			// check if the date is before today
+			if(isSoonerDate(item.date, today)) return;
 
-				taken.push(item);
-			}
-
-			return taken;
+			return true;
 		}
 	},
 	{
@@ -92,43 +85,49 @@ lifeLine.nav.register({
 					return 0;
 				});
 
-				if(match.manualFilter) {
-					data = match.manualFilter(data);
-				}
-				// remove completed items
-				else {
-					data = data.filter(match.filter);
+				// the context for the filter function
+				var ctx;
+
+				if(match.createCtx) {
+					ctx = match.createCtx();
 				}
 
-				// the last item rendered
-				var last;
+				// run the filter function
+				data = data.filter(item => match.filter(item, ctx));
+
+				// make the groups
+				var groups = {};
 
 				// render the list
 				data.forEach((item, i) => {
-					// render the headers
-					if(i === 0 || !isSameDate(item.date, last.date)) {
-						lifeLine.makeDom({
-							parent: content,
-							classes: "list-header",
-							text: stringifyDate(item.date)
-						});
+					// get the header name
+					var dateStr = stringifyDate(item.date);
+
+					// make sure the header exists
+					groups[dateStr] || (groups[dateStr] = []);
+
+					// add the item to the list
+					var items = [
+						{ text: item.name, grow: true },
+						item.class
+					];
+
+					// show the end time for any non 11:59pm times
+					if(item.date.getHours() != 23 || item.date.getMinutes() != 59) {
+						items.splice(1, 0, stringifyTime(item.date));
 					}
 
-					// make this the last item
-					last = item;
-
-					// render the item
-					lifeLine.makeDom({
-						parent: content,
-						classes: "list-item",
-						children: [
-							{ classes: "list-item-name", text: item.name },
-							{ classes: "list-item-class", text: item.class }
-						],
-						on: {
-							click: () => lifeLine.nav.navigate("/item/" + item.id)
-						}
+					groups[dateStr].push({
+						href: `/item/${item.id}`,
+						items
 					});
+				});
+
+				// display all items
+				lifeLine.makeDom({
+					parent: content,
+					widget: "list",
+					items: groups
 				});
 			})
 		);

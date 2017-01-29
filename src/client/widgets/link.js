@@ -11,6 +11,9 @@ lifeLine.makeDom.register("link", {
 			},
 			on: {
 				click: e => {
+					// don't over ride ctrl or alt or shift clicks
+					if(e.ctrlKey || e.altKey || e.shiftKey) return;
+
 					// don't navigate the page
 					e.preventDefault();
 
