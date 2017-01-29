@@ -74,11 +74,22 @@ lifeLine.nav.register({
 				// set the page title
 				setTitle(match.title);
 
+				// the context for the filter function
+				var ctx;
+
+				if(match.createCtx) {
+					ctx = match.createCtx();
+				}
+
+				// run the filter function
+				data = data.filter(item => match.filter(item, ctx));
+
 				// sort the assingments
 				data.sort((a, b) => {
 					// tasks are below assignments
 					if(a.type == "task" && b.type != "task") return 1;
 					if(a.type != "task" && b.type == "task") return -1;
+					//if(a.type == "task" || b.type == "task") return 0;
 
 					// sort by due date
 					if(a.type == "assignment" && b.type == "assignment") {
@@ -93,16 +104,6 @@ lifeLine.nav.register({
 
 					return 0;
 				});
-
-				// the context for the filter function
-				var ctx;
-
-				if(match.createCtx) {
-					ctx = match.createCtx();
-				}
-
-				// run the filter function
-				data = data.filter(item => match.filter(item, ctx));
 
 				// make the groups
 				var groups = {};
