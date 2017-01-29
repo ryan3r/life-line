@@ -14,7 +14,7 @@ const LISTS = [
 		title: "Today",
 		createCtx: () => new Date(),
 		// show all at reasonable number of incomplete assignments
-		filter: (item, today) => !item.done && isSameDate(today, item.date)
+		filter: (item, today) => !item.done && (item.type == "task" || isSameDate(today, item.date))
 	},
 	{
 		url: "/week",
@@ -29,6 +29,9 @@ const LISTS = [
 		filter: (item, {today, endDate}) => {
 			// already done
 			if(item.done) return;
+
+			// show all tasks
+			if(item.type == "task") return true;
 
 			// check if the item is past this week
 			if(!isSoonerDate(item.date, endDate) && !isSameDate(item.date, endDate)) return;
@@ -73,9 +76,15 @@ lifeLine.nav.register({
 
 				// sort the assingments
 				data.sort((a, b) => {
-					// different dates
-					if(a.date.getTime() != b.date.getTime()) {
-						return a.date.getTime() - b.date.getTime();
+					// tasks are below assignments
+					if(a.type == "task" && b.type != "task") return 1;
+					if(a.type != "task" && b.type == "task") return -1;
+
+					// sort by due date
+					if(a.type == "assignment" && b.type == "assignment") {
+						if(a.date.getTime() != b.date.getTime()) {
+							return a.date.getTime() - b.date.getTime();
+						}
 					}
 
 					// order by name
@@ -101,20 +110,24 @@ lifeLine.nav.register({
 				// render the list
 				data.forEach((item, i) => {
 					// get the header name
-					var dateStr = stringifyDate(item.date);
+					var dateStr = item.type == "task" ? "Tasks" : stringifyDate(item.date);
 
 					// make sure the header exists
 					groups[dateStr] || (groups[dateStr] = []);
 
 					// add the item to the list
 					var items = [
-						{ text: item.name, grow: true },
-						item.class
+						{ text: item.name, grow: true }
 					];
 
-					// show the end time for any non 11:59pm times
-					if(item.date.getHours() != 23 || item.date.getMinutes() != 59) {
-						items.splice(1, 0, stringifyTime(item.date));
+					if(item.type != "task") {
+						// show the end time for any non 11:59pm times
+						if(item.date.getHours() != 23 || item.date.getMinutes() != 59) {
+							items.push(stringifyTime(item.date));
+						}
+
+						// show the class
+						items.push(item.class);
 					}
 
 					groups[dateStr].push({

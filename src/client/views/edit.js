@@ -59,6 +59,12 @@ lifeLine.nav.register({
 				// parse the date
 				item.date = new Date(item.date);
 
+				// remove assignemnt fields from tasks
+				if(item.type == "task") {
+					delete item.date;
+					delete item.class;
+				}
+
 				// add a button back to the view
 				if(!actionSub) {
 					actionSub = lifeLine.addAction("View", () => lifeLine.nav.navigate("/item/" + item.id));
@@ -74,6 +80,18 @@ lifeLine.nav.register({
 
 				// save the changes
 				assignments.set(item, changeSub);
+			};
+
+			// hide and show specific fields for different assignment types
+			var toggleFields = () => {
+				if(item.type == "task") {
+					mapped.classField.style.display = "none";
+					mapped.dateField.style.display = "none";
+				}
+				else {
+					mapped.classField.style.display = "";
+					mapped.dateField.style.display = "";
+				}
 			};
 
 			// render the ui
@@ -105,6 +123,9 @@ lifeLine.nav.register({
 									// update the item type
 									item.type = type;
 
+									// hide/show specific fields
+									toggleFields();
+
 									// emit the change
 									change();
 								}
@@ -112,6 +133,7 @@ lifeLine.nav.register({
 						]
 					},
 					{
+						name: "classField",
 						classes: "editor-row",
 						children: [
 							{
@@ -123,6 +145,7 @@ lifeLine.nav.register({
 						]
 					},
 					{
+						name: "dateField",
 						classes: "editor-row",
 						children: [
 							{
@@ -159,6 +182,9 @@ lifeLine.nav.register({
 					}
 				]
 			});
+
+			// show the fields for this item type
+			toggleFields();
 		});
 
 		// remove the subscription when this view is destroyed
