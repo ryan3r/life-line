@@ -60,7 +60,7 @@ lifeLine.nav.register({
 				// find the date and time inputs
 				var dateInput = document.querySelector("input[type=date]");
 				var timeInput = document.querySelector("input[type=time]");
-				
+
 				// parse the date
 				item.date = new Date(dateInput.value + " " + timeInput.value);
 
@@ -156,13 +156,13 @@ lifeLine.nav.register({
 							{
 								widget: "input",
 								type: "date",
-								value: `${item.date.getFullYear()}-${pad(item.date.getMonth() + 1)}-${pad(item.date.getDate())}`,
+								value: item.date && `${item.date.getFullYear()}-${pad(item.date.getMonth() + 1)}-${pad(item.date.getDate())}`,
 								change
 							},
 							{
 								widget: "input",
 								type: "time",
-								value: `${item.date.getHours()}:${pad(item.date.getMinutes())}`,
+								value: item.date && `${item.date.getHours()}:${pad(item.date.getMinutes())}`,
 								change
 							}
 						]
