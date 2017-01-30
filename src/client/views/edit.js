@@ -97,6 +97,15 @@ lifeLine.nav.register({
 					mapped.classField.style.display = "";
 					mapped.dateField.style.display = "";
 				}
+
+				// fill in date if it is missing
+				if(!item.date) {
+					item.date = genDate();
+				}
+
+				if(!item.class) {
+					item.class = "Class";
+				}
 			};
 
 			// render the ui
