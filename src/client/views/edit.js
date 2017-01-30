@@ -44,7 +44,8 @@ lifeLine.nav.register({
 					date: genDate(),
 					id: match[1],
 					description: "",
-					modified: Date.now()
+					modified: Date.now(),
+					type: "assignment"
 				};
 			}
 
@@ -56,8 +57,12 @@ lifeLine.nav.register({
 				// update the modified date
 				item.modified = Date.now();
 
+				// find the date and time inputs
+				var dateInput = document.querySelector("input[type=date]");
+				var timeInput = document.querySelector("input[type=time]");
+				
 				// parse the date
-				item.date = new Date(item.date);
+				item.date = new Date(dateInput.value + " " + timeInput.value);
 
 				// remove assignemnt fields from tasks
 				if(item.type == "task") {
@@ -152,16 +157,12 @@ lifeLine.nav.register({
 								widget: "input",
 								type: "date",
 								value: `${item.date.getFullYear()}-${pad(item.date.getMonth() + 1)}-${pad(item.date.getDate())}`,
-								bind: item,
-								prop: "date",
 								change
 							},
 							{
 								widget: "input",
 								type: "time",
 								value: `${item.date.getHours()}:${pad(item.date.getMinutes())}`,
-								bind: item,
-								prop: "time",
 								change
 							}
 						]
