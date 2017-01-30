@@ -42,7 +42,7 @@ lifeLine.nav.register({
 								text: "Go home."
 							}
 						]
-					})
+					});
 
 					return;
 				}
