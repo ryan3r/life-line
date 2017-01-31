@@ -1,39 +1,25 @@
-var http = require("http");
-var https = require("https");
-var fs = require("fs");
+/**
+ * Create a backup or start the server
+ */
+
 var path = require("path");
-var pkg = require("../../package.json");
+var fs = require("fs");
 
-import {handler} from "./handler";
+import startServer from "./server";
+import backup from "./backup";
+import {genBackupName} from "../common/backup";
 
-import "../common/global";
-import "./global";
-
-// start the server
 export default function start(devMode) {
-	// make the value globally accessable
-	lifeLine.devMode = devMode;
-	// store the version
-	lifeLine.version = pkg.version;
+	// check for the backup command
+	if(process.argv[2] == "backup") {
+		var backupPath = path.join(process.argv[3], genBackupName());
 
-	// dev mode
-	if(devMode) {
-		let server = http.createServer(handler);
-
-		// start the server
-		server.listen(8080, "localhost", () => console.log("Listening on localhost"));
+		// build and save the backup
+		backup()
+			.pipe(fs.createWriteStream(backupPath));
 	}
-	// production
+	// start the server
 	else {
-		// load the keys
-		var keys = {
-			key: fs.readFileSync(path.join(__dirname, "../../../cert/key.pem")),
-			cert: fs.readFileSync(path.join(__dirname, "../../../cert/cert.pem"))
-		};
-
-		let server = https.createServer(keys, handler);
-
-		// start the server
-		server.listen(443, () => console.log("Server started"));
+		startServer(devMode);
 	}
 };
