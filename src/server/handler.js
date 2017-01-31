@@ -7,6 +7,8 @@ var path = require("path");
 import Request from "./request";
 import * as dataStore from "./data-store";
 import * as auth from "./auth";
+import backup from "./backup";
+import Response from "./response";
 
 const NO_RESPONSE = "No response returned by the handler";
 
@@ -23,6 +25,13 @@ export function handler(req, res) {
 	// the login api
 	else if(request.url.substr(0, 10) == "/api/auth/") {
 		response = auth.handle(request.url.substr(10), request);
+	}
+	// create and send the archive
+	else if(request.url.substr(0, 11) == "/api/backup") {
+		response = new Response({
+			extension: ".zip",
+			body: backup()
+		});
 	}
 	// serve static pages
 	else if(request.url.substr(0, 8) == "/static/") {

@@ -79,8 +79,14 @@ export default class Response {
 		// send the headers
 		res.writeHead(this.status, headers);
 
+		// stream the body
+		if(typeof this.body.pipe == "function") {
+			this.body.pipe(res);
+		}
 		// send the body
-		res.end(this.body);
+		else {
+			res.end(this.body);
+		}
 	}
 
 	// create a redirect response
