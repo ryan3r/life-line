@@ -28,9 +28,22 @@ export function handler(req, res) {
 	}
 	// create and send the archive
 	else if(request.url.substr(0, 11) == "/api/backup") {
-		response = new Response({
-			extension: ".zip",
-			body: backup()
+		// verify the user
+		response = auth.getLoggedInUser(request)
+
+		.then(user => {
+			 // not logged in
+			if(!user) {
+				return new Response({
+					status: 401,
+					body: "Not authenticated"
+				});
+			}
+
+			return new Response({
+				extension: ".zip",
+				body: backup()
+			});
 		});
 	}
 	// serve static pages
