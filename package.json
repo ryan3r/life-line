@@ -12,6 +12,7 @@
   "author": "Ryan",
   "license": "ISC",
   "dependencies": {
+    "archiver": "^1.3.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-check-es2015-constants": "^6.8.0",
     "babel-plugin-transform-es2015-arrow-functions": "^6.8.0",

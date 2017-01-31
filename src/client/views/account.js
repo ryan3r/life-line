@@ -2,6 +2,8 @@
  * A view for accessing/modifying information about the current user
  */
 
+import {genBackupName} from "../../common/backup";
+
 lifeLine.nav.register({
 	matcher: /^(?:\/user\/(.+?)|\/account)$/,
 
@@ -62,6 +64,21 @@ lifeLine.nav.register({
 						text: "View all users"
 					});
 				}
+			}
+
+			// create a backup link
+			if(!match[1]) {
+				children.push({ tag: "br" });
+				children.push({ tag: "br" });
+
+				children.push({
+					tag: "a",
+					text: "Download backup",
+					attrs: {
+						href: "/api/backup",
+						download: genBackupName()
+					}
+				});
 			}
 
 			var passwordChange = {};
