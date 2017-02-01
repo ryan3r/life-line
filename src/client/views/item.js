@@ -59,7 +59,7 @@ lifeLine.nav.register({
 					item.modified = Date.now();
 
 					// save the change
-					assignments.set(item);
+					assignments.set(item, [], { saveNow: true });
 				});
 
 				// edit the item

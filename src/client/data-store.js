@@ -138,14 +138,16 @@ class Store extends lifeLine.EventEmitter {
 	}
 
 	// store a value in the store
-	set(value, skips) {
+	set(value, skips, opts = {}) {
 		// store the value in the cache
 		this._cache[value.id] = value;
 
 		// save the item
-		debounce(value.id, () => {
-			this._request("put", `${this.name}/${value.id}`, value);
-		});
+		var save = () => this._request("put", `${this.name}/${value.id}`, value);
+
+		// don't wait to send the changes to the server
+		if(opts.saveNow) save();
+		else debounce(`${this.name}/${value.id}`, save);
 
 		// emit a change
 		this.partialEmit("change", skips);
@@ -161,6 +163,28 @@ class Store extends lifeLine.EventEmitter {
 
 		// emit a change
 		this.partialEmit("change", skips);
+	}
+
+	// force saves to go through
+	forceSave() {
+		for(let timer of Object.getOwnPropertyNames(debounceTimers)) {
+			// only save items from this data store
+			if(timer.indexOf(`${this.name}/`) === 0) {
+				continue;
+			}
+
+			// look up the timer id
+			let id = timer.substr(timer.indexOf("/") + 1);
+
+			// send the save
+			this._request("put", timer, this._cache[id]);
+
+			// clear the timer
+			clearTimeout(timer);
+
+			// remove the timer from the list
+			delete debounceTimers[timer];
+		}
 	}
 }
 

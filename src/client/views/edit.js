@@ -13,6 +13,11 @@ lifeLine.nav.register({
 	make({match, content, setTitle, disposable}) {
 		var actionSub, deleteSub;
 
+		// push the changes through when the page is closed
+		disposable.add({
+			unsubscribe: () => assignments.forceSave()
+		});
+
 		var changeSub = assignments.get(match[1], function(item) {
 			// clear the content
 			content.innerHTML = "";
