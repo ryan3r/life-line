@@ -10,13 +10,6 @@ var assignments = store("assignments");
 // all the different lists
 const LISTS = [
 	{
-		url: "/",
-		title: "Today",
-		createCtx: () => new Date(),
-		// show all at reasonable number of incomplete assignments
-		filter: (item, today) => !item.done && (item.type == "task" || isSameDate(today, item.date))
-	},
-	{
 		url: "/week",
 		title: "This week",
 		createCtx: () => ({
