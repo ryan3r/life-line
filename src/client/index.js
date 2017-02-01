@@ -17,6 +17,7 @@ import "./views/edit";
 import "./views/login";
 import "./views/account";
 import "./views/users";
+import "./views/todo";
 
 // set up the data store
 import {store} from "./data-store";
@@ -36,6 +37,9 @@ lifeLine.makeDom({
 		{ widget: "content" }
 	]
 });
+
+// Add a link to the toda/home page
+lifeLine.addNavCommand("Todo", "/");
 
 // add list views to the navbar
 initNavBar();
