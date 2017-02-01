@@ -4,6 +4,7 @@
 
 var levelup = require("levelup");
 var path = require("path");
+var fs = require("fs");
 
 // the data storage directory
 const DATA_DIR = path.join(__dirname, "..", "..", "..", "life-line-data");
@@ -30,7 +31,7 @@ export function handle(url, req) {
 
 		// get the entire data store
 		if(!key) {
-			store.getAll()
+			return store.getAll()
 				.then(data => lifeLine.jsend.success(data));
 		}
 
@@ -59,13 +60,24 @@ export function handle(url, req) {
 	});
 };
 
+var dbs = new Map();
+
 // wrap level db in a promise based api
 export class Store {
 	constructor(name) {
-		// open the database
-		this.db = levelup(path.join(DATA_DIR, storeName), {
-			valueEncoding: "json"
-		});
+		// use an existing levelup instance
+		if(dbs.has(name)) {
+			this.db = dbs.get(name);
+		}
+		else {
+			// open the database
+			this.db = levelup(path.join(DATA_DIR, name), {
+				valueEncoding: "json"
+			});
+
+			// cache the levelup instance
+			dbs.set(name, this.db);
+		}
 	}
 
 	// get all items in the database
