@@ -2,7 +2,7 @@
  * A collection of data stores
  */
 
-var fs = require("fs-promise");
+var levelup = require("levelup");
 var path = require("path");
 
 // the data storage directory
@@ -20,7 +20,7 @@ export function handle(url, req) {
 	// breakdown store/key
 	var [storeName, key] = url.split("/");
 	// get the data store
-	var store =	exports.store(storeName);
+	var store = new Store(storeName);
 
 	return auth.getLoggedInUser(req)
 
@@ -30,37 +30,28 @@ export function handle(url, req) {
 
 		// get the entire data store
 		if(!key) {
-			return store.getAll()
-
-			.then(data => {
-				// convert the response to jsend
-				return lifeLine.jsend.success(data);
-			})
+			store.getAll()
+				.then(data => lifeLine.jsend.success(data));
 		}
 
 		// get a value
 		if(req.method == "GET") {
 			return store.get(key)
-
-			.then(data => {
-				// convert the response to jsend
-				if(data) return lifeLine.jsend.success(data);
-				else return lifeLine.jsend.fail({ reason: "not-found" });
-			});
+				.then(data => lifeLine.jsend.success(data));
 		}
 		// store a value
 		else if(req.method == "PUT") {
 			return req.json()
 
 			// store the value
-			.then(data => store.set(key, data))
+			.then(data => store.put(key, data))
 
 			// convert to jsend
 			.then(() => lifeLine.jsend.success());
 		}
 		// remove a value
 		else if(req.method == "DELETE") {
-			return store.delete(key)
+			return store.del(key)
 
 			// convert to jsend
 			.then(() => lifeLine.jsend.success());
@@ -68,72 +59,75 @@ export function handle(url, req) {
 	});
 };
 
-// the cache for data stores
-var storeCache = new Map();
-
-// get a data store instance
-export function store(name) {
-	// use the cached version
-	if(storeCache.has(name)) {
-		return storeCache.get(name);
-	}
-
-	var store = new Store(name);
-
-	// cache the refrence
-	storeCache.set(name, store);
-
-	return store;
-};
-
-// an instance of a data store
-var Store = class {
+// wrap level db in a promise based api
+export class Store {
 	constructor(name) {
-		this.name = name;
-
-		// ensure the data store exists
-		if(!fs.existsSync(path.join(DATA_DIR, name))) {
-			fs.mkdirSync(path.join(DATA_DIR, name));
-		}
-	}
-
-	// get the entire contents of a data store
-	getAll() {
-		return fs.readdir(path.join(DATA_DIR, this.name))
-
-		.then(files => {
-			return Promise.all(
-				files.map(key => {
-					// remove the .json
-					key = key.substr(0, key.length - 5);
-
-					return this.get(key);
-				})
-			);
+		// open the database
+		this.db = levelup(path.join(DATA_DIR, storeName), {
+			valueEncoding: "json"
 		});
 	}
 
-	// get a stored value
+	// get all items in the database
+	getAll() {
+		let stream = this.db.createValueStream();
+		let values = [];
+
+		// collect the values
+		stream.on("data", value => values.push(value));
+
+		// send the values back when we are done
+		return new Promise(function(resolve, reject) {
+			// success
+			stream.on("end", () => resolve(values));
+			// error
+			stream.on("error", err => reject(err));
+		});
+	}
+
+	// get an item from the database
 	get(key) {
-		return fs.readFile(path.join(DATA_DIR, this.name, key + ".json"), "utf8")
+		var {promise, callback} = this._createCb();
 
-		// parse the data
-		.then(data => data && JSON.parse(data))
+		// get the value
+		this.db.get(key, callback);
 
-		// swallow not found errors
-		.catch(() => {});
+		return promise;
 	}
 
-	// store a value
-	set(key, value) {
-		// serialize the json
-		var raw = typeof value == "string" ? value : JSON.stringify(value);
+	// store an item in the database
+	put(key, value) {
+		var {promise, callback} = this._createCb();
 
-		return fs.writeFile(path.join(DATA_DIR, this.name, key + ".json"), raw);
+		// get the value
+		this.db.put(key, value, callback);
+
+		return promise;
 	}
 
-	// delete a value
-	delete(key) {
-		return fs.unlink(path.join(DATA_DIR, this.name, key + ".json"));
+	// remove an item from the database
+	del(key) {
+		var {promise, callback} = this._createCb();
+
+		// get the value
+		this.db.del(key, callback);
+
+		return promise;
 	}
-};
+
+	// create a callback and corrisponding Promise
+	_createCb() {
+		var callback;
+
+		// wrap the callback
+		var promise = new Promise(function(resolve, reject) {
+			callback = function(err, value) {
+				// handle error cases
+				if(err) reject(err);
+				else resolve(value);
+			};
+		});
+
+		return {promise, callback};
+	}
+}
