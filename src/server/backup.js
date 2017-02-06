@@ -5,10 +5,10 @@
 var fs = require("fs");
 var archiver = require("archiver");
 
-import {Store} from "./data-store";
+import {store} from "./data-store";
 
 // get the assignments data store
-var assignments = new Store("assignments");
+var assignments = store("assignments");
 
 // create a backup archive
 export default function backup() {
