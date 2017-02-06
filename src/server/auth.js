@@ -4,11 +4,11 @@
 
 var passwordLib = require("password-hash-and-salt");
 
-import {Store} from "./data-store";
+import {store} from "./data-store";
 
 // data stores for tracking users
-var users = new Store("users");
-var sessions = new Store("sessions");
+var users = store("users");
+var sessions = store("sessions");
 
 // the amount of time a session should live for (1 month)
 const SESSION_LIFETIME = 30 * 24 * 60 * 60 * 1000;
@@ -41,7 +41,7 @@ export function handle(url, req) {
 					var {session, cookie, id} = generateSession(login.username);
 
 					// save the session
-					return sessions.put(id, session)
+					return sessions.set(id, session)
 
 					// send the cookie and success response
 					.then(() => new lifeLine.Response({
@@ -216,7 +216,7 @@ export function handle(url, req) {
 
 				// save the changes
 				var save = () =>
-					users.put(req.query.username, targetUser)
+					users.set(req.query.username, targetUser)
 
 					// send back a succes response
 					.then(() => lifeLine.jsend.success());
