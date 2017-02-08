@@ -13,6 +13,9 @@ if(!fs.existsSync(DATA_DIR)) {
 	fs.mkdirSync(DATA_DIR);
 }
 
+// web accessable data stores
+const WEB_ACCESSABLE = ["assignments"];
+
 // the http handler for data stores
 export function handle(url, req) {
 	var auth = require("./auth");
@@ -27,6 +30,11 @@ export function handle(url, req) {
 	.then(user => {
 		// not logged in
 		if(!user) return lifeLine.jsend.fail({ reason: "logged-out" });
+
+		// don't allow web services to access users or sessions
+		if(WEB_ACCESSABLE.indexOf(storeName) === -1) {
+			return lifeLine.jsend.fail({ reason: "access-denied" });
+		}
 
 		// get the entire data store
 		if(!key) {
