@@ -5,6 +5,10 @@
 const DEBOUNCE_TIME = 2000;
 const DATA_STORE_ROOT = "/api/data/";
 
+var idb = require("idb");
+
+// all valid data stores
+const DATA_STORES = ["assignments"];
 // cache data store instances
 var stores = {};
 
@@ -20,6 +24,9 @@ export function store(name) {
 	// cache the data store instance
 	stores[name] = store;
 
+	// tell any listeners the store has been created
+	lifeLine.emit("data-store-created", store);
+
 	return store;
 };
 
@@ -30,6 +37,16 @@ class Store extends lifeLine.EventEmitter {
 		this._cache = {};
 		// don't send duplicate requests
 		this._requesting = [];
+		// promise for the database
+		this._db = idb.open("data-stores", 1, db => {
+			// upgrade or create the db
+			switch(db.oldVersion) {
+				// NOTE: We want cases to fall through so all setup is completed
+				case 0:
+					for(let name of DATA_STORES)
+						db.createObjectStore(name, { keyPath: "id" });
+			}
+		});
 	}
 
 	// set the function to deserialize all data from the server
@@ -38,7 +55,7 @@ class Store extends lifeLine.EventEmitter {
 	}
 
 	// send a request to the server
-	_request(method, url, body) {
+	/*_request(method, url, body) {
 		url = DATA_STORE_ROOT + url;
 
 		// don't duplicate requests
@@ -106,15 +123,28 @@ class Store extends lifeLine.EventEmitter {
 				lifeLine.nav.navigate("/login");
 			}
 		});
-	}
+	}*/
 
 	// get all the items and listen for any changes
 	getAll(fn) {
 		// go to the cache first
 		fn(arrayFromObject(this._cache));
 
-		// send a request to the server for the items
-		this._request("get", this.name);
+		// load items from idb
+		this._db.then(db => {
+			db.transaction(this.name)
+				.objectStore(this.name)
+				.getAll()
+				.then(all => {
+					// store items in the cache
+					for(let item of all) {
+						this._cache[item.id] = item;
+					}
+
+					// notify listeners we loaded the data
+					this.emit("change");
+				});
+		});
 
 		// listen for any changes
 		return this.on("change", () => {
@@ -128,8 +158,21 @@ class Store extends lifeLine.EventEmitter {
 		// go to the cache first
 		fn(this._cache[id]);
 
-		// send a request to the server for the item
-		this._request("get", this.name + "/" + id);
+		// load the item from idb
+		this._db.then(db => {
+			db.transaction(this.name)
+				.objectStore(this.name)
+				.get(id)
+				.then(item => {
+					if(item) {
+						// store item in the cache
+						this._cache[item.id] = item;
+
+						// notify listeners we loaded the data
+						this.emit("change");
+					}
+				});
+		});
 
 		// listen for any changes
 		return this.on("change", () => {
@@ -143,7 +186,14 @@ class Store extends lifeLine.EventEmitter {
 		this._cache[value.id] = value;
 
 		// save the item
-		var save = () => this._request("put", `${this.name}/${value.id}`, value);
+		var save = () => {
+			// save the item in the db
+			this._db.then(db => {
+				db.transaction(this.name, "readwrite")
+					.objectStore(this.name)
+					.put(value);
+			});
+		};
 
 		// don't wait to send the changes to the server
 		if(opts.saveNow) save();
@@ -151,6 +201,8 @@ class Store extends lifeLine.EventEmitter {
 
 		// emit a change
 		this.partialEmit("change", skips);
+
+		this.partialEmit("sync", skips);
 	}
 
 	// remove a value from the store
@@ -158,11 +210,18 @@ class Store extends lifeLine.EventEmitter {
 		// remove the value from the cache
 		delete this._cache[id];
 
-		// send the delete request
-		this._request("delete", `${this.name}/${id}`);
+		// delete the item
+		// load items from idb
+		this._db.then(db => {
+			db.transaction(this.name, "readwrite")
+			.objectStore(this.name)
+			.delete(id);
+		});
 
 		// emit a change
 		this.partialEmit("change", skips);
+
+		this.partialEmit("sync", skips);
 	}
 
 	// force saves to go through
@@ -176,14 +235,20 @@ class Store extends lifeLine.EventEmitter {
 			// look up the timer id
 			let id = timer.substr(timer.indexOf("/") + 1);
 
-			// send the save
-			this._request("put", timer, this._cache[id]);
+			// save the item in the db
+			this._db.then(db => {
+				db.transaction(this.name, "readwrite")
+					.objectStore(this.name)
+					.put(value);
+			});
 
 			// clear the timer
 			clearTimeout(timer);
 
 			// remove the timer from the list
 			delete debounceTimers[timer];
+
+			this.emit("sync");
 		}
 	}
 }
