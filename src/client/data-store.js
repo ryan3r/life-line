@@ -193,6 +193,9 @@ class Store extends lifeLine.EventEmitter {
 					.objectStore(this.name)
 					.put(value);
 			});
+
+			// sync the changes to the server
+			this.partialEmit("sync", skips);
 		};
 
 		// don't wait to send the changes to the server
@@ -201,8 +204,6 @@ class Store extends lifeLine.EventEmitter {
 
 		// emit a change
 		this.partialEmit("change", skips);
-
-		this.partialEmit("sync", skips);
 	}
 
 	// remove a value from the store
@@ -221,6 +222,7 @@ class Store extends lifeLine.EventEmitter {
 		// emit a change
 		this.partialEmit("change", skips);
 
+		// sync the changes to the server
 		this.partialEmit("sync", skips);
 	}
 
@@ -248,6 +250,7 @@ class Store extends lifeLine.EventEmitter {
 			// remove the timer from the list
 			delete debounceTimers[timer];
 
+			// sync the changes to the server
 			this.emit("sync");
 		}
 	}
