@@ -57,7 +57,24 @@ var download = function() {
 			})
 		)
 
-		.then(() => console.log("Update complete"));
+		// notify the client(s) of the update
+		.then(() => notifyClients(version));
+	});
+};
+
+// notify the client(s) of an update
+var notifyClients = function(version) {
+	// get all the clients
+	return clients.matchAll({})
+
+	.then(clients => {
+		for(let client of clients) {
+			// send the version
+			client.postMessage({
+				type: "version-change",
+				version
+			});
+		}
 	});
 };
 
