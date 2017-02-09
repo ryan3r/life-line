@@ -13,14 +13,12 @@ if(!fs.existsSync(DATA_DIR)) {
 	fs.mkdirSync(DATA_DIR);
 }
 
+// web accessable data stores
+const WEB_ACCESSABLE = ["assignments"];
+
 // the http handler for data stores
 export function handle(url, req) {
 	var auth = require("./auth");
-
-	// breakdown store/key
-	var [storeName, key] = url.split("/");
-	// get the data store
-	var store =	exports.store(storeName);
 
 	return auth.getLoggedInUser(req)
 
@@ -28,42 +26,155 @@ export function handle(url, req) {
 		// not logged in
 		if(!user) return lifeLine.jsend.fail({ reason: "logged-out" });
 
-		// get the entire data store
-		if(!key) {
-			return store.getAll()
-
-			.then(data => {
-				// convert the response to jsend
-				return lifeLine.jsend.success(data);
-			})
-		}
-
-		// get a value
-		if(req.method == "GET") {
-			return store.get(key)
-
-			.then(data => {
-				// convert the response to jsend
-				if(data) return lifeLine.jsend.success(data);
-				else return lifeLine.jsend.fail({ reason: "not-found" });
-			});
-		}
-		// store a value
-		else if(req.method == "PUT") {
+		// send an array of items to save or delete
+		if(req.method == "POST") {
+			// recieve and process changes from the server
 			return req.json()
 
-			// store the value
-			.then(data => store.set(key, data))
+			.then(({changes, modifieds}) => {
+				// apply the changes individualy
+				var changePromises = changes.map(change => {
+					// don't allow web services to access users or sessions
+					if(WEB_ACCESSABLE.indexOf(change.store) === -1) {
+						return { code: "access-denied" };
+					}
 
-			// convert to jsend
-			.then(() => lifeLine.jsend.success());
-		}
-		// remove a value
-		else if(req.method == "DELETE") {
-			return store.delete(key)
+					var store = dataStore(change.store);
 
-			// convert to jsend
-			.then(() => lifeLine.jsend.success());
+					// create an item
+					if(change.type == "create") {
+						// save the date we recieved the item on
+						change.data.recieved = Date.now();
+
+						return store.set(change.data.id, change.data);
+					}
+					// put an item
+					else if(change.type == "put") {
+						// get the existing version of this item
+						return store.get(change.data.id)
+
+						.then(local => {
+							// if an item is put it does must exist on the
+							// server or it has been deleted
+							if(!local) {
+								return {
+									store: change.store,
+									id: change.data.id,
+									code: "item-deleted"
+								};
+							}
+
+							// we have a newer version
+							if(local.modified > change.data.modified) {
+								return {
+									store: change.store,
+									id: change.data.id,
+									code: "newer-version",
+									data: local
+								};
+							}
+
+							// save the date we recieved the item on
+							change.data.recieved = Date.now();
+
+							// save the changes
+							return store.set(change.data.id, change.data);
+						});
+					}
+					// delete an item
+					else if(change.type == "delete") {
+						// get the existing version of this item
+						return store.get(change.id)
+
+						.then(local => {
+							// already go no problem
+							if(!local) return;
+
+							// make sure it has not been modified since the delete
+							if(local.modified > change.timestamp) {
+								return {
+									store: change.store,
+									id: change.id,
+									code: "newer-version",
+									data: local
+								};
+							}
+
+							// delete the item
+							return store.delete(change.id);
+						});
+					}
+				});
+
+				var changeResult = Promise.all(changePromises).then(result => {
+					// remove successes (undefineds)
+					return result.filter(result => result);
+				});
+
+				// collect items that have changed since the last access
+				var pushedItems = Promise.all(
+					Object.getOwnPropertyNames(modifieds)
+
+					.map(storeName => {
+						// open the data store
+						var store = dataStore(storeName);
+
+						return store.getAll()
+
+						.then(items => {
+							var _modifieds = modifieds[storeName];
+							// changes to update the client to our state
+							var changes = [];
+
+							items.forEach(item => {
+								// item not in the client or the local is newer
+								if(!_modifieds[item.id] || _modifieds[item.id] < item.modified) {
+									changes.push({
+										code: "newer-version",
+										id: item.id,
+										store: storeName,
+										data: item
+									});
+								}
+
+								// remove items that exist on the server
+								delete _modifieds[item.id]
+							});
+
+							// delete any items that are not on the server
+							Object.getOwnPropertyNames(_modifieds)
+
+							.forEach(id => {
+								// don't send a delete if the item was just created
+								var created = changes.find(change =>
+									change.type == "create" && change.data.id == id);
+
+								if(!created) {
+									changes.push({
+										id: id,
+										store: storeName,
+										code: "item-deleted"
+									});
+								}
+							});
+
+							return changes;
+						});
+					})
+				)
+
+				// combine pushes from all data stores
+				.then(results => results.reduce((a, b) => a.concat(b), []));
+
+				return Promise.all([pushedItems, changeResult])
+
+				.then(changes => {
+					return lifeLine.jsend.success(
+						// combine the pushed items and the change responses
+						changes[0].concat(changes[1])
+					)
+				});
+			});
 		}
 	});
 };
@@ -72,7 +183,7 @@ export function handle(url, req) {
 var storeCache = new Map();
 
 // get a data store instance
-export function store(name) {
+var dataStore = function(name) {
 	// use the cached version
 	if(storeCache.has(name)) {
 		return storeCache.get(name);
@@ -85,6 +196,8 @@ export function store(name) {
 
 	return store;
 };
+
+export var store = dataStore;
 
 // an instance of a data store
 var Store = class {

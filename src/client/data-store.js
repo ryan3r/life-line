@@ -5,6 +5,8 @@
 const DEBOUNCE_TIME = 2000;
 const DATA_STORE_ROOT = "/api/data/";
 
+var idb = require("idb");
+
 // cache data store instances
 var stores = {};
 
@@ -20,6 +22,9 @@ export function store(name) {
 	// cache the data store instance
 	stores[name] = store;
 
+	// tell any listeners the store has been created
+	lifeLine.emit("data-store-created", store);
+
 	return store;
 };
 
@@ -30,6 +35,14 @@ class Store extends lifeLine.EventEmitter {
 		this._cache = {};
 		// don't send duplicate requests
 		this._requesting = [];
+		// promise for the database
+		this._db = idb.open("data-stores", 2, db => {
+			// upgrade or create the db
+			if(db.oldVersion < 1)
+				db.createObjectStore("assignments", { keyPath: "id" });
+			if(db.oldVersion < 2)
+				db.createObjectStore("sync-store", { keyPath: "id" });
+		});
 	}
 
 	// set the function to deserialize all data from the server
@@ -37,84 +50,35 @@ class Store extends lifeLine.EventEmitter {
 		this._deserializer = fn;
 	}
 
-	// send a request to the server
-	_request(method, url, body) {
-		url = DATA_STORE_ROOT + url;
-
-		// don't duplicate requests
-		if(method == "get") {
-			// already making this request
-			if(this._requesting.indexOf(url) !== -1) return;
-
-			this._requesting.push(url);
-		}
-
-		// make the actual request
-		return fetch(url, {
-			method: method,
-			credentials: "include",
-			body: body && JSON.stringify(body)
-		})
-
-		// parse the response
-		.then(res => res.json())
-
-		.then(res => {
-			// remove the lock
-			if(method == "get") {
-				var index = this._requesting.indexOf(url);
-
-				if(index !== -1) this._requesting.splice(index, 1);
-			}
-
-			// update the cache and emit a change
-			if(res.status == "success" && method == "get") {
-				// store the value in the cache
-				if(Array.isArray(res.data)) {
-					res.data.forEach(item => {
-						// deserialize the item
-						if(this._deserializer) {
-							item = this._deserializer(item) || item;
-						}
-
-						// store teh item
-						this._cache[item.id] = item
-					});
-				}
-				else {
-					let item = res.data;
-
-					// deserialize the item
-					if(this._deserializer) {
-						item = this._deserializer(item) || item;
-					}
-
-					this._cache[res.data.id] = item;
-				}
-
-				// emit a change
-				this.emit("change");
-			}
-
-			// throw the error
-			if(res.status == "error") {
-				throw new Error(res.data);
-			}
-
-			// the user is not logged in
-			if(res.status == "fail" && res.data.reason == "logged-out") {
-				lifeLine.nav.navigate("/login");
-			}
-		});
-	}
-
 	// get all the items and listen for any changes
 	getAll(fn) {
+		if(!fn) {
+			// load items from idb
+			return this._db.then(db => {
+				return db.transaction(this.name)
+					.objectStore(this.name)
+					.getAll()
+			});
+		}
+
 		// go to the cache first
 		fn(arrayFromObject(this._cache));
 
-		// send a request to the server for the items
-		this._request("get", this.name);
+		// load items from idb
+		this._db.then(db => {
+			db.transaction(this.name)
+				.objectStore(this.name)
+				.getAll()
+				.then(all => {
+					// store items in the cache
+					for(let item of all) {
+						this._cache[item.id] = item;
+					}
+
+					// notify listeners we loaded the data
+					this.emit("change");
+				});
+		});
 
 		// listen for any changes
 		return this.on("change", () => {
@@ -125,11 +89,44 @@ class Store extends lifeLine.EventEmitter {
 
 	// get a single item and listen for changes
 	get(id, fn) {
+		// just load the value from idb
+		if(!fn) {
+			// hit the cache
+			if(this._cache[id]) return Promise.resolve(this._cache[id]);
+
+			// hit idb
+			return this._db.then(db => {
+				return db.transaction(this.name)
+					.objectStore(this.name)
+					.get(id)
+					.then(item => {
+						if(typeof this._deserializer == "function") {
+							return this._deserializer(item) || item;
+						}
+
+						return item;
+					});
+			});
+		}
+
 		// go to the cache first
 		fn(this._cache[id]);
 
-		// send a request to the server for the item
-		this._request("get", this.name + "/" + id);
+		// load the item from idb
+		this._db.then(db => {
+			db.transaction(this.name)
+				.objectStore(this.name)
+				.get(id)
+				.then(item => {
+					if(item) {
+						// store item in the cache
+						this._cache[item.id] = item;
+
+						// notify listeners we loaded the data
+						this.emit("change");
+					}
+				});
+		});
 
 		// listen for any changes
 		return this.on("change", () => {
@@ -139,18 +136,35 @@ class Store extends lifeLine.EventEmitter {
 
 	// store a value in the store
 	set(value, skips, opts = {}) {
+		var isNew = !!this._cache[value.id];
+
+		// deserialize
+		if(typeof this._deserializer == "function") {
+			value = this._deserializer(value) || value;
+		}
+
 		// store the value in the cache
 		this._cache[value.id] = value;
 
 		// save the item
-		var save = () => this._request("put", `${this.name}/${value.id}`, value);
+		var save = () => {
+			// save the item in the db
+			this._db.then(db => {
+				db.transaction(this.name, "readwrite")
+					.objectStore(this.name)
+					.put(value);
+			});
 
-		// don't wait to send the changes to the server
-		if(opts.saveNow) save();
-		else debounce(`${this.name}/${value.id}`, save);
+			// sync the changes to the server
+			this.partialEmit("sync-put", skips, value, isNew);
+		};
 
 		// emit a change
 		this.partialEmit("change", skips);
+
+		// don't wait to send the changes to the server
+		if(opts.saveNow) return save();
+		else debounce(`${this.name}/${value.id}`, save);
 	}
 
 	// remove a value from the store
@@ -158,11 +172,18 @@ class Store extends lifeLine.EventEmitter {
 		// remove the value from the cache
 		delete this._cache[id];
 
-		// send the delete request
-		this._request("delete", `${this.name}/${id}`);
-
 		// emit a change
 		this.partialEmit("change", skips);
+
+		// sync the changes to the server
+		this.partialEmit("sync-delete", skips, id);
+
+		// delete the item
+		return this._db.then(db => {
+			return db.transaction(this.name, "readwrite")
+				.objectStore(this.name)
+				.delete(id);
+		});
 	}
 
 	// force saves to go through
@@ -175,15 +196,26 @@ class Store extends lifeLine.EventEmitter {
 
 			// look up the timer id
 			let id = timer.substr(timer.indexOf("/") + 1);
-
-			// send the save
-			this._request("put", timer, this._cache[id]);
+			var value = this._cache[id];
 
 			// clear the timer
 			clearTimeout(timer);
 
 			// remove the timer from the list
 			delete debounceTimers[timer];
+
+			// don't save on delete
+			if(!value) return;
+
+			// save the item in the db
+			this._db.then(db => {
+				db.transaction(this.name, "readwrite")
+					.objectStore(this.name)
+					.put(value);
+			});
+
+			// sync the changes to the server
+			this.emit("sync-put", value);
 		}
 	}
 }

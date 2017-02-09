@@ -53,3 +53,6 @@ lifeLine.addCommand("New assignment", () => {
 
 // create the logout button
 lifeLine.addNavCommand("Account", "/account");
+
+// register the service worker
+import "./sw-helper";

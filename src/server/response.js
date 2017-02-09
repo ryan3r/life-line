@@ -62,10 +62,23 @@ export default class Response {
 			}
 		}
 
+		// get the current version
+		var version = lifeLine.version;
+
+		// add the build number on update the page for every change
+		if(lifeLine.devMode) {
+			// get the path to the build info
+			let buildInfoPath = path.join(__dirname, "../../build.json");
+
+			// load and attach the build number
+			version += "@" +
+				JSON.parse(fs.readFileSync(buildInfoPath, "utf8")).buildNumber;
+		}
+
 		// convert headers back to dash case
 		var headers = {
 			// attach the server header
-			server: lifeLine.version
+			server: `life-line v${version}`
 		};
 
 		for(let key of Object.getOwnPropertyNames(this.headers)) {

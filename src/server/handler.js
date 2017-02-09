@@ -47,9 +47,14 @@ export function handler(req, res) {
 		});
 	}
 	// serve static pages
-	else if(request.url.substr(0, 8) == "/static/") {
+	else if(request.url.substr(0, 8) == "/static/" || request.url == "/service-worker.js") {
+		// get the file name
+		let file = request.url == "/service-worker.js" ?
+			"service-worker.js" :
+			request.url.substr(8);
+
 		response = lifeLine.Response.sendFile(
-			path.join(__dirname, "..", "..", "static", request.url.substr(8))
+			path.join(__dirname, "..", "..", "static", file)
 		);
 	}
 	// serve the index page
