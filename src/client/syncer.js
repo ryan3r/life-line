@@ -207,12 +207,15 @@ syncer.sync = function() {
 	});
 };
 
-// when we come back on line sync
-window.addEventListener("online", () => syncer.sync());
+// don't add event listeners in the service worker
+if(typeof window == "function") {
+	// when we come back on line sync
+	window.addEventListener("online", () => syncer.sync());
 
-// when the user navigates back sync
-window.addEventListener("visibilitychange", () => {
-	if(!document.hidden) {
-		syncer.sync();
-	}
-})
+	// when the user navigates back sync
+	window.addEventListener("visibilitychange", () => {
+		if(!document.hidden) {
+			syncer.sync();
+		}
+	});
+}
