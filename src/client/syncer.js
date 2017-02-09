@@ -174,7 +174,6 @@ syncer.sync = function() {
 			results.map((result, index) => {
 				// first result is the promise to reset the change queue
 				if(index === 0) return result;
-				console.log(result);
 
 				// delete the local copy
 				if(result.code == "item-deleted") {
