@@ -4,7 +4,7 @@
 
 import {store as dataStore} from "./data-store";
 
-window.syncStore = dataStore("sync-store");
+var syncStore = dataStore("sync-store");
 
 const STORES = ["assignments"];
 
