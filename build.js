@@ -9,52 +9,66 @@ const DEV_BUNDLE = process.argv[2] !== "-p";
 // a regular expression for parsing error messages
 const ERROR_EXPR = /^.+?: (.+?) \((\d+):(\d+)\) while parsing file: (.+?)$/;
 
-// setup the bundler
-var bundler = browserify("./src/client/index.js", {
-	cache: {},
-	packageCache: {},
-	plugin: DEV_BUNDLE ? [watchify] : [],
-	debug: DEV_BUNDLE
-});
+// a list of bundles to build
+const BUNDLES = [
+	{
+		entry: "./src/client/index.js",
+		output: "static/bundle.js"
+	},
+	{
+		entry: "./src/client/sw-index.js",
+		output: "static/service-worker.js"
+	},
+];
 
-// configure babelify
-bundler = bundler.transform("babelify");
-
-// build the bundle
-var buildBundle = function() {
-	// build
-	var buildStream = bundler.bundle();
-
-	// save
-	buildStream.pipe(fs.createWriteStream("static/bundle.js"));
-
-	// catch errors
-	buildStream.on("error", err => {
-		// break down the error message
-		var match = err.message.match(ERROR_EXPR);
-
-		// we don't understand the error message
-		if(!match) {
-			console.log("COULD NOT PARSE ERROR");
-			console.log(err.message);
-			return;
-		}
-
-		// load the file
-		var file = fs.readFileSync(match[4], "utf8");
-
-		// display the error message
-		console.log("Error:", match[1], `(${match[2]},${match[3]})`);
-		console.log(codeFrame(file, +match[2], +match[3], {
-			highlightCode: true
-		}));
+for(let bundle of BUNDLES) {
+	// setup the bundler
+	let bundler = browserify(bundle.entry, {
+		cache: {},
+		packageCache: {},
+		plugin: DEV_BUNDLE ? [watchify] : [],
+		debug: DEV_BUNDLE
 	});
-};
 
-// rebuild on refresh
-bundler.on("update", buildBundle);
-// log out the build size and time
-bundler.on("log", msg => console.log(msg));
+	// configure babelify
+	bundler = bundler.transform("babelify");
 
-// run the initial build
-buildBundle();
+	// build the bundle
+	let buildBundle = function() {
+		// build
+		var buildStream = bundler.bundle();
+
+		// save
+		buildStream.pipe(fs.createWriteStream(bundle.output));
+
+		// catch errors
+		buildStream.on("error", err => {
+			// break down the error message
+			var match = err.message.match(ERROR_EXPR);
+
+			// we don't understand the error message
+			if(!match) {
+				console.log("COULD NOT PARSE ERROR");
+				console.log(err.message);
+				return;
+			}
+
+			// load the file
+			var file = fs.readFileSync(match[4], "utf8");
+
+			// display the error message
+			console.log("Error:", match[1], `(${match[2]},${match[3]})`);
+			console.log(codeFrame(file, +match[2], +match[3], {
+				highlightCode: true
+			}));
+		});
+	};
+
+	// rebuild on refresh
+	bundler.on("update", buildBundle);
+	// log out the build size and time
+	bundler.on("log", msg => console.log(msg));
+
+	// run the initial build
+	buildBundle();
+}
