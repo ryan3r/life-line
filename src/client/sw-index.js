@@ -21,8 +21,6 @@ var clientVersion;
 
 // download a new version
 var download = function() {
-	console.log("Download new version");
-
 	// save the new version
 	var version;
 
@@ -33,7 +31,6 @@ var download = function() {
 		// download all the files
 		return Promise.all(
 			CACHED_FILES.map(url => {
-				console.log("Fetch file:", url);
 				// download the file
 				return fetch(url)
 
@@ -66,8 +63,6 @@ var download = function() {
 
 // check for updates
 var checkForUpdates = function(newVersion) {
-	console.log("Check for updates");
-
 	// if we have a version use that
 	if(newVersion) {
 		newVersion = Promise.resolve(newVersion);
@@ -97,7 +92,6 @@ var checkForUpdates = function(newVersion) {
 	.then(([newVersion, oldVersion]) => {
 		// same version do nothing
 		if(newVersion == oldVersion) {
-			console.log("Up to date");
 
 			return syncStore.set({
 				id: "version",
@@ -120,7 +114,6 @@ self.addEventListener("fetch", e => {
 
 	// just go to the server for api calls
 	if(url.substr(0, 5) == "/api/") {
-		console.log("Api call");
 
 		e.respondWith(
 			fetch(e.request, {
@@ -129,8 +122,6 @@ self.addEventListener("fetch", e => {
 
 			// network error
 			.catch(err => {
-				console.log("Network error");
-
 				// send an error response
 				return new Response(JSON.stringify({
 					status: "fail",
@@ -154,14 +145,12 @@ self.addEventListener("fetch", e => {
 	}
 	// respond from the cache
 	else {
-		console.log("Static file");
 		e.respondWith(
 			caches.match(e.request)
 
 			.then(res => {
 				// if there was no match send the index page
 				if(!res) {
-					console.log("Use index");
 					return caches.match(new Request("/"));
 				}
 

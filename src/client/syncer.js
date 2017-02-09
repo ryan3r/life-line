@@ -104,7 +104,7 @@ syncer.sync = function() {
 
 	isSyncing = true;
 
-	console.log("Sync start");
+	syncer.emit("sycn-start");
 
 	// load the change queue
 	var promises = [
@@ -203,7 +203,7 @@ syncer.sync = function() {
 			idle(syncer.sync);
 		}
 
-		console.log("Sync complete");
+		syncer.emit("sync-complete");
 	});
 };
 
