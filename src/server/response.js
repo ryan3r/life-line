@@ -65,7 +65,7 @@ export default class Response {
 		// convert headers back to dash case
 		var headers = {
 			// attach the server header
-			server: lifeLine.version
+			server: lifeLine.version + (lifeLine.devMode ? "-dev" : "")
 		};
 
 		for(let key of Object.getOwnPropertyNames(this.headers)) {
