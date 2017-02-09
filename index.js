@@ -1,5 +1,7 @@
 // set up babel
-require("babel-register");
+require("babel-register")({
+	only: /\/node_modules\/life-line\//
+});
 
 // load the server
 module.exports = require("./src/server").default;
