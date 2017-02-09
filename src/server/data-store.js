@@ -17,11 +17,9 @@ if(!fs.existsSync(DATA_DIR)) {
 const WEB_ACCESSABLE = ["assignments"];
 
 // the http handler for data stores
-export function handle(url, req) {
+export function handle(storeName, req) {
 	var auth = require("./auth");
 
-	// breakdown store/key
-	var [storeName, key] = url.split("/");
 	// get the data store
 	var store =	exports.store(storeName);
 
@@ -36,42 +34,91 @@ export function handle(url, req) {
 			return lifeLine.jsend.fail({ reason: "access-denied" });
 		}
 
-		// get the entire data store
-		if(!key) {
+		// get all items modified since ?since
+		if(req.method == "GET") {
+			let since = +req.query.since || 0;
+
 			return store.getAll()
 
-			.then(data => {
-				// convert the response to jsend
-				return lifeLine.jsend.success(data);
-			})
-		}
+			.then(items => {
+				// filter out old items
+				items = items.filter(item => item.modified > since);
 
-		// get a value
-		if(req.method == "GET") {
-			return store.get(key)
-
-			.then(data => {
-				// convert the response to jsend
-				if(data) return lifeLine.jsend.success(data);
-				else return lifeLine.jsend.fail({ reason: "not-found" });
+				return lifeLine.jsend.success(items);
 			});
 		}
-		// store a value
-		else if(req.method == "PUT") {
+		// send an array of items to save or delete
+		else if(req.method == "POST") {
 			return req.json()
 
-			// store the value
-			.then(data => store.set(key, data))
+			.then(changes => {
+				// apply the changes individualy
+				return Promise.all(
+					changes.map(change => {
+						// create an item
+						if(change.type == "create") {
+							return store.set(change.data.id, change.data);
+						}
+						// put an item
+						else if(change.type == "put") {
+							// get the existing version of this item
+							return store.get(change.data.id)
 
-			// convert to jsend
-			.then(() => lifeLine.jsend.success());
-		}
-		// remove a value
-		else if(req.method == "DELETE") {
-			return store.delete(key)
+							.then(local => {
+								// if an item is put it does must exist on the
+								// server or it has been deleted
+								if(!local) {
+									return {
+										id: change.data.id,
+										code: "item-deleted"
+									};
+								}
 
-			// convert to jsend
-			.then(() => lifeLine.jsend.success());
+								// we have a newer version
+								if(local.modified > change.data.modified) {
+									return {
+										id: change.data.id,
+										code: "newer-version",
+										data: local
+									};
+								}
+
+								// save the changes
+								return store.set(change.data.id, change.data);
+							});
+						}
+						// delete an item
+						else if(change.type == "delete") {
+							// get the existing version of this item
+							return store.get(change.id)
+
+							.then(local => {
+								// already go no problem
+								if(!local) return;
+
+								// make sure it has not been modified since the delete
+								if(local.modified > change.timestamp) {
+									return {
+										id: change.id,
+										code: "newer-version",
+										data: local
+									};
+								}
+
+								// delete the item
+								return store.delete(change.id);
+							});
+						}
+					})
+				)
+
+				.then(result => {
+					// remove successes (undefineds)
+					result = result.filter(result => result);
+
+					return lifeLine.jsend.success(result);
+				});
+			});
 		}
 	});
 };
