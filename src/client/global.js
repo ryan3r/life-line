@@ -3,6 +3,7 @@
  */
 
 lifeLine.makeDom = require("./util/dom-maker").default;
+lifeLine.syncer = require("./syncer").syncer;
 
 // add a function for adding actions
 lifeLine.addAction = function(name, fn) {

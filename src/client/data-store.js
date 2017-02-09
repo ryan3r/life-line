@@ -7,8 +7,6 @@ const DATA_STORE_ROOT = "/api/data/";
 
 var idb = require("idb");
 
-// all valid data stores
-const DATA_STORES = ["assignments"];
 // cache data store instances
 var stores = {};
 
@@ -38,14 +36,12 @@ class Store extends lifeLine.EventEmitter {
 		// don't send duplicate requests
 		this._requesting = [];
 		// promise for the database
-		this._db = idb.open("data-stores", 1, db => {
+		this._db = idb.open("data-stores", 2, db => {
 			// upgrade or create the db
-			switch(db.oldVersion) {
-				// NOTE: We want cases to fall through so all setup is completed
-				case 0:
-					for(let name of DATA_STORES)
-						db.createObjectStore(name, { keyPath: "id" });
-			}
+			if(db.oldVersion < 1)
+				db.createObjectStore("assignments", { keyPath: "id" });
+			if(db.oldVersion < 2)
+				db.createObjectStore("sync-store", { keyPath: "id" });
 		});
 	}
 
@@ -56,6 +52,15 @@ class Store extends lifeLine.EventEmitter {
 
 	// get all the items and listen for any changes
 	getAll(fn) {
+		if(!fn) {
+			// load items from idb
+			return this._db.then(db => {
+				return db.transaction(this.name)
+					.objectStore(this.name)
+					.getAll()
+			});
+		}
+
 		// go to the cache first
 		fn(arrayFromObject(this._cache));
 
@@ -84,6 +89,26 @@ class Store extends lifeLine.EventEmitter {
 
 	// get a single item and listen for changes
 	get(id, fn) {
+		// just load the value from idb
+		if(!fn) {
+			// hit the cache
+			if(this._cache[id]) return Promise.resolve(this._cache[id]);
+
+			// hit idb
+			return this._db.then(db => {
+				return db.transaction(this.name)
+					.objectStore(this.name)
+					.get(id)
+					.then(item => {
+						if(typeof this._deserializer == "function") {
+							return this._deserializer(item) || item;
+						}
+
+						return item;
+					});
+			});
+		}
+
 		// go to the cache first
 		fn(this._cache[id]);
 
@@ -111,6 +136,13 @@ class Store extends lifeLine.EventEmitter {
 
 	// store a value in the store
 	set(value, skips, opts = {}) {
+		var isNew = !!this._cache[value.id];
+
+		// deserialize
+		if(typeof this._deserializer == "function") {
+			value = this._deserializer(value) || value;
+		}
+
 		// store the value in the cache
 		this._cache[value.id] = value;
 
@@ -124,15 +156,15 @@ class Store extends lifeLine.EventEmitter {
 			});
 
 			// sync the changes to the server
-			this.partialEmit("sync", skips);
+			this.partialEmit("sync-put", skips, value, isNew);
 		};
-
-		// don't wait to send the changes to the server
-		if(opts.saveNow) save();
-		else debounce(`${this.name}/${value.id}`, save);
 
 		// emit a change
 		this.partialEmit("change", skips);
+
+		// don't wait to send the changes to the server
+		if(opts.saveNow) return save();
+		else debounce(`${this.name}/${value.id}`, save);
 	}
 
 	// remove a value from the store
@@ -140,19 +172,18 @@ class Store extends lifeLine.EventEmitter {
 		// remove the value from the cache
 		delete this._cache[id];
 
-		// delete the item
-		// load items from idb
-		this._db.then(db => {
-			db.transaction(this.name, "readwrite")
-			.objectStore(this.name)
-			.delete(id);
-		});
-
 		// emit a change
 		this.partialEmit("change", skips);
 
 		// sync the changes to the server
-		this.partialEmit("sync", skips);
+		this.partialEmit("sync-delete", skips, id);
+
+		// delete the item
+		return this._db.then(db => {
+			return db.transaction(this.name, "readwrite")
+				.objectStore(this.name)
+				.delete(id);
+		});
 	}
 
 	// force saves to go through
@@ -165,6 +196,16 @@ class Store extends lifeLine.EventEmitter {
 
 			// look up the timer id
 			let id = timer.substr(timer.indexOf("/") + 1);
+			var value = this._cache[id];
+
+			// clear the timer
+			clearTimeout(timer);
+
+			// remove the timer from the list
+			delete debounceTimers[timer];
+
+			// don't save on delete
+			if(!value) return;
 
 			// save the item in the db
 			this._db.then(db => {
@@ -173,14 +214,8 @@ class Store extends lifeLine.EventEmitter {
 					.put(value);
 			});
 
-			// clear the timer
-			clearTimeout(timer);
-
-			// remove the timer from the list
-			delete debounceTimers[timer];
-
 			// sync the changes to the server
-			this.emit("sync");
+			this.emit("sync-put", value);
 		}
 	}
 }
