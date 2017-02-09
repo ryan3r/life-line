@@ -15,10 +15,9 @@ const CACHED_FILES = [
 ];
 
 const STATIC_CACHE = "static";
-const DELAY_TIME = 24 * 60 * 60 * 1000;
 
-// cache the last update time so we don't have to use idb as much
-var lastUpdateCheck = -1;
+// cache the version of the client
+var clientVersion;
 
 // download a new version
 var download = function() {
@@ -46,15 +45,12 @@ var download = function() {
 
 					// save the version
 					if(!version) {
-						lastUpdateCheck = Date.now();
-
-						version = res.headers.get("server");
+						version = clientVersion = res.headers.get("server");
 
 						promises.push(
 							syncStore.set({
 								id: "version",
-								value: version,
-								checked: lastUpdateCheck
+								value: version
 							})
 						);
 					}
@@ -72,12 +68,6 @@ var download = function() {
 var checkForUpdates = function(newVersion) {
 	console.log("Check for updates");
 
-	// don't check too often
-	if(lastUpdateCheck !== -1 && Date.now() - lastUpdateCheck < DELAY_TIME) {
-		console.log("Already checked (cached)");
-		return;
-	}
-
 	// if we have a version use that
 	if(newVersion) {
 		newVersion = Promise.resolve(newVersion);
@@ -89,31 +79,29 @@ var checkForUpdates = function(newVersion) {
 		.then(res => res.headers.get("server"));
 	}
 
+	var oldVersion;
+
+	// already in memory
+	if(clientVersion) {
+		oldVersion = Promise.resolve(clientVersion);
+	}
+	else {
+		oldVersion = syncStore.get("version").then((value = {}) => value.value)
+	}
+
 	return Promise.all([
 		newVersion,
-		// get the version if we have one
-		syncStore.get("version").then((value = {}) => value)
+		oldVersion
 	])
 
-	.then(([newVersion, {value: oldVersion, checked}]) => {
-		// don't check too often
-		if(Date.now() - checked < DELAY_TIME) {
-			console.log("Already checked (idb)");
-
-			lastUpdateCheck = checked;
-
-			return;
-		}
-
+	.then(([newVersion, oldVersion]) => {
 		// same version do nothing
 		if(newVersion == oldVersion) {
 			console.log("Up to date");
-			lastUpdateCheck = Date.now();
 
 			return syncStore.set({
 				id: "version",
-				value: oldVersion,
-				checked: lastUpdateCheck
+				value: oldVersion
 			});
 		}
 
