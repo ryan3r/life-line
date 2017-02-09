@@ -11,7 +11,8 @@ const CACHED_FILES = [
 	"/",
 	"/static/bundle.js",
 	"/static/style.css",
-	"/static/icon-144.png"
+	"/static/icon-144.png",
+	"/static/manifest.json"
 ];
 
 const STATIC_CACHE = "static";
