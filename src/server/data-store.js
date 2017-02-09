@@ -124,17 +124,23 @@ export function handle(url, req) {
 						.then(items => {
 							var _modifieds = modifieds[storeName];
 							// changes to update the client to our state
-							var changes = [];
+							var pushes = [];
 
 							items.forEach(item => {
 								// item not in the client or the local is newer
 								if(!_modifieds[item.id] || _modifieds[item.id] < item.modified) {
-									changes.push({
-										code: "newer-version",
-										id: item.id,
-										store: storeName,
-										data: item
-									});
+									// don't send a delete if the item was just deleted
+									let deleted = changes.find(change =>
+										change.type == "delete" && change.id == item.id);
+
+									if(!deleted) {
+										pushes.push({
+											code: "newer-version",
+											id: item.id,
+											store: storeName,
+											data: item
+										});
+									}
 								}
 
 								// remove items that exist on the server
@@ -150,7 +156,7 @@ export function handle(url, req) {
 									change.type == "create" && change.data.id == id);
 
 								if(!created) {
-									changes.push({
+									pushes.push({
 										id: id,
 										store: storeName,
 										code: "item-deleted"
@@ -158,7 +164,7 @@ export function handle(url, req) {
 								}
 							});
 
-							return changes;
+							return pushes;
 						});
 					})
 				)
