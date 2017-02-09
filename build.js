@@ -2,6 +2,7 @@ var browserify = require("browserify");
 var watchify = require("watchify");
 var fs = require("fs");
 var package = require("./package.json");
+var buildInfo = require("./build.json");
 var codeFrame = require("babel-code-frame");
 
 const DEV_BUNDLE = process.argv[2] !== "-p";
@@ -13,12 +14,13 @@ const ERROR_EXPR = /^.+?: (.+?) \((\d+):(\d+)\) while parsing file: (.+?)$/;
 const BUNDLES = [
 	{
 		entry: "./src/client/index.js",
-		output: "static/bundle.js"
+		output: "static/bundle.js",
+		updateBuildNumber: true
 	},
 	{
 		entry: "./src/client/sw-index.js",
 		output: "static/service-worker.js"
-	},
+	}
 ];
 
 for(let bundle of BUNDLES) {
@@ -67,7 +69,16 @@ for(let bundle of BUNDLES) {
 	// rebuild on refresh
 	bundler.on("update", buildBundle);
 	// log out the build size and time
-	bundler.on("log", msg => console.log(msg));
+	bundler.on("log", msg => {
+		console.log(msg);
+
+		// update the build number in the package
+		if(bundle.updateBuildNumber) {
+			++buildInfo.buildNumber;
+
+			fs.writeFileSync("build.json", JSON.stringify(buildInfo, null, "\t"));
+		}
+	});
 
 	// run the initial build
 	buildBundle();
