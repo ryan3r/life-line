@@ -16,11 +16,6 @@ export default function startServer(devMode) {
 	// store the version
 	lifeLine.version = pkg.version;
 
-	// add the build number to the version
-	if(devMode) {
-		lifeLine.version += require("../../build.json").buildNumber;
-	}
-
 	// dev mode
 	if(devMode) {
 		let server = http.createServer(handler);

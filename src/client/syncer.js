@@ -208,7 +208,7 @@ syncer.sync = function() {
 };
 
 // don't add event listeners in the service worker
-if(typeof window == "function") {
+if(typeof window == "object") {
 	// when we come back on line sync
 	window.addEventListener("online", () => syncer.sync());
 
@@ -218,4 +218,7 @@ if(typeof window == "function") {
 			syncer.sync();
 		}
 	});
+
+	// sync on startup
+	syncer.sync();
 }

@@ -74,7 +74,15 @@ for(let bundle of BUNDLES) {
 
 		// update the build number in the package
 		if(bundle.updateBuildNumber) {
-			++buildInfo.buildNumber;
+			++buildInfo.rawBuildNumber;
+
+			// use base 32 to keep the number short
+			buildInfo.buildNumber = buildInfo.rawBuildNumber.toString(36);
+
+			// loop back to 0 to keep the size down
+			if(buildInfo.buildNumber.length > 5) {
+				buildInfo.rawBuildNumber = 0;
+			}
 
 			fs.writeFileSync("build.json", JSON.stringify(buildInfo, null, "\t"));
 		}
