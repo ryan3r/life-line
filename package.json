@@ -9,7 +9,7 @@
     "start": "node ."
   },
   "repository": "ryan3r/life-line",
-  "author": "Ryan",
+  "author": "Ryan Ray <ryan314r@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "archiver": "^1.3.0",
