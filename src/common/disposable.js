@@ -2,7 +2,7 @@
  * Keep a list of subscriptions to unsubscribe from together
  */
 
-export default class Disposable {
+class Disposable {
 	constructor() {
 		this._subscriptions = [];
 	}
@@ -36,3 +36,5 @@ export default class Disposable {
 		this.add(emitter.on(event, () => this.dispose()));
 	}
 };
+
+module.exports = Disposable;

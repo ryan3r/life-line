@@ -2,14 +2,14 @@
  * Syncronize this client with the server
  */
 
-import {store as dataStore} from "./data-store";
+var dataStore = require("./data-store").store;
 
 var syncStore = dataStore("sync-store");
 
 const STORES = ["assignments"];
 
 // create the global syncer refrence
-export var syncer = new lifeLine.EventEmitter();
+var syncer = module.exports = new lifeLine.EventEmitter();
 
 // save subscriptions to data store sync events so we dont trigger our self when we sync
 var syncSubs = [];

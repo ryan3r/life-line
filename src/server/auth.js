@@ -3,8 +3,7 @@
  */
 
 var passwordLib = require("password-hash-and-salt");
-
-import {store} from "./data-store";
+var {store} = require("./data-store");
 
 // data stores for tracking users
 var users = store("users");
@@ -13,7 +12,7 @@ var sessions = store("sessions");
 // the amount of time a session should live for (1 month)
 const SESSION_LIFETIME = 30 * 24 * 60 * 60 * 1000;
 
-export function handle(url, req) {
+exports.handle = function(url, req) {
 	// login with a google account
 	if(url == "login") {
 		return req.json()
@@ -260,7 +259,7 @@ var verifyPassword = function(password, hash) {
 };
 
 // check if a user is logged in
-export function getLoggedInUser(req) {
+exports.getLoggedInUser = function(req) {
 	// no cookie no user
 	if(!req.cookies.session) return Promise.resolve();
 

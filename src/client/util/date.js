@@ -1,82 +1,82 @@
 /**
- * Date related tools
- */
+* Date related tools
+*/
 
- // check if the dates are the same day
- export function isSameDate(date1, date2) {
- 	return date1.getFullYear() == date2.getFullYear() &&
- 		date1.getMonth() == date2.getMonth() &&
- 		date1.getDate() == date2.getDate();
- };
+// check if the dates are the same day
+exports.isSameDate = function(date1, date2) {
+	return date1.getFullYear() == date2.getFullYear() &&
+		date1.getMonth() == date2.getMonth() &&
+		date1.getDate() == date2.getDate();
+};
 
- // check if a date is less than another
- export function isSoonerDate(date1, date2) {
-     // check the year first
-     if(date1.getFullYear() != date2.getFullYear()) {
-         return date1.getFullYear() < date2.getFullYear();
-     }
+// check if a date is less than another
+exports.isSoonerDate = function(date1, date2) {
+    // check the year first
+    if(date1.getFullYear() != date2.getFullYear()) {
+        return date1.getFullYear() < date2.getFullYear();
+    }
 
-     // check the month next
-     if(date1.getMonth() != date2.getMonth()) {
-         return date1.getMonth() < date2.getMonth();
-     }
+    // check the month next
+    if(date1.getMonth() != date2.getMonth()) {
+        return date1.getMonth() < date2.getMonth();
+    }
 
-     // check the day
-     return date1.getDate() < date2.getDate();
- };
+    // check the day
+    return date1.getDate() < date2.getDate();
+};
 
- // get the date days from now
- export function daysFromNow(days) {
- 	var date = new Date();
+// get the date days from now
+exports.daysFromNow = function(days) {
+	var date = new Date();
 
- 	// advance the date
- 	date.setDate(date.getDate() + days);
+	// advance the date
+	date.setDate(date.getDate() + days);
 
- 	return date;
- };
+	return date;
+};
 
- const STRING_DAYS = ["Sunday", "Monday", "Tuesday", "Wedensday", "Thursday", "Friday", "Saturday"];
+const STRING_DAYS = ["Sunday", "Monday", "Tuesday", "Wedensday", "Thursday", "Friday", "Saturday"];
 
- // convert a date to a string
- export function stringifyDate(date, opts = {}) {
+// convert a date to a string
+exports.stringifyDate = function(date, opts = {}) {
 	 var strDate, strTime = "";
 
-     // check if the date is before today
-     var beforeNow = date.getTime() < Date.now();
+    // check if the date is before today
+    var beforeNow = date.getTime() < Date.now();
 
- 	// Today
- 	if(isSameDate(date, new Date()))
- 		strDate = "Today";
+	// Today
+	if(exports.isSameDate(date, new Date()))
+		strDate = "Today";
 
- 	// Tomorrow
- 	else if(isSameDate(date, daysFromNow(1)) && !beforeNow)
- 		strDate = "Tomorrow";
+	// Tomorrow
+	else if(exports.isSameDate(date, exports.daysFromNow(1)) && !beforeNow)
+		strDate = "Tomorrow";
 
- 	// day of the week (this week)
- 	else if(isSoonerDate(date, daysFromNow(7)) && !beforeNow)
- 		strDate = STRING_DAYS[date.getDay()];
+	// day of the week (this week)
+	else if(exports.isSoonerDate(date, exports.daysFromNow(7)) && !beforeNow)
+		strDate = STRING_DAYS[date.getDay()];
 
- 	// print the date
- 	else
+	// print the date
+	else
 	 	strDate = `${STRING_DAYS[date.getDay()]} ${date.getMonth() + 1}/${date.getDate()}`;
 
 	// add the time on
-	if(opts.includeTime && !isSkipTime(date, opts.skipTimes)) {
-		return strDate + ", " + stringifyTime(date);
+	if(opts.includeTime && !exports.isSkipTime(date, opts.skipTimes)) {
+		return strDate + ", " + exports.stringifyTime(date);
 	}
 
 	return strDate;
- };
+};
 
 // check if this is one of the given skip times
-export function isSkipTime(date, skips = []) {
+exports.isSkipTime = function(date, skips = []) {
 	return skips.find(skip => {
 		return skip.hour === date.getHours() && skip.minute === date.getMinutes();
 	});
 };
 
 // convert a time to a string
-export function stringifyTime(date) {
+exports.stringifyTime = function(date) {
 	var hour = date.getHours();
 
 	// get the am/pm time

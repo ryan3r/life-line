@@ -4,14 +4,13 @@
 
 var fs = require("fs");
 var archiver = require("archiver");
-
-import {store} from "./data-store";
+var {store} = require("./data-store");
 
 // get the assignments data store
 var assignments = store("assignments");
 
 // create a backup archive
-export default function backup() {
+module.exports = function() {
 	// create the backup archive
 	var zip = archiver("zip", { store: true });
 

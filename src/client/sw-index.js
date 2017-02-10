@@ -1,8 +1,8 @@
 // create the global object
-import "../common/global";
-import "./global";
+require("../common/global");
+require("./global");
 
-import {store} from "./data-store";
+var {store} = require("./data-store");
 
 var syncStore = store("sync-store");
 

@@ -2,8 +2,8 @@
  * Display a list of upcomming assignments
  */
 
-import {daysFromNow, isSameDate, stringifyDate, stringifyTime, isSoonerDate} from "../util/date";
-import {store} from "../data-store";
+var {daysFromNow, isSameDate, stringifyDate, stringifyTime, isSoonerDate} = require("../util/date");
+var {store} = require("../data-store");
 
 var assignments = store("assignments");
 
@@ -48,7 +48,7 @@ const LISTS = [
 ];
 
 // add list view links to the navbar
-export function initNavBar() {
+exports.initNavBar = function() {
 	LISTS.forEach(list => lifeLine.addNavCommand(list.title, list.url));
 };
 

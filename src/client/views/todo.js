@@ -2,8 +2,8 @@
  * A list of things todo
  */
 
-import {daysFromNow, isSameDate, stringifyTime} from "../util/date";
-import {store} from "../data-store";
+var {daysFromNow, isSameDate, stringifyTime} = require("../util/date");
+var {store} = require("../data-store");
 
 var assignments = store("assignments");
 

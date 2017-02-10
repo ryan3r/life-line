@@ -128,7 +128,7 @@ var makeGroup = function(group) {
 // a collection of widgets
 var widgets = {};
 
-export default function make(opts) {
+var make = module.exports = function(opts) {
 	// handle a group
 	if(Array.isArray(opts) || opts.group) {
 		return makeGroup(opts);

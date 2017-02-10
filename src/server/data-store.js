@@ -6,18 +6,28 @@ var fs = require("fs-promise");
 var path = require("path");
 
 // the data storage directory
-const DATA_DIR = "life-line-data";
+var dataDir;
 
-// ensure the data dir has been created
-if(!fs.existsSync(DATA_DIR)) {
-	fs.mkdirSync(DATA_DIR);
+// the dir has been configured
+var _readyResolve;
+var ready = new Promise(resolve => _readyResolve = resolve);
+
+exports.setDataDir = dir => {
+	dataDir = dir;
+
+	// ensure the data dir has been created
+	if(!fs.existsSync(dataDir)) {
+		fs.mkdirSync(dataDir);
+	}
+
+	_readyResolve();
 }
 
 // web accessable data stores
 const WEB_ACCESSABLE = ["assignments"];
 
 // the http handler for data stores
-export function handle(url, req) {
+exports.handle = function(url, req) {
 	var auth = require("./auth");
 
 	return auth.getLoggedInUser(req)
@@ -203,22 +213,24 @@ var dataStore = function(name) {
 	return store;
 };
 
-export var store = dataStore;
+exports.store = dataStore;
 
 // an instance of a data store
 var Store = class {
 	constructor(name) {
 		this.name = name;
 
-		// ensure the data store exists
-		if(!fs.existsSync(path.join(DATA_DIR, name))) {
-			fs.mkdirSync(path.join(DATA_DIR, name));
-		}
+		ready.then(() => {
+			// ensure the data store exists
+			if(!fs.existsSync(path.join(dataDir, name))) {
+				fs.mkdirSync(path.join(dataDir, name));
+			}
+		});
 	}
 
 	// get the entire contents of a data store
 	getAll() {
-		return fs.readdir(path.join(DATA_DIR, this.name))
+		return fs.readdir(path.join(dataDir, this.name))
 
 		.then(files => {
 			return Promise.all(
@@ -234,7 +246,7 @@ var Store = class {
 
 	// get a stored value
 	get(key) {
-		return fs.readFile(path.join(DATA_DIR, this.name, key + ".json"), "utf8")
+		return fs.readFile(path.join(dataDir, this.name, key + ".json"), "utf8")
 
 		// parse the data
 		.then(data => data && JSON.parse(data))
@@ -248,11 +260,11 @@ var Store = class {
 		// serialize the json
 		var raw = typeof value == "string" ? value : JSON.stringify(value);
 
-		return fs.writeFile(path.join(DATA_DIR, this.name, key + ".json"), raw);
+		return fs.writeFile(path.join(dataDir, this.name, key + ".json"), raw);
 	}
 
 	// delete a value
 	delete(key) {
-		return fs.unlink(path.join(DATA_DIR, this.name, key + ".json"));
+		return fs.unlink(path.join(dataDir, this.name, key + ".json"));
 	}
 };

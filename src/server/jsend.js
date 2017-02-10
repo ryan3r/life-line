@@ -3,12 +3,12 @@
  */
 
 // shortcuts for the jsend methods
-export var success = data => exports.jsend("success", data);
-export var fail = msg => exports.jsend("fail", msg);
-export var error = err => exports.jsend("error", err instanceof Error ? err.message : err);
+exports.success = data => exports.jsend("success", data);
+exports.fail = msg => exports.jsend("fail", msg);
+exports.error = err => exports.jsend("error", err instanceof Error ? err.message : err);
 
 // create a jsend response
-export var jsend = function(status, data) {
+exports.jsend = function(status, data) {
 	// build the jsend message
 	var msg = {
 		status: status,

@@ -1,26 +1,26 @@
 // create the global object
-import "../common/global";
-import "./global";
+require("../common/global");
+require("./global");
 
 // load all the widgets
-import "./widgets/sidebar";
-import "./widgets/content";
-import "./widgets/link";
-import "./widgets/list";
-import "./widgets/input";
-import "./widgets/toggle-btns";
+require("./widgets/sidebar");
+require("./widgets/content");
+require("./widgets/link");
+require("./widgets/list");
+require("./widgets/input");
+require("./widgets/toggle-btns");
 
 // load all the views
-import {initNavBar} from "./views/lists";
-import "./views/item";
-import "./views/edit";
-import "./views/login";
-import "./views/account";
-import "./views/users";
-import "./views/todo";
+var {initNavBar} = require("./views/lists");
+require("./views/item");
+require("./views/edit");
+require("./views/login");
+require("./views/account");
+require("./views/users");
+require("./views/todo");
 
 // set up the data store
-import {store} from "./data-store";
+var {store} = require("./data-store");
 
 store("assignments").setInit(function(item) {
 	// parse the date
@@ -55,4 +55,4 @@ lifeLine.addCommand("New assignment", () => {
 lifeLine.addNavCommand("Account", "/account");
 
 // register the service worker
-import "./sw-helper";
+require("./sw-helper");
