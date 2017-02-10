@@ -3,12 +3,10 @@
   "version": "0.1.2",
   "description": "",
   "main": "./src/server",
-  "bin": {
-      "life-line": "./bin/life-line"
-  },
+  "bin": "./bin/life-line.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node build -p",
+    "build": "node build -p"
   },
   "repository": "ryan3r/life-line",
   "author": "Ryan Ray <ryan314r@gmail.com>",
@@ -37,6 +35,6 @@
     "babel-plugin-transform-es2015-parameters": "^6.21.0",
     "babel-plugin-transform-es2015-shorthand-properties": "^6.18.0",
     "babel-plugin-transform-es2015-spread": "^6.8.0",
-    "babel-plugin-transform-es2015-template-literals": "^6.8.0",
+    "babel-plugin-transform-es2015-template-literals": "^6.8.0"
   }
 }

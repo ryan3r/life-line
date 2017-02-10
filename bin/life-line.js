@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * Create a backup or start the server
  */
@@ -8,6 +10,7 @@ var nopt = require("nopt");
 var startServer = require("../src/server/server");
 var backup = require("../src/server/backup");
 var {genBackupName} = require("../src/common/backup");
+var {setDataDir} = require("../src/server/data-store");
 
 // parse the command line arguments
 var parsed = nopt({
@@ -18,6 +21,9 @@ var parsed = nopt({
 	certs: String,
 	"data-dir": String
 });
+
+// configure the data stores
+setDataDir(parsed["data-dir"] || path.join(process.cwd(), "life-line-data"));
 
 // run a backup
 if(parsed.backup) {
@@ -33,7 +39,6 @@ else {
 		devMode: parsed.dev,
 		localhost: parsed.localhost,
 		port: parsed.port || 443,
-		certs: parsed.certs,
-		dataDir: parsed["data-dir"] || path.join(process.cwd(), "life-line-data")
+		certs: parsed.certs
 	});
 }

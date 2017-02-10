@@ -4,7 +4,6 @@ var fs = require("fs");
 var path = require("path");
 var pkg = require("../../package.json");
 var handler = require("./handler");
-var {setDataDir} = require("./data-store");
 
 require("../common/global");
 require("./global");
@@ -15,9 +14,6 @@ module.exports = function(opts = {}) {
 	lifeLine.devMode = opts.devMode;
 	// store the version
 	lifeLine.version = pkg.version;
-
-	// configure the data stores
-	setDataDir(opts.dataDir);
 
 	var server;
 
