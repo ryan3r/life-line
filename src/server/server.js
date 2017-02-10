@@ -33,7 +33,7 @@ module.exports = function(opts = {}) {
 	}
 
 	// build the params for server.listen()
-	var startParams = [opts.port];
+	var startParams = [opts.port || 443];
 
 	if(opts.localhost) {
 		startParams.push("localhost");

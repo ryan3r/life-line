@@ -7,10 +7,7 @@
 var path = require("path");
 var fs = require("fs");
 var nopt = require("nopt");
-var startServer = require("../src/server/server");
-var backup = require("../src/server/backup");
-var {genBackupName} = require("../src/common/backup");
-var {setDataDir} = require("../src/server/data-store");
+var lifeLine = require("..");
 
 // parse the command line arguments
 var parsed = nopt({
@@ -23,22 +20,21 @@ var parsed = nopt({
 });
 
 // configure the data stores
-setDataDir(parsed["data-dir"] || path.join(process.cwd(), "life-line-data"));
+if(parsed["data-dir"]) {
+	lifeLine.setDataDir(parsed["data-dir"]);
+}
 
 // run a backup
 if(parsed.backup) {
-	var backupPath = path.join(parsed.backup, genBackupName());
-
 	// build and save the backup
-	backup()
-		.pipe(fs.createWriteStream(backupPath));
+	lifeLine.backup(parsed.backup);
 }
 // start the server
 else {
-	startServer({
+	lifeLine.startServer({
 		devMode: parsed.dev,
 		localhost: parsed.localhost,
-		port: parsed.port || 443,
+		port: parsed.port,
 		certs: parsed.certs
 	});
 }
