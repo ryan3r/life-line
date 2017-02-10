@@ -2,7 +2,7 @@
  * A view for accessing/modifying information about the current user
  */
 
-import {genBackupName} from "../../common/backup";
+var {genBackupName} = require("../../common/backup");
 
 lifeLine.nav.register({
 	matcher: /^(?:\/user\/(.+?)|\/account)$/,

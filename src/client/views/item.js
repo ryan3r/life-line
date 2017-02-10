@@ -2,8 +2,8 @@
  * The view for an assignment
  */
 
-import {daysFromNow, stringifyDate} from "../util/date";
-import {store} from "../data-store";
+var {daysFromNow, stringifyDate} = require("../util/date");
+var {store} = require("../data-store");
 
 var assignments = store("assignments");
 

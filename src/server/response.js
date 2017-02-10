@@ -7,7 +7,7 @@ var fs = require("fs-promise");
 var crypto = require("crypto");
 var path = require("path");
 
-export default class Response {
+class Response {
 	constructor(opts = {}) {
 		this.status = opts.status || 200;
 		this.headers = opts.headers || {};
@@ -159,3 +159,5 @@ export default class Response {
 		});
 	}
 };
+
+module.exports = Response;

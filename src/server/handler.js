@@ -3,17 +3,16 @@
  */
 
 var path = require("path");
-
-import Request from "./request";
-import * as dataStore from "./data-store";
-import * as auth from "./auth";
-import backup from "./backup";
-import Response from "./response";
+var Request = require("./request");
+var dataStore = require("./data-store");
+var auth = require("./auth");
+var backup = require("./backup");
+var Response = require("./response");
 
 const NO_RESPONSE = "No response returned by the handler";
 
 // route requests to the proper handlers
-export function handler(req, res) {
+module.exports = function(req, res) {
 	// wrap the request
 	var request = new Request(req);
 	var response;

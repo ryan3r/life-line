@@ -11,7 +11,7 @@ var idb = require("idb");
 var stores = {};
 
 // get/create a datastore
-export function store(name) {
+var store = exports.store = function(name) {
 	// use the cached store
 	if(name in stores) {
 		return stores[name];

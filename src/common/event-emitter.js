@@ -2,7 +2,7 @@
  * A basic event emitter
  */
 
-export default class EventEmitter {
+class EventEmitter {
 	constructor() {
 		this._listeners = {};
 	}
@@ -70,3 +70,5 @@ export default class EventEmitter {
 		}
 	}
 }
+
+module.exports = EventEmitter;

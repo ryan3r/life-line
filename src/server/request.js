@@ -5,7 +5,7 @@
  var urlLib = require("url");
  var querystring = require("querystring");
 
-export default class Request {
+class Request {
 	constructor(req) {
 		this._req = req;
 		this.method = req.method;
@@ -70,3 +70,5 @@ export default class Request {
 			.then(body => JSON.parse(body));
 	}
 };
+
+module.exports = Request;

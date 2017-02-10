@@ -2,7 +2,7 @@
  * Create a global object with commonly used modules to avoid 50 million requires
  */
 
-import EventEmitter from "./event-emitter";
+var EventEmitter = require("./event-emitter");
 
 var lifeLine = new EventEmitter();
 
@@ -11,7 +11,7 @@ lifeLine.node = typeof process == "object";
 lifeLine.browser = typeof window == "object";
 
 // attach utils
-lifeLine.Disposable = require("./disposable").default;
+lifeLine.Disposable = require("./disposable");
 lifeLine.EventEmitter = EventEmitter;
 
 // attach lifeline to the global object

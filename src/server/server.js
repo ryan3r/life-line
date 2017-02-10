@@ -3,37 +3,44 @@ var https = require("https");
 var fs = require("fs");
 var path = require("path");
 var pkg = require("../../package.json");
+var handler = require("./handler");
 
-import {handler} from "./handler";
-
-import "../common/global";
-import "./global";
+require("../common/global");
+require("./global");
 
 // start the server
-export default function startServer(devMode) {
+module.exports = function(opts = {}) {
 	// make the value globally accessable
-	lifeLine.devMode = devMode;
+	lifeLine.devMode = opts.devMode;
 	// store the version
 	lifeLine.version = pkg.version;
 
-	// dev mode
-	if(devMode) {
-		let server = http.createServer(handler);
+	var server;
 
-		// start the server
-		server.listen(8080, "localhost", () => console.log("Listening on localhost"));
-	}
-	// production
-	else {
+	// secure mode
+	if(opts.certs) {
 		// load the keys
 		var keys = {
-			key: fs.readFileSync("cert/key.pem"),
-			cert: fs.readFileSync("cert/cert.pem")
+			key: fs.readFileSync(path.join(opts.certs, "key.pem")),
+			cert: fs.readFileSync(path.join(opts.certs, "cert.pem"))
 		};
 
-		let server = https.createServer(keys, handler);
-
-		// start the server
-		server.listen(443, () => console.log("Server started"));
+		server = https.createServer(keys, handler);
 	}
+	// plain old http
+	else {
+		server = http.createServer(handler);
+	}
+
+	// build the params for server.listen()
+	var startParams = [opts.port];
+
+	if(opts.localhost) {
+		startParams.push("localhost");
+	}
+
+	startParams.push(() => console.log("Server started"));
+
+	// start the server
+	server.listen.apply(server, startParams);
 };
