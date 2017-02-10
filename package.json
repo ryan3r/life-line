@@ -6,8 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node build -p",
-    "start": "node .",
-    "preversion": "node build -p"
+    "start": "node ."
   },
   "repository": "ryan3r/life-line",
   "author": "Ryan",

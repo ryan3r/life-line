@@ -27,8 +27,8 @@ export default function startServer(devMode) {
 	else {
 		// load the keys
 		var keys = {
-			key: fs.readFileSync(path.join(__dirname, "../../../cert/key.pem")),
-			cert: fs.readFileSync(path.join(__dirname, "../../../cert/cert.pem"))
+			key: fs.readFileSync("cert/key.pem"),
+			cert: fs.readFileSync("cert/cert.pem")
 		};
 
 		let server = https.createServer(keys, handler);

@@ -6,7 +6,7 @@ var fs = require("fs-promise");
 var path = require("path");
 
 // the data storage directory
-const DATA_DIR = path.join(__dirname, "..", "..", "..", "life-line-data");
+const DATA_DIR = "life-line-data";
 
 // ensure the data dir has been created
 if(!fs.existsSync(DATA_DIR)) {
