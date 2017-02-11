@@ -171,4 +171,24 @@ describe("Streams", function() {
 		// check the results
 		assert.equal(total, 12);
 	});
+
+	it("streams can be mapped", function() {
+		// create a stream source pair
+		var {stream, source} = createStream();
+
+		// filter even values
+		var stream2 = stream.filter(val => val % 2 == 1);
+
+		// total the transformed values
+		var total = 0;
+
+		stream2.on("data", val => total += val);
+
+		source.push(1);
+		source.push(2);
+		source.push(3);
+
+		// check the results
+		assert.equal(total, 4);
+	});
 });

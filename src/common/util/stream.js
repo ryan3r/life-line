@@ -117,4 +117,16 @@ class Stream extends lifeLine.EventEmitter {
 			source.push(transformer(value));
 		});
 	}
+
+	/**
+	 * Filter out individual values in a stream
+	 */
+	filter(filter) {
+		return this.pipe((value, source) => {
+			// check all values with the filter
+			if(filter(value)) {
+				source.push(value);
+			}
+		});
+	}
 }
