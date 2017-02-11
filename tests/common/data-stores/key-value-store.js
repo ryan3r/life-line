@@ -87,7 +87,7 @@ describe("Key value store", function() {
 		store.set("real", "Ok");
 		store.set("real", "Ok");
 
-		// change another property
+		// change another property (should not trigger a change)
 		store.set("other", "Other property");
 
 		// stop listening
