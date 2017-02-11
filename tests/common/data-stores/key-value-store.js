@@ -32,6 +32,7 @@ describe("Key value store", function() {
 
 		.then(value => {
 			assert.equal(value, "Bar");
+			z
 		});
 	});
 
