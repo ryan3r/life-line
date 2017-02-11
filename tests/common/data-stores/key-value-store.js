@@ -72,4 +72,30 @@ describe("Key value store", function() {
 			});
 		});
 	});
+
+	it("can watch changes in the store", function() {
+		// create the store and adaptor
+		var store = new KeyValueStore(new MemAdaptor());
+
+		// collect all vaules that come through the watcher
+		var changes = [];
+
+		// watch for changes to the "real" key
+		var subscription = store.watch("real", change => changes.push(change));
+
+		// trigger some changes
+		store.set("real", "Ok");
+		store.set("real", "Ok");
+
+		// change another property
+		store.set("other", "Other property");
+
+		// stop listening
+		subscription.unsubscribe();
+
+		// change the real value this should not cause any changes
+		store.set("real", "Unsubscribed");
+
+		assert.deepEqual(changes, ["Ok", "Ok"]);
+	});
 });
