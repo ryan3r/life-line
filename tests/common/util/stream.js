@@ -151,4 +151,24 @@ describe("Streams", function() {
 		assert.equal(collected, "Yay!Yay!Yay!Yay!Yay!Yay!");
 		assert.equal(count, 6);
 	});
+
+	it("streams can be mapped", function() {
+		// create a stream source pair
+		var {stream, source} = createStream();
+
+		// multiply the values by 2
+		var stream2 = stream.map(val => val * 2);
+
+		// total the transformed values
+		var total = 0;
+
+		stream2.on("data", val => total += val);
+
+		source.push(1);
+		source.push(2);
+		source.push(3);
+
+		// check the results
+		assert.equal(total, 12);
+	});
 });

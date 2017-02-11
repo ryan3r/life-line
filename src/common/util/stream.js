@@ -107,25 +107,14 @@ class Stream extends lifeLine.EventEmitter {
 
 		return stream;
 	}
+
+	/**
+	 * Transform individual values in a stream
+	 */
+	map(transformer) {
+		return this.pipe((value, source) => {
+			// run all the values through the transformer
+			source.push(transformer(value));
+		});
+	}
 }
-
-/*
-var {pusher, stream} = createStream();
-
-pusher.push("Foo");
-
-stream
-	.map(s => s.length)
-	.on("data", l => console.log(l));
-
-pusher.push("Bazinga");
-
-pusher.on("pause", () => console.log("Stop sending data"));
-pusher.on("resume", () => console.log("Start sending data again"));
-
-pusher.end();
-
-var stream2 = stream.pipe((data, pusher) => {
-
-});
-*/
