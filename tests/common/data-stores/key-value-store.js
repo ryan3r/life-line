@@ -73,7 +73,7 @@ describe("Key value store", function() {
 		});
 	});
 
-	it("can watch changes in the store", function() {
+	it("can watch changes in the store", function(done) {
 		// create the store and adaptor
 		var store = new KeyValueStore(new MemAdaptor());
 
@@ -81,7 +81,9 @@ describe("Key value store", function() {
 		var changes = [];
 
 		// watch for changes to the "real" key
-		var subscription = store.watch("real", change => changes.push(change));
+		var stream = store.watch("real");
+
+		var subscription = stream.on("data", change => changes.push(change));
 
 		// trigger some changes
 		store.set("real", "Ok");
@@ -90,12 +92,18 @@ describe("Key value store", function() {
 		// change another property (should not trigger a change)
 		store.set("other", "Other property");
 
-		// stop listening
-		subscription.unsubscribe();
+		setTimeout(() => {
+			// stop listening
+			subscription.unsubscribe();
 
-		// change the real value this should not cause any changes
-		store.set("real", "Unsubscribed");
+			// change the real value this should not cause any changes
+			store.set("real", "Unsubscribed");
 
-		assert.deepEqual(changes, ["Ok", "Ok"]);
+			setTimeout(() => {
+				assert.deepEqual(changes, ["Ok", "Ok"]);
+
+				done();
+			});
+		});
 	});
 });

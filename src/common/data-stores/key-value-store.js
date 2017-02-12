@@ -2,15 +2,22 @@
  * A basic key value data store
  */
 
-class KeyValueStore extends lifeLine.EventEmitter {
+var Stream = require("../util/stream");
+
+class KeyValueStore {
 	constructor(adapter) {
-		super();
 		this._adapter = adapter;
 
 		// make sure we have an adapter
 		if(!adapter) {
 			throw new Error("KeyValueStore must be initialized with an adapter")
 		}
+
+		// create the change stream
+		var {source, stream} = Stream.create();
+
+		this._changesSrc = source;
+		this._changes = stream;
 	}
 
 	/**
@@ -45,7 +52,7 @@ class KeyValueStore extends lifeLine.EventEmitter {
 			});
 
 			// trigger the change
-			this.emit(key, value);
+			this._changesSrc.push({key, value});
 		}
 		// set several values
 		else {
@@ -55,8 +62,11 @@ class KeyValueStore extends lifeLine.EventEmitter {
 					value: key[_key]
 				});
 
-				 // trigger the change
-				 this.emit(_key, key[_key]);
+				// trigger the change
+			   this._changesSrc.push({
+				   key: _key,
+				   value: key[_key]
+			   });
 			 }
 		}
 	}
@@ -67,20 +77,24 @@ class KeyValueStore extends lifeLine.EventEmitter {
 	  * opts.current - send the current value of key (default: false)
 	  * opts.default - the default value to send for opts.current
 	  */
-	 watch(key, opts, fn) {
-		 // make opts optional
-		 if(typeof opts == "function") {
-			 fn = opts;
-			 opts = {};
-		 }
+	 watch(key, opts = {}) {
+		 // get the changes relating to this key
+		 var changes = this._changes
+		 	.filter(change => key == change.key)
+			.map(change => change.value);
 
-		 // send the current value
+		 // send the current value alon with changes
 		 if(opts.current) {
-			 this.get(key, opts.default).then(fn);
+			 return Stream.concat([
+				 // give the initial value
+				 Stream.from([ this.get(key, opts.default) ]),
+				 // recieve any changes later along the line
+				 changes
+			 ]);
 		 }
 
 		 // listen for any changes
-		 return this.on(key, fn);
+		 return changes;
 	 }
 }
 
