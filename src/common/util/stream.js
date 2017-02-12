@@ -17,26 +17,35 @@ var createStream = exports.create = function() {
 
 // the source half is used by the producer to send values
 class Source extends lifeLine.EventEmitter {
+	constructor() {
+		super();
+		this._ready = Promise.resolve();
+	}
+
 	push(value) {
-		// send the value to the consumer
-		this._stream.emit("data", value);
+		// make sure any previously written promises are send before this one
+		this._ready = this._ready.then(() => value)
+			// send the value to the consumer
+			.then(value => this._stream.emit("data", value));
 	}
 
 	end(value) {
 		// if a final value was given send it to the consumer
 		if(value) this.push(value);
 
-		// tell the consumer the stream is done
-		this._stream.emit("end");
+		this._ready.then(() => {
+			// tell the consumer the stream is done
+			this._stream.emit("end");
 
-		// remove the streams refrence to us
-		this._stream.source = undefined;
-		// remove all event listeners from the stream
-		this._stream._listeners = undefined;
-		// remove our refrence to the stream
-		this._stream = undefined;
-		// remove all event listeners
-		this._listeners = undefined;
+			// remove the streams refrence to us
+			this._stream.source = undefined;
+			// remove all event listeners from the stream
+			this._stream._listeners = undefined;
+			// remove our refrence to the stream
+			this._stream = undefined;
+			// remove all event listeners
+			this._listeners = undefined;
+		});
 	}
 }
 

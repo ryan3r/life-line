@@ -3,7 +3,7 @@ var assert = require("assert");
 var Stream = require("../../../src/common/util/stream");
 
 describe("Streams", function() {
-	it("supports basic push and recieve", function() {
+	it("supports basic push and recieve", function(done) {
 		// create a stream source pair
 		var {stream, source} = Stream.create();
 
@@ -13,20 +13,28 @@ describe("Streams", function() {
 		// push one value through the stream that will no be recieved
 		source.push("Before start");
 
-		// start listening
-		var subscription = stream.on("data", data => collected.push(data));
+		setTimeout(() => {
+			// start listening
+			var subscription = stream.on("data", data => collected.push(data));
 
-		// send some data
-		source.push("Foo");
-		source.push("Bar");
+			// send some data
+			source.push("Foo");
+			source.push("Bar");
 
-		// stop listening
-		subscription.unsubscribe();
+			setTimeout(() => {
+				// stop listening
+				subscription.unsubscribe();
 
-		// push a value through that will not be recieved
-		source.push("After stop");
+				// push a value through that will not be recieved
+				source.push("After stop");
 
-		assert.deepEqual(collected, ["Foo", "Bar"]);
+				setTimeout(() => {
+					assert.deepEqual(collected, ["Foo", "Bar"]);
+
+					done();
+				});
+			});
+		});
 	});
 
 	it("supports pause and resume callbacks", function(done) {
@@ -81,7 +89,7 @@ describe("Streams", function() {
 		var sub = stream.on("data", handler);
 	});
 
-	it("streams can be closed", function() {
+	it("streams can be closed", function(done) {
 		// create a stream source pair
 		var {stream, source} = Stream.create();
 
@@ -96,12 +104,16 @@ describe("Streams", function() {
 		// end the stream
 		source.end();
 
-		// check the results
-		assert(ended);
-		assert.equal(value, undefined);
+		setTimeout(function() {
+			// check the results
+			assert(ended);
+			assert.equal(value, undefined);
+
+			done();
+		});
 	});
 
-	it("streams can be closed with an extra value", function() {
+	it("streams can be closed with an extra value", function(done) {
 		// create a stream source pair
 		var {stream, source} = Stream.create();
 
@@ -116,12 +128,16 @@ describe("Streams", function() {
 		// end the stream
 		source.end("last value");
 
-		// check the results
-		assert(ended);
-		assert.equal(value, "last value");
+		setTimeout(() => {
+			// check the results
+			assert(ended);
+			assert.equal(value, "last value");
+
+			done();
+		});
 	});
 
-	it("Streams can be transformed with pipe", function() {
+	it("Streams can be transformed with pipe", function(done) {
 		// create a stream source pair
 		var {stream, source} = Stream.create();
 
@@ -147,12 +163,16 @@ describe("Streams", function() {
 		source.push(2);
 		source.push(3);
 
-		// check the results
-		assert.equal(collected, "Yay!Yay!Yay!Yay!Yay!Yay!");
-		assert.equal(count, 6);
+		setTimeout(() => {
+			// check the results
+			assert.equal(collected, "Yay!Yay!Yay!Yay!Yay!Yay!");
+			assert.equal(count, 6);
+
+			done();
+		});
 	});
 
-	it("streams can be mapped", function() {
+	it("streams can be mapped", function(done) {
 		// create a stream source pair
 		var {stream, source} = Stream.create();
 
@@ -168,11 +188,15 @@ describe("Streams", function() {
 		source.push(2);
 		source.push(3);
 
-		// check the results
-		assert.equal(total, 12);
+		setTimeout(() => {
+			// check the results
+			assert.equal(total, 12);
+
+			done();
+		});
 	});
 
-	it("streams can be mapped", function() {
+	it("streams can be mapped", function(done) {
 		// create a stream source pair
 		var {stream, source} = Stream.create();
 
@@ -188,20 +212,28 @@ describe("Streams", function() {
 		source.push(2);
 		source.push(3);
 
-		// check the results
-		assert.equal(total, 4);
+		setTimeout(() => {
+			// check the results
+			assert.equal(total, 4);
+
+			done();
+		});
 	});
 
-	it("Create streams from arrays", function() {
+	it("Create streams from arrays", function(done) {
 		var total = 0;
 
 		Stream.from([1, 2, 3])
 			.on("data", val => total += val);
 
-		assert.equal(total, 6);
+		setTimeout(() => {
+			assert.equal(total, 6);
+
+			done();
+		});
 	})
 
-	it("can combine 2 streams", function() {
+	it("can combine 2 streams", function(done) {
 		var total = 0;
 
 		Stream.concat([
@@ -211,6 +243,10 @@ describe("Streams", function() {
 
 		.on("data", val => total += val);
 
-		assert.equal(total, 21);
+		setTimeout(() => {
+			assert.equal(total, 21);
+
+			done();
+		});
 	});
 });
