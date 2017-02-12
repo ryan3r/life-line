@@ -1,11 +1,11 @@
 require("../../../src/common/global");
 var assert = require("assert");
-var createStream = require("../../../src/common/util/stream");
+var Stream = require("../../../src/common/util/stream");
 
 describe("Streams", function() {
 	it("supports basic push and recieve", function() {
 		// create a stream source pair
-		var {stream, source} = createStream();
+		var {stream, source} = Stream.create();
 
 		// collect the values emitted by the stream
 		var collected = [];
@@ -31,7 +31,7 @@ describe("Streams", function() {
 
 	it("supports pause and resume callbacks", function(done) {
 		// create a stream source pair
-		var {stream, source} = createStream();
+		var {stream, source} = Stream.create();
 
 		// collect the values emitted by the stream
 		var calls = 0;
@@ -83,7 +83,7 @@ describe("Streams", function() {
 
 	it("streams can be closed", function() {
 		// create a stream source pair
-		var {stream, source} = createStream();
+		var {stream, source} = Stream.create();
 
 		var ended = false, value;
 
@@ -103,7 +103,7 @@ describe("Streams", function() {
 
 	it("streams can be closed with an extra value", function() {
 		// create a stream source pair
-		var {stream, source} = createStream();
+		var {stream, source} = Stream.create();
 
 		var ended = false, value;
 
@@ -123,7 +123,7 @@ describe("Streams", function() {
 
 	it("Streams can be transformed with pipe", function() {
 		// create a stream source pair
-		var {stream, source} = createStream();
+		var {stream, source} = Stream.create();
 
 		// print n "Yay!"s for every value passed in
 		var stream2 = stream.pipe((data, source) => {
@@ -154,7 +154,7 @@ describe("Streams", function() {
 
 	it("streams can be mapped", function() {
 		// create a stream source pair
-		var {stream, source} = createStream();
+		var {stream, source} = Stream.create();
 
 		// multiply the values by 2
 		var stream2 = stream.map(val => val * 2);
@@ -174,7 +174,7 @@ describe("Streams", function() {
 
 	it("streams can be mapped", function() {
 		// create a stream source pair
-		var {stream, source} = createStream();
+		var {stream, source} = Stream.create();
 
 		// filter even values
 		var stream2 = stream.filter(val => val % 2 == 1);
@@ -190,5 +190,27 @@ describe("Streams", function() {
 
 		// check the results
 		assert.equal(total, 4);
+	});
+
+	it("Create streams from arrays", function() {
+		var total = 0;
+
+		Stream.from([1, 2, 3])
+			.on("data", val => total += val);
+
+		assert.equal(total, 6);
+	})
+
+	it("can combine 2 streams", function() {
+		var total = 0;
+
+		Stream.concat([
+			Stream.from([1, 2, 3]),
+			Stream.from([4, 5, 6])
+		])
+
+		.on("data", val => total += val);
+
+		assert.equal(total, 21);
 	});
 });

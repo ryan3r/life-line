@@ -3,7 +3,7 @@
  * streams of values
  */
 
-var createStream = module.exports = function() {
+var createStream = exports.create = function() {
 	// create a stream and Source
 	var stream = new Stream();
 	var source = new Source();
@@ -130,3 +130,63 @@ class Stream extends lifeLine.EventEmitter {
 		});
 	}
 }
+
+// create a stream from an array
+exports.from = function(array) {
+	var {stream, source} = createStream();
+
+	source.on("resume", () => {
+		// push the values through the stream
+		array.forEach(value => source.push(value));
+
+		// end the stream
+		source.end();
+	});
+
+	return stream;
+};
+
+// combine the values of two or more streams the values
+exports.concat = function(streams) {
+	var {stream, source} = createStream();
+	var index = -1;
+
+	// save subscriptions for the pause/resume events
+	var pauseSub, resumeSub;
+
+	// start sending a stream
+	var sendStream = () => {
+		// remove any existing subscriptions
+		if(pauseSub) pauseSub.unsubscribe();
+		if(resumeSub) resumeSub.unsubscribe();
+
+		// the last stream has been passed on
+		if(++index >= streams.length) {
+			// end the combined stream
+			source.end();
+
+			return;
+		}
+
+		var dataSub;
+		var stream = streams[index];
+
+		// pass the values on to the combined stream
+		var resume = () => dataSub = stream.on("data", data => source.push(data));
+
+		// when this stream is done move on to the next one
+		stream.on("end", () => sendStream());
+
+		// pause and resume with the combined stream
+		pauseSub = source.on("pause", () => dataSub.unsubscribe());
+		resumeSub = source.on("resume", resume);
+
+		// start the stream
+		resume();
+	};
+
+	// start the stream when our source starts
+	resumeSub = source.on("resume", () => sendStream());
+
+	return stream;
+};
