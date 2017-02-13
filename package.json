@@ -8,7 +8,9 @@
     "test": "mocha tests/**/*.js --reporter min",
     "build": "node build -p"
   },
-  "precommit": ["npm test"],
+  "precommit": [
+    "npm test"
+  ],
   "repository": "ryan3r/life-line",
   "author": "Ryan Ray <ryan314r@gmail.com>",
   "license": "ISC",
@@ -37,7 +39,7 @@
     "babelify": "^7.3.0",
     "browserify": "^13.3.0",
     "mocha": "^3.2.0",
-    "precommit": "^1.2.2",
+    "pre-commit": "^1.2.2",
     "watchify": "^3.8.0"
   }
 }
