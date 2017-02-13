@@ -17,7 +17,7 @@ class KeyValueStore {
 		var {source, stream} = Stream.create();
 
 		this._changesSrc = source;
-		this._changes = stream;
+		this.changes = stream;
 	}
 
 	/**
@@ -79,7 +79,7 @@ class KeyValueStore {
 	  */
 	 watch(key, opts = {}) {
 		 // get the changes relating to this key
-		 var changes = this._changes
+		 var changes = this.changes
 		 	.filter(change => key == change.key)
 			.map(change => change.value);
 

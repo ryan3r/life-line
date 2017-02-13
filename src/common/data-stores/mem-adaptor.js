@@ -8,6 +8,17 @@ class MemAdaptor {
 	}
 
 	/**
+	 * Get an array of values
+	 */
+	getAll() {
+		return Promise.resolve(
+			Object.getOwnPropertyNames(this._data)
+
+			.map(name => this._data[name])
+		);
+	}
+
+	/**
 	 * Lookup a value
 	 *
 	 * returns {id, value}

@@ -145,11 +145,23 @@ exports.from = function(array) {
 	var {stream, source} = createStream();
 
 	source.on("resume", () => {
-		// push the values through the stream
-		array.forEach(value => source.push(value));
+		// send the array through the stream
+		var send = array => {
+			// push the values through the stream
+			array.forEach(value => source.push(value));
 
-		// end the stream
-		source.end();
+			// end the stream
+			source.end();
+		};
+
+		// resolve the promise first
+		if(array instanceof Promise) {
+			array.then(arr => send(arr));
+		}
+		// use the plain array
+		else {
+			send(array);
+		}
 	});
 
 	return stream;
