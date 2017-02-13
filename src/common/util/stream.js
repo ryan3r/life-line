@@ -17,35 +17,56 @@ var createStream = exports.create = function() {
 
 // the source half is used by the producer to send values
 class Source extends lifeLine.EventEmitter {
-	constructor() {
-		super();
-		this._ready = Promise.resolve();
-	}
-
 	push(value) {
-		// make sure any previously written promises are send before this one
-		this._ready = this._ready.then(() => value)
+		if(this._ready && value instanceof Promise) {
+			// make sure any previously written promises are send before this one
+			var _promise = this._ready = this._ready.then(() => value)
+				.then(value => {
+					// send the value to the consumer
+					this._stream.emit("data", value);
+
+					// if this._ready is resolved remove it
+					if(this._ready == _promise) {
+						this._ready = undefined;
+					}
+				});
+		}
+		else if(value instanceof Promise) {
+			this._ready = value
+				// send the value to the consumer
+				.then(value => this._stream.emit("data", value));
+		}
+		else {
 			// send the value to the consumer
-			.then(value => this._stream.emit("data", value));
+			this._stream.emit("data", value);
+		}
 	}
 
 	end(value) {
 		// if a final value was given send it to the consumer
 		if(value) this.push(value);
 
-		this._ready.then(() => {
+		var end = () => {
 			// tell the consumer the stream is done
 			this._stream.emit("end");
 
 			// remove the streams refrence to us
 			this._stream.source = undefined;
 			// remove all event listeners from the stream
-			this._stream._listeners = undefined;
+			this._stream._listeners = {};
 			// remove our refrence to the stream
 			this._stream = undefined;
 			// remove all event listeners
-			this._listeners = undefined;
-		});
+			this._listeners = {};
+		};
+
+		// wait for any clean up work
+		if(this._ready) {
+			this._ready.then(end);
+		}
+		else {
+			end();
+		}
 	}
 }
 
@@ -208,6 +229,49 @@ exports.concat = function(streams) {
 
 	// start the stream when our source starts
 	resumeSub = source.on("resume", () => sendStream());
+
+	return stream;
+};
+
+/**
+ * Combine several stream THE ORDER OF THE VALUES IS NOT PRESERVED
+ */
+exports.merge = function(streams) {
+	var {stream, source} = createStream();
+	// save the subscriptions from the data method to pause the streams
+	var streamSubs = [];
+
+	// start all the streams
+	source.on("resume", () => {
+		streamSubs = streams.map(stream => {
+			// pass data on from the streams
+			return stream.on("data", data => source.push(data))
+		});
+	});
+
+	// stop all streams
+	source.on("pause", () => {
+		while(streamSubs.length > 0) {
+			streamSubs.shift().unsubscribe();
+		}
+	});
+
+	// when a stream ends remove it from the list
+	for(let stream of streams) {
+		stream.on("end", () => {
+			// find the stream
+			var index = streams.indexOf(stream);
+
+			// remove the stream and its subscription
+			streams.splice(index, 1);
+			streamSubs.splice(index, 1);
+
+			// when the last stream closes close the aggregate
+			if(streams.length === 0) {
+				source.end();
+			}
+		});
+	}
 
 	return stream;
 };

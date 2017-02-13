@@ -41,17 +41,20 @@ describe("Pool store", function() {
 		// turn the stream into an array
 		var collection = [];
 
-		typeA.on("data", value => collection.push(value.name));
+		typeA.on("data", value => collection.push(value));
 
-		setTimeout(() => {
+		//setTimeout(() => {
 			// change a value that matches the query
 			pool.set({ id: "baz", name: "Baz", type: "a" });
 
-			setTimeout(() => {
-				assert.deepEqual(collection, ["Foo", "Baz"]);
+			//setTimeout(() => {
+				assert.deepEqual(collection, [
+					{ type: "change", id: "foo", value: { id: "foo", name: "Foo", type: "a" } },
+					{ type: "change", id: "baz", value: { id: "baz", name: "Baz", type: "a" } },
+				]);
 
 				done();
-			});
-		});
+			//});
+		//});
 	});
 });

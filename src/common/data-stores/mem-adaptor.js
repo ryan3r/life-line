@@ -43,6 +43,15 @@ class MemAdaptor {
 
 		return Promise.resolve();
 	}
+
+	/**
+	 * Remove a value from the adaptor
+	 */
+	remove(key) {
+		delete this._data[key];
+
+		return Promise.resolve();
+	}
 }
 
 module.exports = MemAdaptor;
