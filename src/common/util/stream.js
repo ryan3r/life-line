@@ -79,6 +79,33 @@ class Stream extends lifeLine.EventEmitter {
 		this._refrences = 0;
 	}
 
+	// buffer values send to this stream
+	enableBuffering() {
+		// already buffering
+		if(this._buffer) return;
+
+		this._buffer = [];
+
+		// add values to the buffer if there are no listeners
+		this._bufferSub = super.on("data", data => {
+			if(this._refrences === 0) {
+				this._buffer.push(data);
+			}
+		});
+	}
+
+	// stop buffering values send to this stream
+	disableBuffering() {
+		this._buffer = undefined;
+
+		// stop trying to add values to the buffer
+		if(this._bufferSub) {
+			this._bufferSub.unsubscribe();
+
+			this._bufferSub = undefined;
+		}
+	}
+
 	on(name, fn) {
 		// add the event listener
 		var subscription = super.on(name, fn);
@@ -92,6 +119,14 @@ class Stream extends lifeLine.EventEmitter {
 		// since we now have listeners tell the source to start sending data
 		if(this._refrences == 1) {
 			this._source.emit("resume");
+
+			// send any buffered values
+			if(this._buffer) {
+				while(this._buffer.length > 0) {
+					// send the values but skip the buffer's lisenter
+					this.partialEmit("data", [this._bufferSub], this._buffer.shift());
+				}
+			}
 		}
 
 		var unsubscribed = false;

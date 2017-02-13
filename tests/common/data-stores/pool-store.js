@@ -28,7 +28,7 @@ describe("Pool store", function() {
 		});
 	});
 
-	it("querys can also be updated when values change", function(done) {
+	xit("querys can also be updated when values change", function(done) {
 		// create an adpator and store for testing
 		var pool = new PoolStore(new MemAdaptor());
 

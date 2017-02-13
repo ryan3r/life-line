@@ -249,4 +249,27 @@ describe("Streams", function() {
 			done();
 		});
 	});
+
+	it("can be buffered", function() {
+		var {stream, source} = Stream.create();
+
+		stream.enableBuffering();
+
+		// put some values in
+		source.push(1);
+		source.push(2);
+		source.push(3);
+
+		// empty the buffer
+		var collected = [];
+
+		var sub = stream.on("data", data => collected.push(data));
+
+		// ensure the buffer was emptied
+		sub.unsubscribe();
+
+		stream.on("data", data => collected.push(data));
+
+		assert.deepEqual(collected, [1, 2, 3]);
+	});
 });
