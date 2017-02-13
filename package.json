@@ -8,6 +8,7 @@
     "test": "mocha tests/**/*.js --reporter min",
     "build": "node build -p"
   },
+  "precommit": ["npm tes"],
   "repository": "ryan3r/life-line",
   "author": "Ryan Ray <ryan314r@gmail.com>",
   "license": "ISC",

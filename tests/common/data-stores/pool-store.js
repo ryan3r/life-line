@@ -51,7 +51,7 @@ describe("Pool store", function() {
 				assert.deepEqual(collection, ["Foo", "Baz"]);
 
 				done();
-			});
+			});z
 		});
 	});
 });
