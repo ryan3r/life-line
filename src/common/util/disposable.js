@@ -17,18 +17,7 @@ class Disposable {
 
 	// Add a subscription to the disposable
 	add(subscription) {
-		// copy the disposable
-		if(subscription instanceof Disposable) {
-			// copy the subscriptions from the disposable
-			this._subscriptions = this._subscriptions.concat(subscription._subscriptions);
-
-			// remove the refrences from the disposable
-			subscription._subscriptions = [];
-		}
-		// add a subscription
-		else {
-			this._subscriptions.push(subscription);
-		}
+		this._subscriptions.push(subscription);
 	}
 
 	// dispose when an event is fired
