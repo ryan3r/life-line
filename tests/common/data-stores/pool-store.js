@@ -14,47 +14,41 @@ describe("Pool store", function() {
 		pool.set({ id: "baz", name: "Baz", type: "a" });
 
 		// query all type a elements
-		var typeA = pool.query({ type: "a" });
+		pool.query({ type: "a" })
 
-		// turn the stream into an array
-		var collection = [];
-
-		typeA.on("data", value => collection.push(value.name));
-
-		setTimeout(() => {
-			assert.deepEqual(collection, ["Foo", "Baz"]);
+		.then(collection => {
+			assert.deepEqual(collection, [
+				{ id: "foo", name: "Foo", type: "a" },
+				{ id: "baz", name: "Baz", type: "a" }
+			]);
 
 			done();
-		});
+		})
+
+		.catch(err => done(err));
 	});
 
-	xit("querys can also be updated when values change", function(done) {
+	it("querys can also be updated when values change", function() {
 		// create an adpator and store for testing
 		var pool = new PoolStore(new MemAdaptor());
 
 		// fill the pool
 		pool.set({ id: "foo", name: "Foo", type: "a" });
 
-		// query all type a elements
-		var typeA = pool.query({ type: "a" }, { watch: true });
-
-		// turn the stream into an array
+		// collect values that match
 		var collection = [];
 
-		typeA.on("data", value => collection.push(value));
+		// query all type a elements
+		pool.query({ type: "a" }, { watch: true }, r => collection.push(r));
 
-		//setTimeout(() => {
-			// change a value that matches the query
-			pool.set({ id: "baz", name: "Baz", type: "a" });
+		// change a value that matches the query
+		pool.set({ id: "baz", name: "Baz", type: "a" });
 
-			//setTimeout(() => {
-				assert.deepEqual(collection, [
-					{ type: "change", id: "foo", value: { id: "foo", name: "Foo", type: "a" } },
-					{ type: "change", id: "baz", value: { id: "baz", name: "Baz", type: "a" } },
-				]);
-
-				done();
-			//});
-		//});
+		setTimeout(() => {
+			assert.deepEqual(collection, [
+				{ type: "change", id: "baz", value: { id: "baz", name: "Baz", type: "a" } },
+				{ type: "change", id: "foo", value: { id: "foo", name: "Foo", type: "a" } },
+			]);
+		});
 	});
 });
