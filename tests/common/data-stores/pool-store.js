@@ -44,9 +44,18 @@ describe("Pool store", function() {
 		// change a value that matches the query
 		pool.set({ id: "baz", name: "Baz", type: "a" });
 
+		// change the value so it doesn't match
+		pool.set({ id: "baz", name: "Baz", type: "b" });
+
+		// remove the other value
+		pool.remove("foo");
+
 		setTimeout(() => {
 			assert.deepEqual(collection, [
 				{ type: "change", id: "baz", value: { id: "baz", name: "Baz", type: "a" } },
+				{ type: "change", id: "baz", value: { id: "baz", name: "Baz", type: "a" } },
+				{ type: "unmatch", id: "baz" },
+				{ type: "remove", id: "foo" },
 				{ type: "change", id: "foo", value: { id: "foo", name: "Foo", type: "a" } },
 			]);
 		});
