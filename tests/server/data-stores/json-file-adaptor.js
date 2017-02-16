@@ -1,5 +1,5 @@
 var assert = require("assert");
-var JsonFileAdaptor = require("../../src/server/json-file-adaptor");
+var JsonFileAdaptor = require("../../../src/server/data-stores/json-file-adaptor");
 var path = require("path");
 var fs = require("fs");
 
@@ -14,7 +14,7 @@ describe("Json file adaptor", function(done) {
 	it("can be loaded and queried in object mode", function() {
 		// load an existing file
 		var jfile = new JsonFileAdaptor({
-			src: path.join(__dirname, "../test-files/reads/jfile-object.json"),
+			src: path.join(__dirname, "../../test-files/reads/jfile-object.json"),
 			mode: "object"
 		});
 
@@ -40,7 +40,7 @@ describe("Json file adaptor", function(done) {
 	it("can be loaded and queried in array mode", function() {
 		// load an existing file
 		var jfile = new JsonFileAdaptor({
-			src: path.join(__dirname, "../test-files/reads/jfile-array.json"),
+			src: path.join(__dirname, "../../test-files/reads/jfile-array.json"),
 			mode: "array"
 		});
 
@@ -64,7 +64,7 @@ describe("Json file adaptor", function(done) {
 	});
 
 	it("can write to a json file in object mode", function() {
-		var src = path.join(__dirname, "../test-files/writes/jfile-object.json");
+		var src = path.join(__dirname, "../../test-files/writes/jfile-object.json");
 
 		// craete an object mode file
 		var jfile = new JsonFileAdaptor({
@@ -85,7 +85,7 @@ describe("Json file adaptor", function(done) {
 	});
 
 	it("can write to a json file in array mode", function() {
-		var src = path.join(__dirname, "../test-files/writes/jfile-array.json");
+		var src = path.join(__dirname, "../../test-files/writes/jfile-array.json");
 
 		// craete an object mode file
 		var jfile = new JsonFileAdaptor({
@@ -106,7 +106,7 @@ describe("Json file adaptor", function(done) {
 	});
 
 	it("can remove a value from a file", function() {
-		var src = path.join(__dirname, "../test-files/writes/jfile-remove.json");
+		var src = path.join(__dirname, "../../test-files/writes/jfile-remove.json");
 
 		// craete an object mode file
 		var jfile = new JsonFileAdaptor({
