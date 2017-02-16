@@ -16,3 +16,9 @@ lifeLine.EventEmitter = EventEmitter;
 
 // attach lifeline to the global object
 (lifeLine.node ? global : browser).lifeLine = lifeLine;
+
+// attach config
+var MemAdaptor = require("./data-stores/mem-adaptor");
+var KeyValueStore = require("./data-stores/key-value-store");
+
+lifeLine.config = new KeyValueStore(new MemAdaptor());
