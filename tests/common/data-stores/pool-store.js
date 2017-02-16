@@ -61,4 +61,24 @@ describe("Pool store", function() {
 			done();
 		});
 	});
+
+	it("queryies can be passed functions to test their values against", function() {
+		// create an adpator and store for testing
+		var pool = new PoolStore(new MemAdaptor());
+
+		// fill the adaptor
+		pool.set({ id: "foo", name: "Foo", value: 1 });
+		pool.set({ id: "bar", name: "Bar", value: 2 });
+		pool.set({ id: "baz", name: "Baz", value: 3 });
+
+		// query all type a elements
+		return pool.query({ value: val => val > 1 })
+
+		.then(collection => {
+			assert.deepEqual(collection, [
+				{ id: "bar", name: "Bar", value: 2 },
+				{ id: "baz", name: "Baz", value: 3 }
+			]);
+		});
+	});
 });

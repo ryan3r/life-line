@@ -25,7 +25,16 @@ class PoolStore extends lifeLine.EventEmitter {
 			// check that all the properties match
 			return Object.getOwnPropertyNames(props)
 
-			.every(propName => props[propName] == value[propName]);
+			.every(propName => {
+				// a function to check if a value matches
+				if(typeof props[propName] == "function") {
+					return props[propName](value[propName]);
+				}
+				// plain equality
+				else {
+					return props[propName] == value[propName]
+				}
+			});
 		};
 
 		// keep track of the current list of items so when items
