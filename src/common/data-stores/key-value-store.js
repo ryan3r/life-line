@@ -17,6 +17,11 @@ class KeyValueStore extends lifeLine.EventEmitter {
 	 * Get the corrisponding value out of the data store otherwise return default
 	 */
 	get(key, _default) {
+		// check if this value has been overriden
+		if(this._overrides && this._overrides.hasOwnProperty(key)) {
+			return Promise.resolve(this._overrides[key]);
+		}
+
 		return this._adapter.get(key)
 
 		.then(result => {
@@ -81,6 +86,15 @@ class KeyValueStore extends lifeLine.EventEmitter {
 
 		 // listen for any changes
 		 return this.on(key, fn);
+	 }
+
+	 /**
+	  * Override the values from the adaptor without writing to them
+	  *
+	  * Useful for combining json settings with command line flags
+	  */
+	 setOverrides(overrides) {
+		 this._overrides = overrides;
 	 }
 }
 

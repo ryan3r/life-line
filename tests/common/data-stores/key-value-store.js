@@ -35,6 +35,30 @@ describe("Key value store", function() {
 		});
 	});
 
+	it("can override values", function() {
+		// create an adaptor
+		var adaptor = new MemAdaptor();
+
+		// put a value in it
+		adaptor.set({ id: "Foo", value: "Bar" });
+
+		// create a store using the adaptor
+		var store = new KeyValueStore(adaptor);
+
+		// put in overrides for Foo
+		store.setOverrides({
+			Foo : "Baz"
+		});
+
+		// get the value
+		return store.get("Foo")
+
+		.then(value => {
+			// check the value
+			assert.equal(value, "Baz");
+		});
+	});
+
 	it("can store values", function() {
 		// create the empty store and adaptor
 		var adaptor = new MemAdaptor();
