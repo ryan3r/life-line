@@ -19,6 +19,20 @@ class Response {
 
 	// the method to send the response
 	$send(req, res) {
+		// stringify json response
+		if(typeof this.body == "object" && typeof this.body.pipe != "function") {
+			// pretty print json for development
+			if(lifeLine.devMode) {
+				this.body = JSON.stringify(this.body, null, 4);
+			}
+			else {
+				this.body = JSON.stringify(this.body);
+			}
+
+			// set the content type to json
+			this.extension = ".json";
+		}
+
 		// a special hook so send file has access to the request
 		if(this.$presend) {
 			this.$presend(req);
