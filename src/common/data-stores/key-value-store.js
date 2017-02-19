@@ -46,7 +46,8 @@ class KeyValueStore extends lifeLine.EventEmitter {
 		if(typeof key == "string") {
 			this._adapter.set({
 				id: key,
-				value
+				value,
+				modified: Date.now()
 			});
 
 			// trigger the change
@@ -57,7 +58,8 @@ class KeyValueStore extends lifeLine.EventEmitter {
 			for(let _key of Object.getOwnPropertyNames(key)) {
 				this._adapter.set({
 					id: _key,
-					value: key[_key]
+					value: key[_key],
+					modified: Date.now()
 				});
 
 				// trigger the change

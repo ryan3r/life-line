@@ -17,6 +17,11 @@ describe("Pool store", function() {
 		pool.query({ type: "a" })
 
 		.then(collection => {
+			// remove modified dates
+			for(let value of collection) {
+				delete value.modified;
+			}
+
 			assert.deepEqual(collection, [
 				{ id: "foo", name: "Foo", type: "a" },
 				{ id: "baz", name: "Baz", type: "a" }
@@ -51,6 +56,13 @@ describe("Pool store", function() {
 			// remove the other value
 			pool.remove("foo");
 
+			// remove modified dates
+			for(let change of collection) {
+				if(change.value) {
+					delete change.value.modified;
+				}
+			}
+
 			assert.deepEqual(collection, [
 				{ type: "change", id: "foo", value: { id: "foo", name: "Foo", type: "a" } },
 				{ type: "change", id: "baz", value: { id: "baz", name: "Baz", type: "a" } },
@@ -62,7 +74,7 @@ describe("Pool store", function() {
 		});
 	});
 
-	it("queryies can be passed functions to test their values against", function() {
+	it("queries can be passed functions to test their values against", function() {
 		// create an adpator and store for testing
 		var pool = new PoolStore(new MemAdaptor());
 
@@ -75,6 +87,11 @@ describe("Pool store", function() {
 		return pool.query({ value: val => val > 1 })
 
 		.then(collection => {
+			// remove modified dates
+			for(let value of collection) {
+				delete value.modified;
+			}
+
 			assert.deepEqual(collection, [
 				{ id: "bar", name: "Bar", value: 2 },
 				{ id: "baz", name: "Baz", value: 3 }

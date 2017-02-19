@@ -97,7 +97,10 @@ describe("Adaptor server", function() {
 		// set some test values
 		adaptor.set({ id: "foo", value: "bar" });
 
-		return server("/foo", { method: "DELETE" })
+		return server("/foo", {
+			method: "DELETE",
+			headers: {}
+		})
 
 		.then(res => {
 			// check the status
@@ -239,6 +242,60 @@ describe("Adaptor server", function() {
 			assert.deepEqual(res.body, [
 				{ id: "bar", value: "Bar" }
 			]);
+		});
+	});
+
+	it("returns Conflict when the local is newer (set)", function() {
+		// create an adaptor and server
+		var adaptor = new MemAdaptor();
+		var server = AdaptorServer(adaptor);
+
+		// set some test values
+		adaptor.set({ id: "foo", modified: 2, value: "bar" });
+
+		// pass a fake request
+		return server("/foo", {
+			method: "PUT",
+			json() {
+				return {
+					id: "foo",
+					modified: 1,
+					value: "baz"
+				};
+			}
+		})
+
+		.then(res => {
+			// check the status
+			assert.equal(res.status, 409);
+
+			// check the body
+			assert.deepEqual(res.body, { id: "foo", modified: 2, value: "bar" });
+		});
+	});
+
+	it("returns Conflict when the local is newer (delete)", function() {
+		// create an adaptor and server
+		var adaptor = new MemAdaptor();
+		var server = AdaptorServer(adaptor);
+
+		// set some test values
+		adaptor.set({ id: "foo", modified: 2, value: "bar" });
+
+		// pass a fake request
+		return server("/foo", {
+			method: "DELETE",
+			headers: {
+				xDeleted: 1
+			}
+		})
+
+		.then(res => {
+			// check the status
+			assert.equal(res.status, 409);
+
+			// check the body
+			assert.deepEqual(res.body, { id: "foo", modified: 2, value: "bar" });
 		});
 	});
 });

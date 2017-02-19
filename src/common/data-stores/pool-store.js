@@ -111,6 +111,9 @@ class PoolStore extends lifeLine.EventEmitter {
 	 * Store a value in the pool
 	 */
 	set(value) {
+		// set the modified date
+		value.modified = Date.now();
+
 		// store the value in the adaptor
 		this._adaptor.set(value);
 
@@ -127,7 +130,7 @@ class PoolStore extends lifeLine.EventEmitter {
 	 */
 	remove(id) {
 		// remove the value from the adaptor
-		this._adaptor.remove(id);
+		this._adaptor.remove(id, Date.now());
 
 		// propogate the change
 		this.emit("change", {

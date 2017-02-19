@@ -71,6 +71,9 @@ describe("Key value store", function() {
 		return adaptor.get("Foo")
 
 		.then(value => {
+			// remove the modified date
+			delete value.modified;
+
 			assert.deepEqual(value, {
 				id: "Foo",
 				value: "Bar"
@@ -90,6 +93,9 @@ describe("Key value store", function() {
 		return adaptor.get("Foo")
 
 		.then(value => {
+			// remove the modified date
+			delete value.modified;
+
 			assert.deepEqual(value, {
 				id: "Foo",
 				value: "Bar"

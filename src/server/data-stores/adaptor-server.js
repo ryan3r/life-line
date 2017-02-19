@@ -96,15 +96,28 @@ module.exports = function(adaptor, permissor = {}) {
 				}
 
 				// parse the body
-				return req.json()
+				return Promise.all([
+					req.json(),
+					adaptor.get(key)
+				])
 
 				// store the value
-				.then(value => adaptor.set(value))
+				.then(([newValue, oldValue]) => {
+					// the value they are sending is older that the current value
+					if(oldValue && oldValue.modified > newValue.modified) {
+						return new lifeLine.Response({
+							status: 409,
+							body: oldValue
+						});
+					}
 
-				// send the success response
-				.then(() => {
-					return new lifeLine.Response({
-						status: 204
+					return adaptor.set(newValue)
+
+					// send the success response
+					.then(() => {
+						return new lifeLine.Response({
+							status: 204
+						});
 					});
 				});
 			});
@@ -130,14 +143,26 @@ module.exports = function(adaptor, permissor = {}) {
 					});
 				}
 
-				return adaptor.remove(key)
+				return adaptor.get(key)
 
-				// send the success response
-				.then(() => {
-					return new lifeLine.Response({
-						status: 204
+				.then(value => {
+					// the value has been modified since the delete was sent
+					if(value && value.modified > req.headers.xDeleted) {
+						return new lifeLine.Response({
+							status: 409,
+							body: value
+						});
+					}
+
+					return adaptor.remove(key)
+
+					// send the success response
+					.then(() => {
+						return new lifeLine.Response({
+							status: 204
+						});
 					});
-				});
+				})
 			});
 		}
 		// method not supported
