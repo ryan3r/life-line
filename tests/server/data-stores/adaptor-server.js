@@ -213,4 +213,32 @@ describe("Adaptor server", function() {
 			assert.equal(res.status, 405);
 		});
 	});
+
+	it("can get all the items that the user can access", function() {
+		// create an adaptor and server
+		var adaptor = new MemAdaptor();
+		var server = AdaptorServer(adaptor, {
+			read(id) {
+				return id == "bar";
+			}
+		});
+
+		// set some test values
+		adaptor.set({ id: "foo", value: "Foo" });
+		adaptor.set({ id: "bar", value: "Bar" });
+		adaptor.set({ id: "baz", value: "Baz" });
+
+		// pass a fake request
+		return server("/", { method: "GET" })
+
+		.then(res => {
+			// check the status
+			assert.equal(res.status, 200);
+
+			// check the body
+			assert.deepEqual(res.body, [
+				{ id: "bar", value: "Bar" }
+			]);
+		});
+	});
 });

@@ -9,6 +9,24 @@ module.exports = function(adaptor, permissor = {}) {
 			return adaptor.getAll()
 
 			.then(values => {
+				// no access restrictions
+				if(!permissor.read) {
+					return values;
+				}
+
+				// if we have a read restriction check that
+				return Promise.all(
+					// check if the values accessable
+					values.map(value => permissor.read(value.id, req))
+				)
+
+				.then(allows => {
+					// filter out items this user does not have access to
+					return values.filter((value, i) => allows[i]);
+				});
+			})
+
+			.then(values => {
 				// create the response
 				return new lifeLine.Response({
 					body: values
@@ -24,7 +42,7 @@ module.exports = function(adaptor, permissor = {}) {
 
 			// check authentication
 			if(permissor.read) {
-				allow = Promise.resolve(permissor.read(key));
+				allow = Promise.resolve(permissor.read(key, req));
 			}
 
 			return allow.then(allowed => {
@@ -65,7 +83,7 @@ module.exports = function(adaptor, permissor = {}) {
 
 			// check authentication
 			if(permissor.write) {
-				allow = Promise.resolve(permissor.write(key));
+				allow = Promise.resolve(permissor.write(key, req));
 			}
 
 			return allow.then(allowed => {
@@ -100,7 +118,7 @@ module.exports = function(adaptor, permissor = {}) {
 
 			// check authentication
 			if(permissor.write) {
-				allow = Promise.resolve(permissor.write(key));
+				allow = Promise.resolve(permissor.write(key, req));
 			}
 
 			return allow.then(allowed => {
