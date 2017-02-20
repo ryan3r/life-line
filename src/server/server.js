@@ -5,9 +5,6 @@ var path = require("path");
 var pkg = require("../../package.json");
 var handler = require("./handler");
 
-require("../common/global");
-require("./global");
-
 // start the server
 module.exports = function(opts = {}) {
 	// make the value globally accessable

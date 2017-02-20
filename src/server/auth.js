@@ -3,11 +3,7 @@
  */
 
 var passwordLib = require("password-hash-and-salt");
-var {store} = require("./data-store");
-
-// data stores for tracking users
-var users = store("users");
-var sessions = store("sessions");
+var {users, sessions} = require("./data-stores");
 
 // the amount of time a session should live for (1 month)
 const SESSION_LIFETIME = 30 * 24 * 60 * 60 * 1000;
@@ -73,7 +69,7 @@ exports.handle = function(url, req) {
 		}
 
 		// remove the session
-		return sessions.delete(req.cookies.session)
+		return sessions.set(req.cookies.session, undefined)
 
 		// catch session not defined
 		.catch(() => {})

@@ -15,7 +15,7 @@ class JsonFileAdaptor {
 			this.mode = opts.mode;
 			this.src = opts.src;
 		}
-		// default to object mode
+		// default to array mode
 		else {
 			this.mode = ARRAY_MODE;
 			this.src = opts;

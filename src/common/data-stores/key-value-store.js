@@ -44,7 +44,7 @@ class KeyValueStore extends lifeLine.EventEmitter {
 	set(key, value) {
 		// set a single value
 		if(typeof key == "string") {
-			this._adapter.set({
+			return this._adapter.set({
 				id: key,
 				value,
 				modified: Date.now()
@@ -55,16 +55,23 @@ class KeyValueStore extends lifeLine.EventEmitter {
 		}
 		// set several values
 		else {
+			// tell the caller when we are done
+			let promises = [];
+
 			for(let _key of Object.getOwnPropertyNames(key)) {
-				this._adapter.set({
-					id: _key,
-					value: key[_key],
-					modified: Date.now()
-				});
+				promises.push(
+					this._adapter.set({
+						id: _key,
+						value: key[_key],
+						modified: Date.now()
+					})
+				);
 
 				// trigger the change
 				this.emit(_key, key[_key]);
 			}
+
+			return Promise.all(promises);
 		}
 	}
 
