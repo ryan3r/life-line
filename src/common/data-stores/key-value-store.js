@@ -44,7 +44,7 @@ class KeyValueStore extends lifeLine.EventEmitter {
 	set(key, value) {
 		// set a single value
 		if(typeof key == "string") {
-			return this._adapter.set({
+			var promise = this._adapter.set({
 				id: key,
 				value,
 				modified: Date.now()
@@ -52,6 +52,8 @@ class KeyValueStore extends lifeLine.EventEmitter {
 
 			// trigger the change
 			this.emit(key, value);
+
+			return promise;
 		}
 		// set several values
 		else {
@@ -90,11 +92,17 @@ class KeyValueStore extends lifeLine.EventEmitter {
 
 		 // send the current value
 		 if(opts.current) {
-			 fn(this.get(key, opts.default));
+			 this.get(key, opts.default)
+			 	.then(value => fn(value));
 		 }
 
 		 // listen for any changes
-		 return this.on(key, fn);
+		 return this.on(key, value => {
+			 // only emit the change if there is not an override in place
+			 if(!this._overrides || !this._overrides.hasOwnProperty(key)) {
+				 fn(value);
+			 }
+		 });
 	 }
 
 	 /**
@@ -104,6 +112,11 @@ class KeyValueStore extends lifeLine.EventEmitter {
 	  */
 	 setOverrides(overrides) {
 		 this._overrides = overrides;
+
+		 // emit changes for each of the overrides
+		 Object.getOwnPropertyNames(overrides)
+
+		 .forEach(key => this.emit(key, overrides[key]));
 	 }
 }
 

@@ -76,7 +76,7 @@ module.exports = function(req, res) {
 			// log the error to the console
 			console.log(err);
 
-			return new lifeLine.jsend.error(err);
+			return lifeLine.jsend.error(err);
 		})
 
 		// send the response

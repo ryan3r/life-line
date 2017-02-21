@@ -6,7 +6,7 @@ var fs = require("fs-promise");
 var path = require("path");
 
 // the data storage directory
-var dataDir;
+var dataDir = "../life-line-data";
 
 // the dir has been configured
 var _readyResolve;

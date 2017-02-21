@@ -14,15 +14,12 @@ var parsed = nopt({
 	backup: String,
 	port: Number,
 	localhost: Boolean,
-	dev: Boolean,
-	certs: String,
-	"data-dir": String
+	devMode: Boolean,
+	certs: String
 });
 
-// configure the data stores
-if(parsed["data-dir"]) {
-	lifeLine.setDataDir(parsed["data-dir"]);
-}
+// update the configuration
+global.lifeLine.config.setOverrides(parsed);
 
 // run a backup
 if(parsed.backup) {
@@ -31,10 +28,5 @@ if(parsed.backup) {
 }
 // start the server
 else {
-	lifeLine.startServer({
-		devMode: parsed.dev,
-		localhost: parsed.localhost,
-		port: parsed.port,
-		certs: parsed.certs
-	});
+	lifeLine.startServer();
 }

@@ -20,7 +20,9 @@ class Response {
 	// the method to send the response
 	$send(req, res) {
 		// stringify json response
-		if(typeof this.body == "object" && typeof this.body.pipe != "function") {
+		if(typeof this.body == "object" &&
+			typeof this.body.pipe != "function" &&
+			!(this.body instanceof Buffer)) {
 			// pretty print json for development
 			if(lifeLine.devMode) {
 				this.body = JSON.stringify(this.body, null, 4);
@@ -79,41 +81,45 @@ class Response {
 		// get the current version
 		var version = lifeLine.version;
 
-		// add the build number on update the page for every change
-		if(lifeLine.devMode) {
-			// get the path to the build info
-			let buildInfoPath = path.join(__dirname, "../../build.json");
+		lifeLine.config.get("devMode")
 
-			// load and attach the build number
-			version += "@" +
-				JSON.parse(fs.readFileSync(buildInfoPath, "utf8")).buildNumber;
-		}
+		.then(devMode => {
+			// add the build number on update the page for every change
+			if(devMode) {
+				// get the path to the build info
+				let buildInfoPath = path.join(__dirname, "../../build.json");
 
-		// convert headers back to dash case
-		var headers = {
-			// attach the server header
-			server: `life-line v${version}`
-		};
+				// load and attach the build number
+				version += "@" +
+					JSON.parse(fs.readFileSync(buildInfoPath, "utf8")).buildNumber;
+			}
 
-		for(let key of Object.getOwnPropertyNames(this.headers)) {
-			// convert the name to dash case
-			let dashCase = key.replace(/[A-Z]/g, char => "-" + char.toLowerCase());
+			// convert headers back to dash case
+			var headers = {
+				// attach the server header
+				server: `life-line v${version}`
+			};
 
-			// copy over the headers
-			headers[dashCase] = this.headers[key];
-		}
+			for(let key of Object.getOwnPropertyNames(this.headers)) {
+				// convert the name to dash case
+				let dashCase = key.replace(/[A-Z]/g, char => "-" + char.toLowerCase());
 
-		// send the headers
-		res.writeHead(this.status, headers);
+				// copy over the headers
+				headers[dashCase] = this.headers[key];
+			}
 
-		// stream the body
-		if(typeof this.body.pipe == "function") {
-			this.body.pipe(res);
-		}
-		// send the body
-		else {
-			res.end(this.body);
-		}
+			// send the headers
+			res.writeHead(this.status, headers);
+
+			// stream the body
+			if(typeof this.body.pipe == "function") {
+				this.body.pipe(res);
+			}
+			// send the body
+			else {
+				res.end(this.body);
+			}
+		});
 	}
 
 	// create a redirect response
