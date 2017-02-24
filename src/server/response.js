@@ -112,7 +112,7 @@ class Response {
 			res.writeHead(this.status, headers);
 
 			// stream the body
-			if(typeof this.body.pipe == "function") {
+			if(typeof this.body == "object" && typeof this.body.pipe == "function") {
 				this.body.pipe(res);
 			}
 			// send the body

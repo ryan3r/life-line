@@ -4,12 +4,15 @@
 
 var path = require("path");
 var Request = require("./request");
-var dataStore = require("./data-store");
+var {assignments} = require("./data-stores");
+var createAdaptorServer = require("./data-stores/adaptor-server");
 var auth = require("./auth");
 var backup = require("./backup");
 var Response = require("./response");
 
 const NO_RESPONSE = "No response returned by the handler";
+
+var adaptorServer = createAdaptorServer(assignments._adaptor);
 
 // route requests to the proper handlers
 module.exports = function(req, res) {
@@ -19,7 +22,7 @@ module.exports = function(req, res) {
 
 	// the data api
 	if(request.url.substr(0, 10) == "/api/data/") {
-		response = dataStore.handle(request.url.substr(10), request);
+		response = adaptorServer(request.url.substr(9), request);
 	}
 	// the login api
 	else if(request.url.substr(0, 10) == "/api/auth/") {

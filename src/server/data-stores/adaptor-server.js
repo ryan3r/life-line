@@ -53,7 +53,7 @@ module.exports = function(adaptor, permissor = {}) {
 						body: "You do not have premission to access " + key
 					});
 				}
-
+				
 				// send the value
 				return adaptor.get(key)
 

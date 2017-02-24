@@ -23,4 +23,4 @@ exports.sessions = new KeyValueStore(
 	})
 );
 
-exports.assignments = new PoolStore(new FolderAdaptor(path.join(DS_DIR, "assignements")));
+exports.assignments = new PoolStore(new FolderAdaptor(path.join(DS_DIR, "assignments")));

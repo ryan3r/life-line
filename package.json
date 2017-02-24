@@ -16,6 +16,7 @@
     "fs-promise": "^1.0.0",
     "idb": "^2.0.0",
     "mime-db": "^1.25.0",
+    "node-fetch": "^1.6.3",
     "nopt": "^4.0.1",
     "password-hash-and-salt": "^0.1.4"
   },

@@ -5,11 +5,8 @@
 var path = require("path");
 var fs = require("fs");
 var archiver = require("archiver");
-var {store} = require("./data-store");
+var {assignments} = require("./data-stores");
 var {genBackupName} = require("../common/backup");
-
-// get the assignments data store
-var assignments = store("assignments");
 
 // create a backup archive
 module.exports = function(outdir) {
@@ -17,7 +14,7 @@ module.exports = function(outdir) {
 	var zip = archiver("zip", { store: true });
 
 	// load all the assignments
-	assignments.getAll()
+	assignments.query({})
 
 	.then(assignments => {
 		// add the assignments to the archive

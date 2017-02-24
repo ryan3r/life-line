@@ -144,7 +144,7 @@ self.addEventListener("fetch", e => {
 				return new Response(JSON.stringify({
 					status: "fail",
 					data: {
-						reason: "networ-error"
+						reason: "network-error"
 					}
 				}), {
 					headers: {

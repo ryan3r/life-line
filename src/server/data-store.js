@@ -1,6 +1,6 @@
 /**
  * A collection of data stores
- */
+ * /
 
 var fs = require("fs-promise");
 var path = require("path");
@@ -268,3 +268,4 @@ var Store = class {
 		return fs.unlink(path.join(dataDir, this.name, key + ".json"));
 	}
 };
+*/

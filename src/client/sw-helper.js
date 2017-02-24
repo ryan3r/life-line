@@ -5,7 +5,7 @@
  // register the service worker
  if(navigator.serviceWorker) {
 	 // make sure it's registered
-	 navigator.serviceWorker.register("/service-worker.js");
+	 //navigator.serviceWorker.register("/service-worker.js");
 
 	 // listen for messages
 	 navigator.serviceWorker.addEventListener("message", e => {
