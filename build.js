@@ -20,6 +20,10 @@ const BUNDLES = [
 	{
 		entry: "./src/client/sw-index.js",
 		output: "static/service-worker.js"
+	},
+	{
+		entry: "./tests/all.js",
+		output: "static/tests.js"
 	}
 ];
 

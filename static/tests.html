@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tests</title>
+		<link rel="stylesheet" href="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.css"/>
+	</head>
+	<body>
+		<div id="mocha"></div>
+		<script src="https://cdn.rawgit.com/jquery/jquery/2.1.4/dist/jquery.min.js"></script>
+		<script src="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.js"></script>
+		<script>mocha.setup("bdd");</script>
+		<script src="/static/tests.js"></script>
+		<script>
+			mocha.run();
+		</script>
+	</body>
+</html>
