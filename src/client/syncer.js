@@ -1,7 +1,7 @@
 /**
  * Syncronize this client with the server
  */
-
+/*
 var dataStore = require("./data-store").store;
 
 var syncStore = dataStore("sync-store");
@@ -221,3 +221,4 @@ if(typeof window == "object") {
 	// sync on startup
 	syncer.sync();
 }
+*/

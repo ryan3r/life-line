@@ -3,9 +3,7 @@
  */
 
 var {daysFromNow, isSameDate, stringifyTime} = require("../util/date");
-var {store} = require("../data-store");
-
-var assignments = store("assignments");
+var {assignments} = require("../data-stores");
 
 lifeLine.nav.register({
 	matcher: "/",
@@ -15,7 +13,7 @@ lifeLine.nav.register({
 
 		// load the items
 		disposable.add(
-			assignments.getAll(function(data) {
+			assignments.query({ done: false }, function(data) {
 				// clear the old content
 				content.innerHTML = "";
 
@@ -31,9 +29,6 @@ lifeLine.nav.register({
 
 				// select the items to display
 				data.forEach(item => {
-					// skip completed items
-					if(item.done) return;
-
 					// assignments for today
 					if(item.type == "assignment") {
 						// today

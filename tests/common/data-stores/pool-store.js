@@ -44,7 +44,14 @@ describe("Pool store", function() {
 		var collection = [];
 
 		// query all type a elements
-		pool.query({ type: "a" }, { watch: true }, r => collection.push(r));
+		pool.query({ type: "a" }, values => {
+			// remove modified fields
+			for(let value of values) {
+				delete value.modified;
+			}
+
+			collection.push(values);
+		});
 
 		setTimeout(() => {
 			// change a value that matches the query
@@ -56,18 +63,11 @@ describe("Pool store", function() {
 			// remove the other value
 			pool.remove("foo");
 
-			// remove modified dates
-			for(let change of collection) {
-				if(change.value) {
-					delete change.value.modified;
-				}
-			}
-
 			assert.deepEqual(collection, [
-				{ type: "change", id: "foo", value: { id: "foo", name: "Foo", type: "a" } },
-				{ type: "change", id: "baz", value: { id: "baz", name: "Baz", type: "a" } },
-				{ type: "unmatch", id: "baz" },
-				{ type: "remove", id: "foo" }
+				[{ id: "foo", name: "Foo", type: "a" }],
+				[{ id: "foo", name: "Foo", type: "a" }, { id: "baz", name: "Baz", type: "a" }],
+				[{ id: "foo", name: "Foo", type: "a" }],
+				[]
 			]);
 
 			done();

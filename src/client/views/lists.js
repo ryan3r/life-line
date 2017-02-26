@@ -3,9 +3,7 @@
  */
 
 var {daysFromNow, isSameDate, stringifyDate, stringifyTime, isSoonerDate} = require("../util/date");
-var {store} = require("../data-store");
-
-var assignments = store("assignments");
+var {assignments} = require("../data-stores");
 
 // all the different lists
 const LISTS = [
@@ -20,9 +18,6 @@ const LISTS = [
 		}),
 		// show all at reasonable number of incomplete assignments
 		filter: (item, {today, endDate}) => {
-			// already done
-			if(item.done) return;
-
 			// show all tasks
 			if(item.type == "task") return true;
 
@@ -33,16 +28,17 @@ const LISTS = [
 			if(isSoonerDate(item.date, today)) return;
 
 			return true;
-		}
+		},
+		query: { done: false }
 	},
 	{
 		url: "/upcoming",
-		filter: item => !item.done,
+		query: { done: false },
 		title: "Upcoming"
 	},
 	{
 		url: "/done",
-		filter: item => item.done,
+		query: { done: true },
 		title: "Done"
 	}
 ];
@@ -60,7 +56,7 @@ lifeLine.nav.register({
 	// make the list
 	make({setTitle, content, disposable, match}) {
 		disposable.add(
-			assignments.getAll(function(data) {
+			assignments.query(match.query || {}, function(data) {
 				// clear the content
 				content.innerHTML = "";
 
@@ -75,14 +71,15 @@ lifeLine.nav.register({
 				}
 
 				// run the filter function
-				data = data.filter(item => match.filter(item, ctx));
+				if(match.filter) {
+					data = data.filter(item => match.filter(item, ctx));
+				}
 
 				// sort the assingments
 				data.sort((a, b) => {
 					// tasks are below assignments
 					if(a.type == "task" && b.type != "task") return 1;
 					if(a.type != "task" && b.type == "task") return -1;
-					//if(a.type == "task" || b.type == "task") return 0;
 
 					// sort by due date
 					if(a.type == "assignment" && b.type == "assignment") {

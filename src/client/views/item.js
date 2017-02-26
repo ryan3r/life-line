@@ -3,9 +3,7 @@
  */
 
 var {daysFromNow, stringifyDate} = require("../util/date");
-var {store} = require("../data-store");
-
-var assignments = store("assignments");
+var {assignments} = require("../data-stores");
 
 lifeLine.nav.register({
 	matcher: /^\/item\/(.+?)$/,
@@ -14,7 +12,7 @@ lifeLine.nav.register({
 		var actionDoneSub, actionEditSub;
 
 	 	disposable.add(
-			assignments.get(match[1], function(item) {
+			assignments.query({ id: match[1] }, function([item]) {
 				// clear the content
 				content.innerHTML = "";
 
@@ -59,7 +57,7 @@ lifeLine.nav.register({
 					item.modified = Date.now();
 
 					// save the change
-					assignments.set(item, [], { saveNow: true });
+					assignments.set(item);
 				});
 
 				// edit the item

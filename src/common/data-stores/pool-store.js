@@ -3,23 +3,16 @@
  */
 
 class PoolStore extends lifeLine.EventEmitter {
-	constructor(adaptor) {
+	constructor(adaptor, initFn) {
 		super();
 		this._adaptor = adaptor;
+		this._initFn = initFn;
 	}
 
 	/**
 	 * Get all items matcing the provided properties
 	 */
-	query(props, opts, fn) {
-		// make opts optional
-		if(typeof opts == "function") {
-			fn = opts;
-			opts = {};
-		}
-
-		opts || (opts = {});
-
+	query(props, fn) {
 		// check if a value matches the query
 		var filter = value => {
 			// check that all the properties match
@@ -37,70 +30,93 @@ class PoolStore extends lifeLine.EventEmitter {
 			});
 		};
 
-		// keep track of the current list of items so when items
-		// stop fiting the query we can notify the consumer
-		var currentItems = [];
-
 		// get all current items that match the filter
 		var current = this._adaptor.getAll()
 
 		.then(values => {
-			var matches = values.filter(filter);
+			// filter out the values
+			values = values.filter(filter);
 
-			// track the id
-			for(let value of matches) {
-				currentItems.push(value.id);
+			// do any initialization
+			if(this._initFn) {
+				values = values.map(value => this._initFn(value) || value);
 			}
 
-			return matches;
+			return values;
 		});
 
 		// optionaly run changes through the query as well
-		if(opts.watch) {
+		if(typeof fn == "function") {
+			let subscription, stopped;
+
 			// wrap the values in change objects and send the to the consumer
 			current.then(values => {
+				// don't listen if unsubscribe was already called
+				if(stopped) return;
+
 				// send the values we currently have
-				for(let value of values) {
-					fn({ type: "change", id: value.id, value });
-				}
+				fn(values.slice(0));
 
 				// watch for changes after the initial values are send
-				this.on("change", change => {
+				subscription = this.on("change", change => {
+					// find the previous value
+					var index = values.findIndex(value => value.id == change.id);
+
 					if(change.type == "change") {
 						// check if the value matches the query
 						let matches = filter(change.value);
 
 						if(matches) {
-							// if this isn't in the currentItems list add it
-							if(currentItems.indexOf(change.id) === -1) {
-								currentItems.push(change.id);
+							// freshly created
+							if(index === -1) {
+								let {value} = change;
+
+								// do any initialization
+								if(this._initFn) {
+									value = this._initFn(value) || value;
+								}
+
+								values.push(value);
+							}
+							// update an existing value
+							else {
+								values[index] = change.value;
 							}
 
-							// pass the change along
-							fn(change);
+							fn(values.slice(0));
 						}
 						// tell the consumer this value no longer matches
-						else if(currentItems.indexOf(change.id) !== -1) {
-							// remove the item from the current items list
-							currentItems.splice(currentItems.indexOf(change.id), 1);
+						else if(index !== -1) {
+							// remove the item
+							if(index !== -1) {
+								values.splice(index, 1);
+							}
 
-							fn({
-								type: "unmatch",
-								id: change.id
-							});
+							fn(values.slice(0));
 						}
 					}
-					else if(change.type == "remove" && currentItems.indexOf(change.id) !== -1) {
-						// remove the item from the current items list
-						currentItems.splice(currentItems.indexOf(change.id), 1);
+					else if(change.type == "remove" && index !== -1) {
+						// remove the item
+						if(index !== -1) {
+							values.splice(index, 1);
+						}
 
-						fn({
-							type: "remove",
-							id: change.id
-						});
+						fn(values.slice(0));
 					}
 				});
 			});
+
+			return {
+				unsubscribe() {
+					// if we are listening stop
+					if(subscription) {
+						subscription.unsubscribe()
+					}
+
+					// don't listen
+					stopped = true;
+				}
+			}
 		}
 		else {
 			return current;
