@@ -3,9 +3,9 @@ require("../common/global");
 require("./global");
 
 var KeyValueStore = require("../common/data-stores/key-value-store");
-var MemAdaptor = require("../common/data-stores/mem-adaptor");
+var IdbAdaptor = require("./data-stores/idb-adaptor");
 
-var syncStore = new KeyValueStore(new MemAdaptor());
+var syncStore = new KeyValueStore(new IdbAdaptor("sync-store"));
 
 // all the files to cache
 const CACHED_FILES = [
@@ -95,7 +95,7 @@ var checkForUpdates = function(newVersion) {
 		oldVersion = Promise.resolve(clientVersion);
 	}
 	else {
-		oldVersion = syncStore.get("version").then((value = {}) => value.value)
+		oldVersion = syncStore.get("version");
 	}
 
 	return Promise.all([
@@ -106,7 +106,6 @@ var checkForUpdates = function(newVersion) {
 	.then(([newVersion, oldVersion]) => {
 		// same version do nothing
 		if(newVersion == oldVersion) {
-
 			return syncStore.set("version", oldVersion);
 		}
 
@@ -125,7 +124,6 @@ self.addEventListener("fetch", e => {
 
 	// just go to the server for api calls
 	if(url.substr(0, 5) == "/api/") {
-
 		e.respondWith(
 			fetch(e.request, {
 				credentials: "include"

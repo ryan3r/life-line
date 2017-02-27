@@ -4,6 +4,7 @@
 
 var HttpAdaptor = require("../../common/data-stores/http-adaptor");
 var PoolStore = require("../../common/data-stores/pool-store");
+var IdbAdaptor = require("./idb-adaptor");
 
 var initItem = item => {
 	// instantiate the date
