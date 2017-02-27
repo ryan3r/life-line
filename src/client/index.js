@@ -19,16 +19,6 @@ require("./views/account");
 require("./views/users");
 require("./views/todo");
 
-// set up the data store
-var {store} = require("./data-store");
-
-store("assignments").setInit(function(item) {
-	// parse the date
-	if(typeof item.date == "string") {
-		item.date = new Date(item.date);
-	}
-});
-
 // instantiate the dom
 lifeLine.makeDom({
 	parent: document.body,

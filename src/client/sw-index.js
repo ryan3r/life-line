@@ -2,9 +2,10 @@
 require("../common/global");
 require("./global");
 
-var {store} = require("./data-store");
+var KeyValueStore = require("../common/data-stores/key-value-store");
+var MemAdaptor = require("../common/data-stores/mem-adaptor");
 
-var syncStore = store("sync-store");
+var syncStore = new KeyValueStore(new MemAdaptor());
 
 // all the files to cache
 const CACHED_FILES = [
@@ -45,12 +46,7 @@ var download = function() {
 					if(!version) {
 						version = clientVersion = res.headers.get("server");
 
-						promises.push(
-							syncStore.set({
-								id: "version",
-								value: version
-							})
-						);
+						promises.push(syncStore.set("version", version));
 					}
 
 					return promises.length == 1 ? promises[0] : Promise.all(promises);
@@ -111,10 +107,7 @@ var checkForUpdates = function(newVersion) {
 		// same version do nothing
 		if(newVersion == oldVersion) {
 
-			return syncStore.set({
-				id: "version",
-				value: oldVersion
-			});
+			return syncStore.set("version", oldVersion);
 		}
 
 		// download the new version
