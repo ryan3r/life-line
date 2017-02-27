@@ -90,7 +90,7 @@ class JsonFileAdaptor {
 	 */
 	get(id) {
 		return this._file.then(file => {
-			return file[id]
+			return file[id];
 		});
 	}
 
