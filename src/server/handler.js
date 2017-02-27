@@ -4,15 +4,12 @@
 
 var path = require("path");
 var Request = require("./request");
-var {assignments} = require("./data-stores");
-var createAdaptorServer = require("./data-stores/adaptor-server");
+var adaptorServer = require("./data-stores/server");
 var auth = require("./auth");
 var backup = require("./backup");
 var Response = require("./response");
 
 const NO_RESPONSE = "No response returned by the handler";
-
-var adaptorServer = createAdaptorServer(assignments._adaptor);
 
 // route requests to the proper handlers
 module.exports = function(req, res) {
