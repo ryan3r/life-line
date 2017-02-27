@@ -33,10 +33,28 @@ module.exports = function(adaptor, permissor = {}) {
 				});
 			});
 		}
+		// check our access level
+		else if(req.method == "GET" && url == "/access") {
+			let access;
+
+			// assume full access if there is no accessLevel method
+			if(!permissor.accessLevel) {
+				access = Promise.resolve("full");
+			}
+			else {
+				access = Promise.resolve(permissor.accessLevel(req))
+			}
+
+			return access.then(level => {
+				return new lifeLine.Response({
+					body: level
+				});
+			});
+		}
 		// get a single value
-		else if(req.method == "GET") {
+		else if(req.method == "GET" && url.substr(0, 7) == "/value/") {
 			// extract the key from the url
-			var key = url.substr(1);
+			var key = url.substr(7);
 
 			var allow = Promise.resolve(true);
 
@@ -53,7 +71,7 @@ module.exports = function(adaptor, permissor = {}) {
 						body: "You do not have premission to access " + key
 					});
 				}
-				
+
 				// send the value
 				return adaptor.get(key)
 
@@ -75,9 +93,9 @@ module.exports = function(adaptor, permissor = {}) {
 			});
 		}
 		// store a value
-		else if(req.method == "PUT") {
+		else if(req.method == "PUT" && url.substr(0, 7) == "/value/") {
 			// extract the key from the url
-			var key = url.substr(1);
+			var key = url.substr(7);
 
 			var allow = Promise.resolve(true);
 
@@ -123,9 +141,9 @@ module.exports = function(adaptor, permissor = {}) {
 			});
 		}
 		// delete a value
-		else if(req.method == "DELETE") {
+		else if(req.method == "DELETE" && url.substr(0, 7) == "/value/") {
 			// extract the key from the url
-			var key = url.substr(1);
+			var key = url.substr(7);
 
 			var allow = Promise.resolve(true);
 

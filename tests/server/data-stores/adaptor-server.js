@@ -36,7 +36,7 @@ describe("Adaptor server", function() {
 		adaptor.set({ id: "foo", value: "bar" });
 
 		// pass a fake request
-		return server("/foo", { method: "GET" })
+		return server("/value/foo", { method: "GET" })
 
 		.then(res => {
 			// check the status
@@ -53,7 +53,7 @@ describe("Adaptor server", function() {
 		var server = AdaptorServer(adaptor);
 
 		// pass a fake request
-		return server("/foo", { method: "GET" })
+		return server("/value/foo", { method: "GET" })
 
 		.then(res => {
 			// check the status
@@ -66,7 +66,7 @@ describe("Adaptor server", function() {
 		var adaptor = new MemAdaptor();
 		var server = AdaptorServer(adaptor);
 
-		return server("/foo", {
+		return server("/value/foo", {
 			method: "PUT",
 			json() {
 				return Promise.resolve({
@@ -97,7 +97,7 @@ describe("Adaptor server", function() {
 		// set some test values
 		adaptor.set({ id: "foo", value: "bar" });
 
-		return server("/foo", {
+		return server("/value/foo", {
 			method: "DELETE",
 			headers: {}
 		})
@@ -131,8 +131,8 @@ describe("Adaptor server", function() {
 
 		// pass a fake request
 		return Promise.all([
-			server("/foo", { method: "GET" }),
-			server("/bar", { method: "GET" })
+			server("/value/foo", { method: "GET" }),
+			server("/value/bar", { method: "GET" })
 		])
 
 		.then(([foo, bar]) => {
@@ -154,7 +154,7 @@ describe("Adaptor server", function() {
 			}
 		});
 
-		return server("/foo", {
+		return server("/value/foo", {
 			method: "PUT",
 			json() {
 				return Promise.resolve({
@@ -189,7 +189,7 @@ describe("Adaptor server", function() {
 		// set some test values
 		adaptor.set({ id: "foo", value: "bar" });
 
-		return server("/foo", { method: "DELETE" })
+		return server("/value/foo", { method: "DELETE" })
 
 		.then(res => {
 			// check the status
@@ -254,7 +254,7 @@ describe("Adaptor server", function() {
 		adaptor.set({ id: "foo", modified: 2, value: "bar" });
 
 		// pass a fake request
-		return server("/foo", {
+		return server("/value/foo", {
 			method: "PUT",
 			json() {
 				return {
@@ -283,7 +283,7 @@ describe("Adaptor server", function() {
 		adaptor.set({ id: "foo", modified: 2, value: "bar" });
 
 		// pass a fake request
-		return server("/foo", {
+		return server("/value/foo", {
 			method: "DELETE",
 			headers: {
 				xDeleted: 1

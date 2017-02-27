@@ -47,7 +47,7 @@ class HttpAdaptor {
 	 * Get a single value
 	 */
 	get(key) {
-		return fetch(this._opts.src + key, this._createOpts())
+		return fetch(this._opts.src + "value/" + key, this._createOpts())
 
 		.then(res => {
 			// not logged in
@@ -81,7 +81,7 @@ class HttpAdaptor {
 		fetchOpts.body = JSON.stringify(value);
 
 		// send the item
-		return fetch(this._opts.src + value.id, fetchOpts)
+		return fetch(this._opts.src + "value/" + value.id, fetchOpts)
 
 		.then(res => {
 			// not logged in
@@ -106,7 +106,7 @@ class HttpAdaptor {
 		fetchOpts.method = "DELETE";
 
 		// send the item
-		return fetch(this._opts.src + key, fetchOpts)
+		return fetch(this._opts.src + "value/" + key, fetchOpts)
 
 		.then(res => {
 			// not logged in
@@ -119,6 +119,13 @@ class HttpAdaptor {
 				throw error;
 			}
 		});
+	}
+
+	// check our access level
+	accessLevel() {
+		return fetch(this._opts.src + "access", this._createOpts())
+			// the response is just a string
+			.then(res => res.text());
 	}
 }
 

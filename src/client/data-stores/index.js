@@ -12,4 +12,16 @@ var initItem = item => {
 	}
 };
 
-exports.assignments = new PoolStore(new HttpAdaptor("/api/data/"), initItem);
+var assignmentsAdaptor = new HttpAdaptor("/api/data/");
+
+exports.assignments = new PoolStore(assignmentsAdaptor, initItem);
+
+// check our access level
+assignmentsAdaptor.accessLevel()
+
+.then(level => {
+	// we are logged out
+	if(level == "none") {
+		lifeLine.nav.navigate("/login");
+	}
+});
