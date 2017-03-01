@@ -27,7 +27,7 @@ class HttpAdaptor {
 		}
 		// use the creadentials from the browser
 		else {
-			opts.creadentials = "include";
+			opts.credentials = "include";
 		}
 
 		return opts;

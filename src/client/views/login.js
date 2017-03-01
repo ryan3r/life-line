@@ -73,6 +73,12 @@ lifeLine.nav.register({
 						// login suceeded go home
 						if(res.status == "success") {
 							lifeLine.nav.navigate("/");
+
+							// sync now that we are logged in
+							if(lifeLine.sync) {
+								lifeLine.sync();
+							}
+
 							return;
 						}
 

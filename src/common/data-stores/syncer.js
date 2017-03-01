@@ -75,6 +75,14 @@ class Syncer {
 	sync() {
 		return new Sync(this._local, this._remote, this._changeStore, this._changesName).sync();
 	}
+
+	// get the remote access level
+	accessLevel() {
+		return this._remote.accessLevel()
+
+		// if anything goes wrong assume full permissions
+		.catch(() => "full");
+	}
 }
 
 // a single sync
