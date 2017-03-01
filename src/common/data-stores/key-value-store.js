@@ -5,13 +5,13 @@
 var EventEmitter = require("../util/event-emitter");
 
 class KeyValueStore extends EventEmitter {
-	constructor(adapter) {
+	constructor(adaptor) {
 		super();
-		this._adapter = adapter;
+		this._adaptor = adaptor;
 
-		// make sure we have an adapter
-		if(!adapter) {
-			throw new Error("KeyValueStore must be initialized with an adapter")
+		// make sure we have an adaptor
+		if(!adaptor) {
+			throw new Error("KeyValueStore must be initialized with an adaptor")
 		}
 	}
 
@@ -24,7 +24,7 @@ class KeyValueStore extends EventEmitter {
 			return Promise.resolve(this._overrides[key]);
 		}
 
-		return this._adapter.get(key)
+		return this._adaptor.get(key)
 
 		.then(result => {
 			// the item is not defined
@@ -46,7 +46,7 @@ class KeyValueStore extends EventEmitter {
 	set(key, value) {
 		// set a single value
 		if(typeof key == "string") {
-			var promise = this._adapter.set({
+			var promise = this._adaptor.set({
 				id: key,
 				value,
 				modified: Date.now()
@@ -64,7 +64,7 @@ class KeyValueStore extends EventEmitter {
 
 			for(let _key of Object.getOwnPropertyNames(key)) {
 				promises.push(
-					this._adapter.set({
+					this._adaptor.set({
 						id: _key,
 						value: key[_key],
 						modified: Date.now()
