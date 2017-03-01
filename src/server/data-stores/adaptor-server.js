@@ -121,14 +121,6 @@ module.exports = function(adaptor, permissor = {}) {
 
 				// store the value
 				.then(([newValue, oldValue]) => {
-					// the value they are sending is older that the current value
-					if(oldValue && oldValue.modified > newValue.modified) {
-						return new lifeLine.Response({
-							status: 409,
-							body: oldValue
-						});
-					}
-
 					return adaptor.set(newValue)
 
 					// send the success response
@@ -164,14 +156,6 @@ module.exports = function(adaptor, permissor = {}) {
 				return adaptor.get(key)
 
 				.then(value => {
-					// the value has been modified since the delete was sent
-					if(value && value.modified > req.headers.xDeleted) {
-						return new lifeLine.Response({
-							status: 409,
-							body: value
-						});
-					}
-
 					return adaptor.remove(key)
 
 					// send the success response
