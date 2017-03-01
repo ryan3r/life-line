@@ -92,10 +92,18 @@ class KeyValueStore extends EventEmitter {
 			 opts = {};
 		 }
 
+		 // if a change is triggered before get comes back don't emit the value from get
+		 var changeRecieved = false;
+
 		 // send the current value
 		 if(opts.current) {
 			 this.get(key, opts.default)
-			 	.then(value => fn(value));
+
+		 	.then(value => {
+				if(!changeRecieved) {
+					fn(value);
+				}
+			});
 		 }
 
 		 // listen for any changes
@@ -104,6 +112,8 @@ class KeyValueStore extends EventEmitter {
 			 if(!this._overrides || !this._overrides.hasOwnProperty(key)) {
 				 fn(value);
 			 }
+
+			 changeRecieved = true;
 		 });
 	 }
 
@@ -113,12 +123,13 @@ class KeyValueStore extends EventEmitter {
 	  * Useful for combining json settings with command line flags
 	  */
 	 setOverrides(overrides) {
-		 this._overrides = overrides;
-
 		 // emit changes for each of the overrides
 		 Object.getOwnPropertyNames(overrides)
 
 		 .forEach(key => this.emit(key, overrides[key]));
+
+		 // set the overrides after so the emit is not blocked
+		 this._overrides = overrides;
 	 }
 }
 

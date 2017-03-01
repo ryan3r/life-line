@@ -13,7 +13,8 @@ var parsed = nopt({
 	port: Number,
 	localhost: Boolean,
 	devMode: Boolean,
-	certs: String
+	certs: String,
+	dataDir: String
 });
 
 // update the configuration
