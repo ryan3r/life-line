@@ -33,9 +33,11 @@ class PoolStore extends EventEmitter {
 		};
 
 		// get all current items that match the filter
-		var current = this._adaptor.getAll()
+		var current = ("id" in props) ?
+			this._adaptor.get(props.id).then(value => [value]):
+			this._adaptor.getAll();
 
-		.then(values => {
+		current = current.then(values => {
 			// filter out the values
 			values = values.filter(filter);
 
