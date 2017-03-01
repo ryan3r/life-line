@@ -195,7 +195,7 @@ class Sync {
 					);
 				}
 				// the local version is newer
-				else {
+				else if(modifieds[value.id] < value.modified) {
 					promises.push(this._remote.set(value));
 				}
 			}
