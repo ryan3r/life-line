@@ -2,6 +2,11 @@
  * An adaptor for http based stores
  */
 
+if(typeof window != "object") {
+	// polyfill fetch for node
+	fetch = require("node-fetch");
+}
+
 class HttpAdaptor {
 	constructor(opts) {
 		// if we are just given a string use it as the source

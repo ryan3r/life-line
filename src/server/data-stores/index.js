@@ -4,6 +4,7 @@
 
 var KeyValueStore = require("../../common/data-stores/key-value-store");
 var PoolStore = require("../../common/data-stores/pool-store");
+var MemAdaptor = require("../../common/data-stores/mem-adaptor");
 var FolderAdaptor = require("./folder-adaptor");
 var JsonFileAdaptor = require("./json-file-adaptor");
 var path = require("path");
@@ -24,3 +25,5 @@ exports.sessions = new KeyValueStore(
 );
 
 exports.assignments = new PoolStore(new FolderAdaptor(path.join(DS_DIR, "assignments")));
+
+exports.config = new KeyValueStore(new MemAdaptor());

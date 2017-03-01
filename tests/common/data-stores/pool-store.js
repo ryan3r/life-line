@@ -1,4 +1,3 @@
-require("../../../src/common/global");
 var assert = require("assert");
 var MemAdaptor = require("../../../src/common/data-stores/mem-adaptor");
 var PoolStore = require("../../../src/common/data-stores/pool-store");

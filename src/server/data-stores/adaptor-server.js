@@ -2,6 +2,8 @@
  * Serve an adaptor over http
  */
 
+var Response = require("../response");
+
 module.exports = function(adaptor, permissor = {}) {
 	return function(url, req) {
 		// get all the values in the adaptor
@@ -28,7 +30,7 @@ module.exports = function(adaptor, permissor = {}) {
 
 			.then(values => {
 				// create the response
-				return new lifeLine.Response({
+				return new Response({
 					body: values
 				});
 			});
@@ -46,7 +48,7 @@ module.exports = function(adaptor, permissor = {}) {
 			}
 
 			return access.then(level => {
-				return new lifeLine.Response({
+				return new Response({
 					body: level
 				});
 			});
@@ -66,7 +68,7 @@ module.exports = function(adaptor, permissor = {}) {
 			return allow.then(allowed => {
 				// not given access
 				if(!allowed) {
-					return new lifeLine.Response({
+					return new Response({
 						status: 403,
 						body: "You do not have premission to access " + key
 					});
@@ -78,13 +80,13 @@ module.exports = function(adaptor, permissor = {}) {
 				.then(value => {
 					// send the value
 					if(value) {
-						return new lifeLine.Response({
+						return new Response({
 							body: value
 						});
 					}
 					// no such value :(
 					else {
-						return new lifeLine.Response({
+						return new Response({
 							status: 404,
 							body: "Value " + key + " could not be found"
 						});
@@ -107,7 +109,7 @@ module.exports = function(adaptor, permissor = {}) {
 			return allow.then(allowed => {
 				// not given access
 				if(!allowed) {
-					return new lifeLine.Response({
+					return new Response({
 						status: 403,
 						body: "You do not have premission to write to " + key
 					});
@@ -125,7 +127,7 @@ module.exports = function(adaptor, permissor = {}) {
 
 					// send the success response
 					.then(() => {
-						return new lifeLine.Response({
+						return new Response({
 							status: 204
 						});
 					});
@@ -147,7 +149,7 @@ module.exports = function(adaptor, permissor = {}) {
 			return allow.then(allowed => {
 				// not given access
 				if(!allowed) {
-					return new lifeLine.Response({
+					return new Response({
 						status: 403,
 						body: "You do not have premission to delete " + key
 					});
@@ -160,7 +162,7 @@ module.exports = function(adaptor, permissor = {}) {
 
 					// send the success response
 					.then(() => {
-						return new lifeLine.Response({
+						return new Response({
 							status: 204
 						});
 					});
@@ -170,7 +172,7 @@ module.exports = function(adaptor, permissor = {}) {
 		// method not supported
 		else {
 			return Promise.resolve(
-				new lifeLine.Response({
+				new Response({
 					status: 405
 				})
 			);

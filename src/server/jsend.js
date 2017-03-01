@@ -2,6 +2,9 @@
  * JSend for the server side
  */
 
+var Response = require("./response");
+var {config} = require("./data-stores");
+
 // shortcuts for the jsend methods
 exports.success = data => exports.jsend("success", data);
 exports.fail = msg => exports.jsend("fail", msg);
@@ -15,18 +18,22 @@ exports.jsend = function(status, data) {
 		data: data
 	};
 
-	// stringify the json
-	if(lifeLine.devMode) {
-		// format it in dev mode
-		msg = JSON.stringify(msg, null, 4);
-	}
-	else {
-		msg = JSON.stringify(msg);
-	}
+	return config.get("devMode")
 
-	// make the response
-	return new lifeLine.Response({
-		extension: ".json",
-		body: msg
+	.then(devMode => {
+		// stringify the json
+		if(devMode) {
+			// format it in dev mode
+			msg = JSON.stringify(msg, null, 4);
+		}
+		else {
+			msg = JSON.stringify(msg);
+		}
+
+		// make the response
+		return new Response({
+			extension: ".json",
+			body: msg
+		});
 	});
 };

@@ -23,7 +23,7 @@ describe("Http adaptor", function() {
 		server = http.createServer(function(req, res) {
 			serveFn(req.url, new Request(req))
 
-			.then(r => r.$send(req, res));
+			.then(r => r.$send(req, res)).catch(err => console.log(err.stack));
 		});
 
 		// start the server

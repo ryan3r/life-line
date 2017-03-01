@@ -34,7 +34,9 @@ for(let bundle of BUNDLES) {
 		packageCache: {},
 		plugin: DEV_BUNDLE ? [watchify] : [],
 		debug: DEV_BUNDLE
-	});
+	})
+
+	.ignore("node-fetch");
 
 	// configure babelify
 	bundler = bundler.transform("babelify");

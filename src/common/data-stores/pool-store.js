@@ -2,7 +2,9 @@
  * A data store which contains a pool of objects which are queryable by any property
  */
 
-class PoolStore extends lifeLine.EventEmitter {
+var EventEmitter = require("../util/event-emitter");
+
+class PoolStore extends EventEmitter {
 	constructor(adaptor, initFn) {
 		super();
 		this._adaptor = adaptor;

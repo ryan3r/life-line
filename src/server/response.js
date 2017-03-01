@@ -6,6 +6,7 @@ var mimedb = require("mime-db");
 var fs = require("fs-promise");
 var crypto = require("crypto");
 var path = require("path");
+var {config} = require("./data-stores");
 
 class Response {
 	constructor(opts = {}) {
@@ -19,71 +20,71 @@ class Response {
 
 	// the method to send the response
 	$send(req, res) {
-		// stringify json response
-		if(typeof this.body == "object" &&
-			typeof this.body.pipe != "function" &&
-			!(this.body instanceof Buffer)) {
-			// pretty print json for development
-			if(lifeLine.devMode) {
-				this.body = JSON.stringify(this.body, null, 4);
-			}
-			else {
-				this.body = JSON.stringify(this.body);
-			}
-
-			// set the content type to json
-			this.extension = ".json";
-		}
-
-		// a special hook so send file has access to the request
-		if(this.$presend) {
-			this.$presend(req);
-		}
-
-		// attach the set-cookie header
-		if(this.cookie) {
-			// the path by default is /
-			this.cookie.path = "/";
-
-			// stringify the cookie
-			this.headers.setCookie = this.cookie.name + "=" + this.cookie.value;
-
-			// add other cookie properties
-			for(let part of Object.getOwnPropertyNames(this.cookie)) {
-				// don't add name and value
-				if(part == "name" || part == "value") continue;
-
-				// add this section of the cookie
-				this.headers.setCookie += ";" + part + "=" + this.cookie[part];
-			}
-		}
-
-		// add the content type header
-		if(this.extension && !this.headers.contentType) {
-			// remove the . from the extension
-			if(this.extension.charAt(0) == ".") {
-				this.extension = this.extension.substr(1);
-			}
-
-			// look up the mimetype
-			for(let mimetype of Object.getOwnPropertyNames(mimedb)) {
-				let def = mimedb[mimetype];
-
-				// match found
-				if(def.extensions && def.extensions.indexOf(this.extension) !== -1) {
-					this.headers.contentType = mimetype;
-
-					break;
-				}
-			}
-		}
-
-		// get the current version
-		var version = lifeLine.version;
-
-		lifeLine.config.get("devMode")
+		return config.get("devMode")
 
 		.then(devMode => {
+			// stringify json response
+			if(typeof this.body == "object" &&
+				typeof this.body.pipe != "function" &&
+				!(this.body instanceof Buffer)) {
+				// pretty print json for development
+				if(devMode) {
+					this.body = JSON.stringify(this.body, null, 4);
+				}
+				else {
+					this.body = JSON.stringify(this.body);
+				}
+
+				// set the content type to json
+				this.extension = ".json";
+			}
+
+			// a special hook so send file has access to the request
+			if(this.$presend) {
+				this.$presend(req);
+			}
+
+			// attach the set-cookie header
+			if(this.cookie) {
+				// the path by default is /
+				this.cookie.path = "/";
+
+				// stringify the cookie
+				this.headers.setCookie = this.cookie.name + "=" + this.cookie.value;
+
+				// add other cookie properties
+				for(let part of Object.getOwnPropertyNames(this.cookie)) {
+					// don't add name and value
+					if(part == "name" || part == "value") continue;
+
+					// add this section of the cookie
+					this.headers.setCookie += ";" + part + "=" + this.cookie[part];
+				}
+			}
+
+			// add the content type header
+			if(this.extension && !this.headers.contentType) {
+				// remove the . from the extension
+				if(this.extension.charAt(0) == ".") {
+					this.extension = this.extension.substr(1);
+				}
+
+				// look up the mimetype
+				for(let mimetype of Object.getOwnPropertyNames(mimedb)) {
+					let def = mimedb[mimetype];
+
+					// match found
+					if(def.extensions && def.extensions.indexOf(this.extension) !== -1) {
+						this.headers.contentType = mimetype;
+
+						break;
+					}
+				}
+			}
+
+			// get the current version
+			var version = require("../../package.json").version;
+
 			// add the build number on update the page for every change
 			if(devMode) {
 				// get the path to the build info

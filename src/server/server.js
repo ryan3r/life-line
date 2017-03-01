@@ -2,17 +2,14 @@ var http = require("http");
 var https = require("https");
 var fs = require("fs");
 var path = require("path");
-var pkg = require("../../package.json");
 var handler = require("./handler");
+var {config} = require("./data-stores");
 
 // start the server
 module.exports = function() {
-	// store the version
-	lifeLine.version = pkg.version;
-
 	var server;
 
-	return lifeLine.config.get("certs")
+	return config.get("certs")
 
 	.then(certs => {
 		// secure mode
@@ -31,8 +28,8 @@ module.exports = function() {
 		}
 
 		return Promise.all([
-			lifeLine.config.get("port", 443),
-			lifeLine.config.get("localhost", false),
+			config.get("port", 443),
+			config.get("localhost", false),
 		]);
 	})
 

@@ -2,7 +2,9 @@
  * A basic key value data store
  */
 
-class KeyValueStore extends lifeLine.EventEmitter {
+var EventEmitter = require("../util/event-emitter");
+
+class KeyValueStore extends EventEmitter {
 	constructor(adapter) {
 		super();
 		this._adapter = adapter;

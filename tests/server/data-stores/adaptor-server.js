@@ -1,5 +1,3 @@
-require("../../../src/common/global");
-require("../../../src/server/global");
 var assert = require("assert");
 var AdaptorServer = require("../../../src/server/data-stores/adaptor-server");
 var MemAdaptor = require("../../../src/common/data-stores/mem-adaptor");

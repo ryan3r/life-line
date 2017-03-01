@@ -4,8 +4,6 @@
  * Create a backup or start the server
  */
 
-var path = require("path");
-var fs = require("fs");
 var nopt = require("nopt");
 var lifeLine = require("..");
 
@@ -19,7 +17,7 @@ var parsed = nopt({
 });
 
 // update the configuration
-global.lifeLine.config.setOverrides(parsed);
+lifeLine.config.setOverrides(parsed);
 
 // run a backup
 if(parsed.backup) {
