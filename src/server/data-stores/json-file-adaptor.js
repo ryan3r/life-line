@@ -20,14 +20,14 @@ class JsonFileAdaptor {
 			this.mode = ARRAY_MODE;
 			this.src = opts;
 		}
-
-		// load the file
-		this._openFile(this.src);
 	}
 
 	// open and parse a file
-	_openFile(src) {
-		this._file = fs.readFile(src, "utf8")
+	_openFile() {
+		// if the file is already open don't do anything
+		if(this._file) return this._file;
+
+		this._file = fs.readFile(this.src, "utf8")
 
 		.then(file => {
 			// if the file is empty treat it as such (don't error out)
@@ -69,13 +69,25 @@ class JsonFileAdaptor {
 			// rethrow any other errors
 			throw err;
 		});
+
+		return this._file;
+	}
+
+	/**
+	 * Change the file this store is using
+	 */
+	setFile(src) {
+		// update the source string
+		this.src = src;
+		// remove the old file from memory
+		delete this._file;
 	}
 
 	/**
 	 * Get all the values in the json file
 	 */
 	getAll() {
-		return this._file.then(file => {
+		return this._openFile().then(file => {
 			// get all the ids
 			return Object.getOwnPropertyNames(file)
 
@@ -89,7 +101,7 @@ class JsonFileAdaptor {
 	 * Get a specific item by id
 	 */
 	get(id) {
-		return this._file.then(file => {
+		return this._openFile().then(file => {
 			return file[id];
 		});
 	}
@@ -100,7 +112,7 @@ class JsonFileAdaptor {
 
 		// the file is already correctly formatted
 		if(this.mode == OBJECT_MODE) {
-			file = this._file.then(file => {
+			file = this._openFile().then(file => {
 				var mapped = {};
 
 				// convert the form id: {id, value} to id: value
@@ -134,7 +146,7 @@ class JsonFileAdaptor {
 	 * Store a value in the file
 	 */
 	set(value) {
-		this._file = this._file.then(file => {
+		this._file = this._openFile().then(file => {
 			// store it
 			file[value.id] = value;
 
@@ -148,7 +160,7 @@ class JsonFileAdaptor {
 	 * Remove a value in the file
 	 */
 	remove(value) {
-		this._file = this._file.then(file => {
+		this._file = this._openFile().then(file => {
 			// delete it
 			delete file[value.id];
 
