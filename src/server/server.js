@@ -9,15 +9,15 @@ var {config} = require("./data-stores");
 module.exports = function() {
 	var server;
 
-	return config.get("certs")
+	return config.get(["key", "cert"])
 
-	.then(certs => {
+	.then(([key, cert]) => {
 		// secure mode
-		if(certs) {
+		if(key && cert) {
 			// load the keys
-			var keys = {
-				key: fs.readFileSync(path.join(certs, "key.pem")),
-				cert: fs.readFileSync(path.join(certs, "cert.pem"))
+			let keys = {
+				key: fs.readFileSync(key),
+				cert: fs.readFileSync(cert)
 			};
 
 			server = https.createServer(keys, handler);
