@@ -3,9 +3,7 @@
  */
 
 var {daysFromNow, stringifyDate} = require("../util/date");
-var {store} = require("../data-store");
-
-var assignments = store("assignments");
+var {assignments} = require("../data-stores");;
 
 lifeLine.nav.register({
 	matcher: /^\/edit\/(.+?)$/,
@@ -13,12 +11,17 @@ lifeLine.nav.register({
 	make({match, content, setTitle, disposable}) {
 		var actionSub, deleteSub;
 
-		// push the changes through when the page is closed
-		disposable.add({
-			unsubscribe: () => assignments.forceSave()
-		});
+		// if we make a change don't refresh the page
+		var debounce;
 
-		var changeSub = assignments.get(match[1], function(item) {
+		var changeSub = assignments.query({ id: match[1] }, function([item]) {
+			// if we make a change don't refresh the page
+			if(debounce) {
+				debounce = false;
+
+				return;
+			}
+
 			// clear the content
 			content.innerHTML = "";
 
@@ -50,7 +53,8 @@ lifeLine.nav.register({
 					id: match[1],
 					description: "",
 					modified: Date.now(),
-					type: "assignment"
+					type: "assignment",
+					done: false
 				};
 			}
 
@@ -88,8 +92,10 @@ lifeLine.nav.register({
 					});
 				}
 
+				debounce = true;
+
 				// save the changes
-				assignments.set(item, changeSub);
+				assignments.set(item);
 			};
 
 			// hide and show specific fields for different assignment types

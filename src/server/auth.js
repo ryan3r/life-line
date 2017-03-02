@@ -3,11 +3,9 @@
  */
 
 var passwordLib = require("password-hash-and-salt");
-var {store} = require("./data-store");
-
-// data stores for tracking users
-var users = store("users");
-var sessions = store("sessions");
+var {users, sessions} = require("./data-stores");
+var Response = require("./response");
+var jsend = require("./jsend");
 
 // the amount of time a session should live for (1 month)
 const SESSION_LIFETIME = 30 * 24 * 60 * 60 * 1000;
@@ -24,7 +22,7 @@ exports.handle = function(url, req) {
 			.then(user => {
 				// no such user
 				if(!user) {
-					return lifeLine.jsend.fail();
+					return jsend.fail();
 				}
 
 				// verify the password
@@ -33,7 +31,7 @@ exports.handle = function(url, req) {
 				.then(valid => {
 					// invalid password
 					if(!valid) {
-						return lifeLine.jsend.fail();
+						return jsend.fail();
 					}
 
 					// generate the session
@@ -43,7 +41,7 @@ exports.handle = function(url, req) {
 					return sessions.set(id, session)
 
 					// send the cookie and success response
-					.then(() => new lifeLine.Response({
+					.then(() => new Response({
 						cookie,
 						extension: ".json",
 						body: JSON.stringify({
@@ -57,7 +55,7 @@ exports.handle = function(url, req) {
 	// log the current user out
 	else if(url == "logout") {
 		// send a success response and remove the cookie
-		let done = () => new lifeLine.Response({
+		let done = () => new Response({
 			cookie: {
 				name: "session",
 				value: "",
@@ -73,7 +71,7 @@ exports.handle = function(url, req) {
 		}
 
 		// remove the session
-		return sessions.delete(req.cookies.session)
+		return sessions.set(req.cookies.session, undefined)
 
 		// catch session not defined
 		.catch(() => {})
@@ -88,14 +86,14 @@ exports.handle = function(url, req) {
 		.then(user => {
 			// no user/session
 			if(!user) {
-				return lifeLine.jsend.fail();
+				return jsend.fail();
 			}
 
 			// get a specific user
 			if(req.query.username) {
 				// not allowed to view other users
 				if(!user.admin) {
-					return lifeLine.jsend.fail();
+					return jsend.fail();
 				}
 
 				// get the user
@@ -104,13 +102,13 @@ exports.handle = function(url, req) {
 				.then(viewUser => {
 					// no such user
 					if(!viewUser) {
-						return lifeLine.jsend.fail();
+						return jsend.fail();
 					}
 
 					// remove the password
 					delete viewUser.password;
 
-					return lifeLine.jsend.success(viewUser);
+					return jsend.success(viewUser);
 				});
 			}
 			// get the currently logged in user
@@ -118,7 +116,7 @@ exports.handle = function(url, req) {
 				// remove the password
 				delete user.password;
 
-				return lifeLine.jsend.success(user);
+				return jsend.success(user);
 			}
 		});
 	}
@@ -132,7 +130,7 @@ exports.handle = function(url, req) {
 		.then(([user, body]) => {
 			// not allowed to change this user
 			if(!user || (user.username != req.query.username && !user.admin)) {
-				return lifeLine.jsend.fail({
+				return jsend.fail({
 					msg: "You do not have access to this user"
 				});
 			}
@@ -163,7 +161,7 @@ exports.handle = function(url, req) {
 					if(!user.admin || user.username == req.query.username) {
 						// the old password must be supplied
 						if(!body.oldPassword) {
-							return lifeLine.jsend.fail({
+							return jsend.fail({
 								msg: "You must enter your old password to change your password"
 							});
 						}
@@ -174,7 +172,7 @@ exports.handle = function(url, req) {
 						.then(valid => {
 							// not authenticated
 							if(!valid) {
-								return lifeLine.jsend.fail({
+								return jsend.fail({
 									msg: "The old password you supplied is not correct"
 								});
 							}
@@ -205,7 +203,7 @@ exports.handle = function(url, req) {
 				if("admin" in body) {
 					// the user must be an admin
 					if(!user.admin) {
-						return lifeLine.jsend.fail({
+						return jsend.fail({
 							msg: "You must be an admin to change the admin status of a user"
 						});
 					}
@@ -218,7 +216,7 @@ exports.handle = function(url, req) {
 					users.set(req.query.username, targetUser)
 
 					// send back a succes response
-					.then(() => lifeLine.jsend.success());
+					.then(() => jsend.success());
 
 				// wait for the password to be checked and changed before saving
 				return response.then(res => res || save());
@@ -232,13 +230,13 @@ exports.handle = function(url, req) {
 		.then(user => {
 			// not allowed to access the user list
 			if(!user || !user.admin) {
-				return lifeLine.jsend.fail();
+				return jsend.fail();
 			}
 
 			// send the user list
 			return users.getAll()
 
-			.then(users => lifeLine.jsend.success(users));
+			.then(users => jsend.success(users));
 		});
 	}
 };

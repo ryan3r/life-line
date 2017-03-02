@@ -1,11 +1,11 @@
 {
   "name": "life-line",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "",
   "main": "./src/server",
   "bin": "./bin/life-line.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha tests/**/*.js --reporter min",
     "build": "node build -p"
   },
   "repository": "ryan3r/life-line",
@@ -16,13 +16,11 @@
     "fs-promise": "^1.0.0",
     "idb": "^2.0.0",
     "mime-db": "^1.25.0",
+    "node-fetch": "^1.6.3",
     "nopt": "^4.0.1",
     "password-hash-and-salt": "^0.1.4"
   },
   "devDependencies": {
-    "babelify": "^7.3.0",
-    "browserify": "^13.3.0",
-    "watchify": "^3.8.0",
     "babel-plugin-check-es2015-constants": "^6.8.0",
     "babel-plugin-transform-es2015-arrow-functions": "^6.8.0",
     "babel-plugin-transform-es2015-block-scoped-functions": "^6.8.0",
@@ -35,6 +33,10 @@
     "babel-plugin-transform-es2015-parameters": "^6.21.0",
     "babel-plugin-transform-es2015-shorthand-properties": "^6.18.0",
     "babel-plugin-transform-es2015-spread": "^6.8.0",
-    "babel-plugin-transform-es2015-template-literals": "^6.8.0"
+    "babel-plugin-transform-es2015-template-literals": "^6.8.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.3.0",
+    "mocha": "^3.2.0",
+    "watchify": "^3.8.0"
   }
 }

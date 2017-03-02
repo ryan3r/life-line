@@ -4,10 +4,11 @@
 
 var path = require("path");
 var Request = require("./request");
-var dataStore = require("./data-store");
+var adaptorServer = require("./data-stores/server");
 var auth = require("./auth");
 var backup = require("./backup");
 var Response = require("./response");
+var jsend = require("./jsend");
 
 const NO_RESPONSE = "No response returned by the handler";
 
@@ -19,7 +20,7 @@ module.exports = function(req, res) {
 
 	// the data api
 	if(request.url.substr(0, 10) == "/api/data/") {
-		response = dataStore.handle(request.url.substr(10), request);
+		response = adaptorServer(request.url.substr(9), request);
 	}
 	// the login api
 	else if(request.url.substr(0, 10) == "/api/auth/") {
@@ -52,13 +53,13 @@ module.exports = function(req, res) {
 			"service-worker.js" :
 			request.url.substr(8);
 
-		response = lifeLine.Response.sendFile(
+		response = Response.sendFile(
 			path.join(__dirname, "..", "..", "static", file)
 		);
 	}
 	// serve the index page
 	else {
-		response = lifeLine.Response.sendFile(
+		response = Response.sendFile(
 			path.join(__dirname, "..", "..", "static", "index.html")
 		);
 	}
@@ -66,7 +67,7 @@ module.exports = function(req, res) {
 	// send the response when the promise resolves
 	Promise.resolve(response)
 		// no response returned
-		.then(response => response || (new lifeLine.Response({ status: 500, body: NO_RESPONSE })))
+		.then(response => response || (new Response({ status: 500, body: NO_RESPONSE })))
 
 		// there was an internal error
 		.catch(err => {
@@ -76,7 +77,7 @@ module.exports = function(req, res) {
 			// log the error to the console
 			console.log(err);
 
-			return new lifeLine.jsend.error(err);
+			return jsend.error(err);
 		})
 
 		// send the response

@@ -20,6 +20,10 @@ const BUNDLES = [
 	{
 		entry: "./src/client/sw-index.js",
 		output: "static/service-worker.js"
+	},
+	{
+		entry: "./tests/all.js",
+		output: "static/tests.js"
 	}
 ];
 
@@ -30,7 +34,9 @@ for(let bundle of BUNDLES) {
 		packageCache: {},
 		plugin: DEV_BUNDLE ? [watchify] : [],
 		debug: DEV_BUNDLE
-	});
+	})
+
+	.ignore("node-fetch");
 
 	// configure babelify
 	bundler = bundler.transform("babelify");

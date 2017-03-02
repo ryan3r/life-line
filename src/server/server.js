@@ -2,45 +2,51 @@ var http = require("http");
 var https = require("https");
 var fs = require("fs");
 var path = require("path");
-var pkg = require("../../package.json");
 var handler = require("./handler");
-
-require("../common/global");
-require("./global");
+var {config} = require("./data-stores");
 
 // start the server
-module.exports = function(opts = {}) {
-	// make the value globally accessable
-	lifeLine.devMode = opts.devMode;
-	// store the version
-	lifeLine.version = pkg.version;
-
+module.exports = function() {
 	var server;
 
-	// secure mode
-	if(opts.certs) {
-		// load the keys
-		var keys = {
-			key: fs.readFileSync(path.join(opts.certs, "key.pem")),
-			cert: fs.readFileSync(path.join(opts.certs, "cert.pem"))
-		};
+	return Promise.all([
+		config.get("key"),
+		config.get("cert")
+	])
 
-		server = https.createServer(keys, handler);
-	}
-	// plain old http
-	else {
-		server = http.createServer(handler);
-	}
+	.then(([key, cert]) => {
+		// secure mode
+		if(key && cert) {
+			// load the keys
+			let keys = {
+				key: fs.readFileSync(key),
+				cert: fs.readFileSync(cert)
+			};
 
-	// build the params for server.listen()
-	var startParams = [opts.port || 443];
+			server = https.createServer(keys, handler);
+		}
+		// plain old http
+		else {
+			server = http.createServer(handler);
+		}
 
-	if(opts.localhost) {
-		startParams.push("localhost");
-	}
+		return Promise.all([
+			config.get("port", 443),
+			config.get("localhost", false),
+		]);
+	})
 
-	startParams.push(() => console.log("Server started"));
+	.then(([port, localhost]) => {
+		// build the params for server.listen()
+		var startParams = [port];
 
-	// start the server
-	server.listen.apply(server, startParams);
+		if(localhost) {
+			startParams.push("localhost");
+		}
+
+		startParams.push(() => console.log("Server started"));
+
+		// start the server
+		server.listen.apply(server, startParams);
+	});
 };
