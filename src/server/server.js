@@ -9,7 +9,10 @@ var {config} = require("./data-stores");
 module.exports = function() {
 	var server;
 
-	return config.get(["key", "cert"])
+	return Promise.all([
+		config.get("key"),
+		config.get("cert")
+	])
 
 	.then(([key, cert]) => {
 		// secure mode
