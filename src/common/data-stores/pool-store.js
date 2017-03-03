@@ -17,6 +17,9 @@ class PoolStore extends EventEmitter {
 	query(props, fn) {
 		// check if a value matches the query
 		var filter = value => {
+			// not an item
+			if(!value) return false;
+
 			// check that all the properties match
 			return Object.getOwnPropertyNames(props)
 
