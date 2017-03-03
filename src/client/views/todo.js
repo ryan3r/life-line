@@ -13,19 +13,31 @@ lifeLine.nav.register({
 
 		// load the items
 		disposable.add(
-			assignments.query({ done: false }, function(data) {
+			assignments.query({
+				done: false,
+				// make sure the assignment is in the future
+				date: date => !date || new Date(date).getTime() > Date.now()
+			}, function(data) {
 				// clear the old content
 				content.innerHTML = "";
 
 				var groups = {
 					Tasks: [],
 					Today: [],
-					Tomorrow: []
+					Tomorrow: [],
+					Upcomming: []
 				};
 
 				// today and tomorrows dates
 				var today = new Date();
 				var tomorrow = daysFromNow(1);
+
+				// sort by date
+				data.sort((a, b) => {
+					if(a.type == "assignment" && b.type == "assignment") {
+						return a.date.getTime() - b.date.getTime();
+					}
+				});
 
 				// select the items to display
 				data.forEach(item => {
@@ -38,6 +50,10 @@ lifeLine.nav.register({
 						// tomorrow
 						else if(isSameDate(tomorrow, item.date)) {
 							groups.Tomorrow.push(createUi(item));
+						}
+						// add upcomming items
+						else if(groups.Upcomming.length < 5) {
+							groups.Upcomming.push(createUi(item));
 						}
 					}
 
