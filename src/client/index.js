@@ -8,6 +8,7 @@ require("./widgets/content");
 require("./widgets/link");
 require("./widgets/list");
 require("./widgets/input");
+require("./widgets/progress");
 require("./widgets/toggle-btns");
 
 // load all the views
@@ -24,6 +25,7 @@ lifeLine.makeDom({
 	parent: document.body,
 	group: [
 		{ widget: "sidebar" },
+		{ widget: "progress" },
 		{ widget: "content" }
 	]
 });
