@@ -58,6 +58,9 @@ lifeLine.nav.register({
 
 					// save the change
 					assignments.set(item);
+
+					// sync the change
+					lifeLine.sync();
 				});
 
 				// edit the item
