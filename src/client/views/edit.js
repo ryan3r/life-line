@@ -14,6 +14,9 @@ lifeLine.nav.register({
 		// if we make a change don't refresh the page
 		var debounce;
 
+		// sync if anything is changed
+		var changed = false;
+
 		var changeSub = assignments.query({ id: match[1] }, function([item]) {
 			// if we make a change don't refresh the page
 			if(debounce) {
@@ -41,6 +44,9 @@ lifeLine.nav.register({
 
 					// navigate away
 					lifeLine.nav.navigate("/");
+
+					// sync the changes
+					lifeLine.sync();
 				});
 			}
 
@@ -93,6 +99,7 @@ lifeLine.nav.register({
 				}
 
 				debounce = true;
+				changed = true;
 
 				// save the changes
 				assignments.set(item);
@@ -210,6 +217,15 @@ lifeLine.nav.register({
 
 		// remove the subscription when this view is destroyed
 		disposable.add(changeSub);
+
+		// sync if we changed anything
+		disposable.add({
+			unsubscribe: function() {
+				if(changed) {
+					lifeLine.sync();
+				}
+			}
+		});
 	}
 });
 
