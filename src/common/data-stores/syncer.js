@@ -73,7 +73,34 @@ class Syncer {
 
 	// sync the two stores
 	sync() {
-		return new Sync(this._local, this._remote, this._changeStore, this._changesName).sync();
+		// only run one sync at a time
+		if(this._syncing) return this._syncing;
+
+		var retryCount = 3;
+		var $sync = new Sync(this._local, this._remote, this._changeStore, this._changesName);
+
+		var sync = () => {
+			// attempt to sync
+			return $sync.sync()
+
+			.catch(err => {
+				// retry if it fails
+				if(retryCount-- > 0 && (typeof navigator != "object" || navigator.onLine)) {
+					return new Promise(resolve => {
+						// wait 1 second
+						setTimeout(() => resolve(sync()), 1000);
+					});
+				}
+			});
+		};
+
+		// start the sync
+		this._syncing = sync()
+
+		// release the lock
+		.then(() => this._syncing = undefined);
+
+		return this._syncing;
 	}
 
 	// get the remote access level

@@ -52,4 +52,9 @@ if(typeof window == "object") {
 			lifeLine.sync();
 		}
 	});
+
+	// sync when we reconnect
+	window.addEventListener("online", () => {
+		lifeLine.sync();
+	});
 }
