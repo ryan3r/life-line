@@ -132,15 +132,8 @@ self.addEventListener("fetch", e => {
 			// network error
 			.catch(err => {
 				// send an error response
-				return new Response(JSON.stringify({
-					status: "fail",
-					data: {
-						reason: "network-error"
-					}
-				}), {
-					headers: {
-						"content-type": "application/json"
-					}
+				return new Response(err.message, {
+					status: 500
 				});
 			})
 

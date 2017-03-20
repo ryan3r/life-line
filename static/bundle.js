@@ -476,6 +476,11 @@ if (typeof window == "object") {
 			lifeLine.sync();
 		}
 	});
+
+	// sync when we reconnect
+	window.addEventListener("online", function () {
+		lifeLine.sync();
+	});
 }
 
 },{"../../common/data-stores/http-adaptor":24,"../../common/data-stores/pool-store":26,"../../common/data-stores/syncer":27,"./idb-adaptor":3}],5:[function(require,module,exports){
@@ -2627,7 +2632,21 @@ var HttpAdaptor = function () {
 
 			// parse the json response
 			.then(function (res) {
+				// server/service worker error
+				if (res.status == 500) {
+					return res.text().then(function (msg) {
+						throw new Error(msg);
+					});
+				}
+
 				return res.json();
+			}).then(function (json) {
+				// an error occured on the server
+				if (json.status == "error") {
+					throw new Error(json.data);
+				}
+
+				return json;
 			});
 		}
 
@@ -2654,8 +2673,22 @@ var HttpAdaptor = function () {
 					return undefined;
 				}
 
+				// server/service worker error
+				if (res.status == 500) {
+					return res.text().then(function (msg) {
+						throw new Error(msg);
+					});
+				}
+
 				// parse the item
 				return res.json();
+			}).then(function (json) {
+				// an error occured on the server
+				if (json.status == "error") {
+					throw new Error(json.data);
+				}
+
+				return json;
 			});
 		}
 
@@ -2683,6 +2716,25 @@ var HttpAdaptor = function () {
 
 					throw error;
 				}
+
+				// server/service worker error
+				if (res.status == 500) {
+					return res.text().then(function (msg) {
+						throw new Error(msg);
+					});
+				}
+
+				// parse the error message
+				if (res.status != 304) {
+					return res.json();
+				}
+			}).then(function (json) {
+				// an error occured on the server
+				if (json.status == "error") {
+					throw new Error(json.data);
+				}
+
+				return json;
 			});
 		}
 
@@ -2709,6 +2761,25 @@ var HttpAdaptor = function () {
 
 					throw error;
 				}
+
+				// server/service worker error
+				if (res.status == 500) {
+					return res.text().then(function (msg) {
+						throw new Error(msg);
+					});
+				}
+
+				// parse the error message
+				if (res.status != 304) {
+					return res.json();
+				}
+			}).then(function (json) {
+				// an error occured on the server
+				if (json.status == "error") {
+					throw new Error(json.data);
+				}
+
+				return json;
 			});
 		}
 
@@ -3243,7 +3314,38 @@ var Syncer = function () {
 	}, {
 		key: "sync",
 		value: function sync() {
-			return new Sync(this._local, this._remote, this._changeStore, this._changesName).sync();
+			var _this4 = this;
+
+			// only run one sync at a time
+			if (this._syncing) return this._syncing;
+
+			var retryCount = 3;
+			var $sync = new Sync(this._local, this._remote, this._changeStore, this._changesName);
+
+			var sync = function () {
+				// attempt to sync
+				return $sync.sync().catch(function (err) {
+					// retry if it fails
+					if (retryCount-- > 0 && (typeof navigator != "object" || navigator.onLine)) {
+						return new Promise(function (resolve) {
+							// wait 1 second
+							setTimeout(function () {
+								return resolve(sync());
+							}, 1000);
+						});
+					}
+				});
+			};
+
+			// start the sync
+			this._syncing = sync()
+
+			// release the lock
+			.then(function () {
+				return _this4._syncing = undefined;
+			});
+
+			return this._syncing;
 		}
 
 		// get the remote access level
@@ -3279,30 +3381,30 @@ var Sync = function () {
 	_createClass(Sync, [{
 		key: "sync",
 		value: function sync() {
-			var _this4 = this;
+			var _this5 = this;
 
 			// get the ids and last modified dates for all remote values
 			return this.getModifieds().then(function (modifieds) {
 				// remove the values we deleted from the remote host
-				return _this4.remove(modifieds)
+				return _this5.remove(modifieds)
 
 				// merge modified values
 				.then(function () {
-					return _this4.mergeModifieds(modifieds);
+					return _this5.mergeModifieds(modifieds);
 				});
 			}).then(function (remoteDeletes) {
 				// send values we created since the last sync
-				return _this4.create(remoteDeletes)
+				return _this5.create(remoteDeletes)
 
 				// remove any items that where deleted remotly
 				.then(function () {
-					return _this4.applyDeletes(remoteDeletes);
+					return _this5.applyDeletes(remoteDeletes);
 				});
 			})
 
 			// clear the changes
 			.then(function () {
-				return _this4._changeStore.set(_this4._changesName, []);
+				return _this5._changeStore.set(_this5._changesName, []);
 			});
 		}
 
@@ -3311,7 +3413,7 @@ var Sync = function () {
 	}, {
 		key: "getModifieds",
 		value: function getModifieds() {
-			var _this5 = this;
+			var _this6 = this;
 
 			this._items = {};
 
@@ -3327,7 +3429,7 @@ var Sync = function () {
 						var value = _step.value;
 
 						// store the items
-						_this5._items[value.id] = value;
+						_this6._items[value.id] = value;
 						// get the modified times
 						modifieds[value.id] = value.modified;
 					}
@@ -3355,7 +3457,7 @@ var Sync = function () {
 	}, {
 		key: "remove",
 		value: function remove(modifieds) {
-			var _this6 = this;
+			var _this7 = this;
 
 			return this._changeStore.get(this._changesName, []).then(function (changes) {
 				var promises = [];
@@ -3374,7 +3476,7 @@ var Sync = function () {
 							delete modifieds[change.id];
 
 							// delete it remotely
-							promises.push(_this6._remote.remove(change.id));
+							promises.push(_this7._remote.remove(change.id));
 						}
 					}
 				} catch (err) {
@@ -3401,7 +3503,7 @@ var Sync = function () {
 	}, {
 		key: "mergeModifieds",
 		value: function mergeModifieds(modifieds) {
-			var _this7 = this;
+			var _this8 = this;
 
 			var remoteDeletes = [];
 
@@ -3435,13 +3537,13 @@ var Sync = function () {
 						else if (modifieds[value.id] > value.modified) {
 								promises.push(
 								// fetch the remote value
-								_this7.get(value.id).then(function (newValue) {
-									return _this7._local.set(newValue);
+								_this8.get(value.id).then(function (newValue) {
+									return _this8._local.set(newValue);
 								}));
 							}
 							// the local version is newer
 							else if (modifieds[value.id] < value.modified) {
-									promises.push(_this7._remote.set(value));
+									promises.push(_this8._remote.set(value));
 								}
 					}
 
@@ -3469,8 +3571,8 @@ var Sync = function () {
 					for (var _iterator4 = remoteCreates[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
 						var id = _step4.value;
 
-						promises.push(_this7.get(id).then(function (newValue) {
-							return _this7._local.set(newValue);
+						promises.push(_this8.get(id).then(function (newValue) {
+							return _this8._local.set(newValue);
 						}));
 					}
 				} catch (err) {
@@ -3510,7 +3612,7 @@ var Sync = function () {
 	}, {
 		key: "create",
 		value: function create(remoteDeletes) {
-			var _this8 = this;
+			var _this9 = this;
 
 			return this._changeStore.get(this._changesName).then(function () {
 				var changes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
@@ -3535,8 +3637,8 @@ var Sync = function () {
 							}
 
 							// save the value to the remote
-							promises.push(_this8._local.get(change.id).then(function (value) {
-								return _this8._remote.set(value);
+							promises.push(_this9._local.get(change.id).then(function (value) {
+								return _this9._remote.set(value);
 							}));
 						}
 					}
@@ -3564,10 +3666,10 @@ var Sync = function () {
 	}, {
 		key: "applyDeletes",
 		value: function applyDeletes(remoteDeletes) {
-			var _this9 = this;
+			var _this10 = this;
 
 			return Promise.all(remoteDeletes.map(function (id) {
-				return _this9._local.remove(id);
+				return _this10._local.remove(id);
 			}));
 		}
 	}]);

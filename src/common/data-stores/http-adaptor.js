@@ -45,7 +45,27 @@ class HttpAdaptor {
 		return fetch(this._opts.src, this._createOpts())
 
 		// parse the json response
-		.then(res => res.json())
+		.then(res => {
+			// server/service worker error
+			if(res.status == 500) {
+				return res.text()
+
+				.then(msg => {
+					throw new Error(msg);
+				});
+			}
+
+			return res.json();
+		})
+
+		.then(json => {
+			// an error occured on the server
+			if(json.status == "error") {
+				throw new Error(json.data);
+			}
+
+			return json;
+		});
 	}
 
 	/**
@@ -70,8 +90,26 @@ class HttpAdaptor {
 				return undefined;
 			}
 
+			// server/service worker error
+			if(res.status == 500) {
+				return res.text()
+
+				.then(msg => {
+					throw new Error(msg);
+				});
+			}
+
 			// parse the item
 			return res.json();
+		})
+
+		.then(json => {
+			// an error occured on the server
+			if(json.status == "error") {
+				throw new Error(json.data);
+			}
+
+			return json;
 		});
 	}
 
@@ -98,6 +136,29 @@ class HttpAdaptor {
 
 				throw error;
 			}
+
+			// server/service worker error
+			if(res.status == 500) {
+				return res.text()
+
+				.then(msg => {
+					throw new Error(msg);
+				});
+			}
+
+			// parse the error message
+			if(res.status != 304) {
+				return res.json();
+			}
+		})
+
+		.then(json => {
+			// an error occured on the server
+			if(json.status == "error") {
+				throw new Error(json.data);
+			}
+
+			return json;
 		});
 	}
 
@@ -123,6 +184,29 @@ class HttpAdaptor {
 
 				throw error;
 			}
+
+			// server/service worker error
+			if(res.status == 500) {
+				return res.text()
+
+				.then(msg => {
+					throw new Error(msg);
+				});
+			}
+
+			// parse the error message
+			if(res.status != 304) {
+				return res.json();
+			}
+		})
+
+		.then(json => {
+			// an error occured on the server
+			if(json.status == "error") {
+				throw new Error(json.data);
+			}
+
+			return json;
 		});
 	}
 

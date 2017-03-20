@@ -598,15 +598,8 @@ self.addEventListener("fetch", function (e) {
 		// network error
 		.catch(function (err) {
 			// send an error response
-			return new Response(JSON.stringify({
-				status: "fail",
-				data: {
-					reason: "network-error"
-				}
-			}), {
-				headers: {
-					"content-type": "application/json"
-				}
+			return new Response(err.message, {
+				status: 500
 			});
 		}).then(function (res) {
 			// check for updates
