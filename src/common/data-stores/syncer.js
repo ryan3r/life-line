@@ -3,9 +3,12 @@
  */
 
 var KeyValueStore = require("./key-value-store");
+var EventEmitter = require("../util/event-emitter");
 
-class Syncer {
+class Syncer extends EventEmitter {
 	constructor(opts) {
+		super();
+
 		this._local = opts.local;
 		this._remote = opts.remote;
 		this._changeStore = new KeyValueStore(opts.changeStore);
@@ -79,13 +82,29 @@ class Syncer {
 		var retryCount = 3;
 		var $sync = new Sync(this._local, this._remote, this._changeStore, this._changesName);
 
+		// pass on the progress
+		var sub = $sync.on("progress", value => this.emit("progress", value));
+
 		var sync = () => {
+			// tell the ui we are syncing
+			this.emit("sync-start");
+
 			// attempt to sync
 			return $sync.sync()
 
+			.then(() => {
+				// the the ui the sync has succeeded
+				this.emit("sync-complete", { failed: false });
+			})
+
 			.catch(err => {
+				var retrying = retryCount-- > 0 && (typeof navigator != "object" || navigator.onLine);
+
+				// tell the ui the sync failed
+				this.emit("sync-complete", { retrying, failed: true });
+
 				// retry if it fails
-				if(retryCount-- > 0 && (typeof navigator != "object" || navigator.onLine)) {
+				if(retrying) {
 					return new Promise(resolve => {
 						// wait 1 second
 						setTimeout(() => resolve(sync()), 1000);
@@ -98,7 +117,10 @@ class Syncer {
 		this._syncing = sync()
 
 		// release the lock
-		.then(() => this._syncing = undefined);
+		.then(() => {
+			this._syncing = undefined;
+			sub.unsubscribe();
+		});
 
 		return this._syncing;
 	}
@@ -113,36 +135,66 @@ class Syncer {
 }
 
 // a single sync
-class Sync {
+class Sync extends EventEmitter {
 	constructor(local, remote, changeStore, changesName) {
+		super();
 		this._local = local;
 		this._remote = remote;
 		this._changeStore = changeStore;
 		this._changesName = changesName;
+		this._progress = 0;
+	}
+
+	stepProgress() {
+		this._progress += 1 / 7;
+
+		this.emit("progress", this._progress);
 	}
 
 	sync() {
+		this.stepProgress();
+
 		// get the ids and last modified dates for all remote values
 		return this.getModifieds()
 
 		.then(modifieds => {
+			this.stepProgress();
+
 			// remove the values we deleted from the remote host
 			return this.remove(modifieds)
 
 			// merge modified values
-			.then(() => this.mergeModifieds(modifieds));
+			.then(() => {
+				this.stepProgress();
+
+				return this.mergeModifieds(modifieds);
+			});
 		})
 
 		.then(remoteDeletes => {
+			this.stepProgress();
+
 			// send values we created since the last sync
 			return this.create(remoteDeletes)
 
 			// remove any items that where deleted remotly
-			.then(() => this.applyDeletes(remoteDeletes));
+			.then(() => {
+				this.stepProgress();
+
+				return this.applyDeletes(remoteDeletes);
+			});
 		})
 
 		// clear the changes
-		.then(() => this._changeStore.set(this._changesName, []));
+		.then(() => {
+			this.stepProgress();
+
+			return this._changeStore.set(this._changesName, []);
+		})
+
+		.then(() => {
+			this.stepProgress();
+		});
 	}
 
 	// get the last modified times for each value
@@ -196,18 +248,9 @@ class Sync {
 
 		.then(values => {
 			var promises = [];
-			// start with a list of all the ids and remove ids we have locally
-			var remoteCreates = Object.getOwnPropertyNames(modifieds);
 
 			// check all the local values against the remote ones
 			for(let value of values) {
-				// remove items we already have from the creates
-				let index = remoteCreates.indexOf(value.id);
-
-				if(index !== -1) {
-					remoteCreates.splice(index, 1);
-				}
-
 				// deleted from the remote adaptor
 				if(!modifieds[value.id]) {
 					remoteDeletes.push(value.id);
@@ -225,10 +268,15 @@ class Sync {
 				else if(modifieds[value.id] < value.modified) {
 					promises.push(this._remote.set(value));
 				}
+
+				// remove items we already have from the creates
+				if(modifieds[value.id]) {
+					delete modifieds[value.id];
+				}
 			}
 
 			// get values from the remote we are missing
-			for(let id of remoteCreates) {
+			for(let id of Object.getOwnPropertyNames(modifieds)) {
 				promises.push(
 					this.get(id)
 

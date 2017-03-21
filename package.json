@@ -6,7 +6,8 @@
   "bin": "./bin/life-line.js",
   "scripts": {
     "test": "mocha tests/**/*.js --reporter min",
-    "build": "node build -p"
+    "build": "node build -p",
+    "start": "node bin/life-line --devMode --port=8080 --localhost --dataDir=../life-line-data"
   },
   "repository": "ryan3r/life-line",
   "author": "Ryan Ray <ryan314r@gmail.com>",

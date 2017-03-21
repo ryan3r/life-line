@@ -62,7 +62,7 @@ describe("Http adaptor", function() {
 		});
 	});
 
-	it("can get an value by id", function() {
+	it("can get a value by id", function() {
 		var httpAdaptor = new HttpAdaptor({
 			src: ADDRESS,
 			session: "let-in"

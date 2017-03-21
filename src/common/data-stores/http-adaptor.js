@@ -105,7 +105,7 @@ class HttpAdaptor {
 
 		.then(json => {
 			// an error occured on the server
-			if(json.status == "error") {
+			if(json && json.status == "error") {
 				throw new Error(json.data);
 			}
 

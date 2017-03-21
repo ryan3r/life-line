@@ -20,14 +20,23 @@ const STATIC_CACHE = "static";
 
 // cache the version of the client
 var clientVersion;
+// don't run 2 downloads at the same time
+var downloading;
+// we installed a new version in the install phase
+var newVersionInstalled;
 
 // download a new version
-var download = function() {
+var download = function(install) {
+	// already downloading
+	if(downloading) {
+		return downloading;
+	}
+
 	// save the new version
 	var version;
 
 	// open the cache
-	return caches.open(STATIC_CACHE)
+	downloading = caches.open(STATIC_CACHE)
 
 	.then(cache => {
 		// download all the files
@@ -55,8 +64,22 @@ var download = function() {
 		)
 
 		// notify the client(s) of the update
-		.then(() => notifyClients(version));
+		.then(() => {
+			// wait for activation
+			if(install) {
+				newVersionInstalled = version;
+			}
+			// updated on reload tell the clients
+			else {
+				return notifyClients(version);
+			}
+		});
 	});
+
+	return downloading
+
+	// release the lock
+	.then(() => downloading = undefined);
 };
 
 // notify the client(s) of an update
@@ -76,7 +99,7 @@ var notifyClients = function(version) {
 };
 
 // check for updates
-var checkForUpdates = function(newVersion) {
+var checkForUpdates = function({newVersion, install} = {}) {
 	// if we have a version use that
 	if(newVersion) {
 		newVersion = Promise.resolve(newVersion);
@@ -110,12 +133,33 @@ var checkForUpdates = function(newVersion) {
 		}
 
 		// download the new version
-		return download();
+		return download(install);
 	});
 };
 
 // when we are installed check for updates
-self.addEventListener("install", e => e.waitUntil(checkForUpdates()));
+self.addEventListener("install", e => {
+	e.waitUntil(
+		checkForUpdates({ install: true })
+
+		.then(() => self.skipWaiting())
+	);
+});
+
+self.addEventListener("activate", e => {
+	e.waitUntil(
+		self.clients.claim()
+
+		.then(() => {
+			// notify clients of the update
+			if(newVersionInstalled) {
+				notifyClients(newVersionInstalled);
+
+				newVersionInstalled = undefined;
+			}
+		})
+	)
+});
 
 // handle a network Request
 self.addEventListener("fetch", e => {
@@ -139,7 +183,9 @@ self.addEventListener("fetch", e => {
 
 			.then(res => {
 				// check for updates
-				checkForUpdates(res.headers.get("server"));
+				checkForUpdates({
+					newVersion: res.headers.get("server")
+				});
 
 				return res;
 			})

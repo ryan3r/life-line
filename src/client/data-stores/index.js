@@ -33,6 +33,15 @@ assignmentsAdaptor.accessLevel()
 	}
 });
 
+var progress;
+
+// start the sync
+assignmentsAdaptor.on("sync-start", () => progress = new lifeLine.Progress())
+// update the progress
+assignmentsAdaptor.on("progress", value => progress.set(value));
+// the sync is done
+assignmentsAdaptor.on("sync-complete", value => progress.set(1));
+
 // trigger a sync
 lifeLine.sync = function() {
 	// trigger a sync
@@ -44,7 +53,7 @@ lifeLine.sync = function() {
 
 if(typeof window == "object") {
 	// initial sync
-	lifeLine.sync();
+	setTimeout(() => lifeLine.sync());
 
 	// sync when we revisit the page
 	window.addEventListener("visibilitychange", () => {
