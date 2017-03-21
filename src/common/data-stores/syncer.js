@@ -159,6 +159,7 @@ class Sync extends EventEmitter {
 
 		.then(modifieds => {
 			this.stepProgress();
+
 			// remove the values we deleted from the remote host
 			return this.remove(modifieds)
 
@@ -247,18 +248,9 @@ class Sync extends EventEmitter {
 
 		.then(values => {
 			var promises = [];
-			// start with a list of all the ids and remove ids we have locally
-			var remoteCreates = Object.getOwnPropertyNames(modifieds);
 
 			// check all the local values against the remote ones
 			for(let value of values) {
-				// remove items we already have from the creates
-				let index = remoteCreates.indexOf(value.id);
-
-				if(index !== -1) {
-					remoteCreates.splice(index, 1);
-				}
-
 				// deleted from the remote adaptor
 				if(!modifieds[value.id]) {
 					remoteDeletes.push(value.id);
@@ -276,10 +268,15 @@ class Sync extends EventEmitter {
 				else if(modifieds[value.id] < value.modified) {
 					promises.push(this._remote.set(value));
 				}
+
+				// remove items we already have from the creates
+				if(modifieds[value.id]) {
+					delete modifieds[value.id];
+				}
 			}
 
 			// get values from the remote we are missing
-			for(let id of remoteCreates) {
+			for(let id of Object.getOwnPropertyNames(modifieds)) {
 				promises.push(
 					this.get(id)
 
