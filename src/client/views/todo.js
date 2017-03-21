@@ -2,7 +2,7 @@
  * A list of things todo
  */
 
-var {daysFromNow, isSameDate, stringifyTime} = require("../util/date");
+var {daysFromNow, isSameDate, stringifyTime, stringifyDate} = require("../util/date");
 var {assignments} = require("../data-stores");
 
 lifeLine.nav.register({
@@ -24,9 +24,10 @@ lifeLine.nav.register({
 				var groups = {
 					Tasks: [],
 					Today: [],
-					Tomorrow: [],
-					Upcomming: []
+					Tomorrow: []
 				};
+
+				var upcomming = [];
 
 				// today and tomorrows dates
 				var today = new Date();
@@ -52,8 +53,11 @@ lifeLine.nav.register({
 							groups.Tomorrow.push(createUi(item));
 						}
 						// add upcomming items
-						else if(groups.Upcomming.length < 5) {
-							groups.Upcomming.push(createUi(item));
+						else if(upcomming.length < 10) {
+							upcomming.push([
+								item,
+								createUi(item)
+							]);
 						}
 					}
 
@@ -62,6 +66,20 @@ lifeLine.nav.register({
 						groups.Tasks.push(createUi(item));
 					}
 				});
+
+				// don't have too many items in the todo page
+				var toRemove = groups.Today.length + groups.Tomorrow.length + groups.Tasks.length;
+
+				upcomming = upcomming.slice(0, Math.max(0, 10 - toRemove));
+
+				// add groups for each of the upcoming
+				for(let day of upcomming) {
+					let strDate = stringifyDate(day[0].date);
+
+					groups[strDate] || (groups[strDate] = []);
+
+					groups[strDate].push(day[1]);
+				}
 
 				// remove any empty fields
 				Object.getOwnPropertyNames(groups)
