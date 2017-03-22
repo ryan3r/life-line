@@ -82,7 +82,7 @@ lifeLine.nav.register({
 					if(a.type != "task" && b.type == "task") return -1;
 
 					// sort by due date
-					if(a.type == "assignment" && b.type == "assignment") {
+					if(a.type != "task" && b.type != "task") {
 						if(a.date.getTime() != b.date.getTime()) {
 							return a.date.getTime() - b.date.getTime();
 						}
@@ -118,7 +118,7 @@ lifeLine.nav.register({
 						}
 
 						// show the class
-						items.push(item.class);
+						items.push(item.class || item.location);
 					}
 
 					groups[dateStr].push({

@@ -35,7 +35,7 @@ lifeLine.nav.register({
 
 				// sort by date
 				data.sort((a, b) => {
-					if(a.type == "assignment" && b.type == "assignment") {
+					if(a.type != "task" && b.type != "task") {
 						return a.date.getTime() - b.date.getTime();
 					}
 				});
@@ -43,7 +43,7 @@ lifeLine.nav.register({
 				// select the items to display
 				data.forEach(item => {
 					// assignments for today
-					if(item.type == "assignment") {
+					if(item.type != "task") {
 						// today
 						if(isSameDate(today, item.date)) {
 							groups.Today.push(createUi(item));
@@ -116,17 +116,17 @@ var createUi = function(item) {
 			]
 		};
 	}
-	// render an item
+	// render an assignment or exam
 	else {
 		return {
 			href: `/item/${item.id}`,
 			items: [
 				{
-					text: item.name,
+					text: item.type == "assignment" ?  item.name : `${item.name} - ${item.class}`,
 					grow: true
 				},
 				stringifyTime(item.date),
-				item.class
+				item.type == "assignment" ? item.class : item.location
 			]
 		};
 	}

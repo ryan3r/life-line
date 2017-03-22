@@ -17,8 +17,8 @@ lifeLine.nav.register({
 				content.innerHTML = "";
 
 				// remove the old action
-				if(actionDoneSub) {
-					actionDoneSub.unsubscribe();
+				if(actionEditSub) {
+					if(actionDoneSub) actionDoneSub.unsubscribe();
 					actionEditSub.unsubscribe();
 				}
 
@@ -46,22 +46,24 @@ lifeLine.nav.register({
 				}
 
 				// set the title for the content
-				setTitle("Assignment");
+				setTitle(item.type[0].toUpperCase() + item.type.substr(1));
 
-				// mark the item as done
-				actionDoneSub = lifeLine.addAction(item.done ? "Done" : "Not done", () => {
-					// mark the item done
-					item.done = !item.done;
+				if(item.type != "exam") {
+					// mark the item as done
+					actionDoneSub = lifeLine.addAction(item.done ? "Done" : "Not done", () => {
+						// mark the item done
+						item.done = !item.done;
 
-					// update the modified time
-					item.modified = Date.now();
+						// update the modified time
+						item.modified = Date.now();
 
-					// save the change
-					assignments.set(item);
+						// save the change
+						assignments.set(item);
 
-					// sync the change
-					lifeLine.sync();
-				});
+						// sync the change
+						lifeLine.sync();
+					});
+				}
 
 				// edit the item
 				actionEditSub = lifeLine.addAction("Edit",
@@ -94,7 +96,7 @@ lifeLine.nav.register({
 						},
 						{
 							classes: "assignment-description",
-							text: item.description
+							text: item.description || item.location
 						}
 					]
 				});

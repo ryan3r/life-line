@@ -182,11 +182,13 @@ html, body {
 
 .list-item-grow {
 	flex-grow: 10;
+	flex-basis: 60%;
 }
 
 .list-item-part {
 	flex-grow: 1;
 	text-align: center;
+	flex-basis: 20%;
 }
 
 .list-header {
