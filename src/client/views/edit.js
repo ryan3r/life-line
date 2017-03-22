@@ -85,6 +85,14 @@ lifeLine.nav.register({
 					delete item.class;
 				}
 
+				// remove exam fields from tasks and assignments
+				if(item.type != "exam") {
+					delete item.location;
+				}
+				else {
+					delete item.description;
+				}
+
 				// add a button back to the view
 				if(!actionSub) {
 					actionSub = lifeLine.addAction("View", () => lifeLine.nav.navigate("/item/" + item.id));
@@ -116,13 +124,28 @@ lifeLine.nav.register({
 					mapped.dateField.style.display = "";
 				}
 
-				// fill in date if it is missing
-				if(!item.date) {
-					item.date = genDate();
+				if(item.type == "exam") {
+					mapped.descriptionField.style.display = "none";
+					mapped.locationField.style.display = "";
+				}
+				else {
+					mapped.descriptionField.style.display = "";
+					mapped.locationField.style.display = "none";
 				}
 
-				if(!item.class) {
-					item.class = "Class";
+				// fill in date if it is missing
+				if(item.type != "task") {
+					if(!item.date) {
+						item.date = genDate();
+					}
+
+					if(!item.class) {
+						item.class = "Class";
+					}
+
+					if(item.type == "exam" && !item.location) {
+						item.location = "Location";
+					}
 				}
 			};
 
@@ -149,6 +172,7 @@ lifeLine.nav.register({
 								btns: [
 									{ text: "Assignment", value: "assignment" },
 									{ text: "Task", value: "task" },
+									{ text: "Exam", value: "exam" }
 								],
 								value: item.type,
 								change: type => {
@@ -195,6 +219,19 @@ lifeLine.nav.register({
 						]
 					},
 					{
+						name: "locationField",
+						classes: "editor-row",
+						children: [
+							{
+								widget: "input",
+								bind: item,
+								prop: "location",
+								change
+							}
+						]
+					},
+					{
+						name: "descriptionField",
 						classes: "textarea-wrapper",
 						children: [
 							{
