@@ -9,6 +9,8 @@ var auth = require("./auth");
 var backup = require("./backup");
 var Response = require("./response");
 var jsend = require("./jsend");
+var {apiKeys} = require("./data-stores");
+var reminders = require("./reminders");
 
 const NO_RESPONSE = "No response returned by the handler";
 
@@ -45,6 +47,74 @@ module.exports = function(req, res) {
 				body: backup()
 			});
 		});
+	}
+	// send the publicKey to the users
+	else if(request.url == "/api/public-key") {
+		// verify the user
+		response = auth.getLoggedInUser(request)
+
+		.then(user => {
+			// not logged in
+		   if(!user) {
+			   return new Response({
+				   status: 401,
+				   body: "Not authenticated"
+			   });
+		   }
+
+		   return apiKeys.get("publicKey")
+
+		   .then(key => {
+			   // no public key generated
+			   if(!key) {
+				   return new Response({
+					   status: 404,
+					   body: "Public key is missing"
+				   });
+			   }
+
+			   // the = padding that should be on the base64 encoded key
+			    var padding = "=".repeat((4 - key.length % 4) % 4);
+
+				// convert the url safe encoded string to a propper one
+				key = key
+					.replace(/-/g, "+")
+					.replace(/_/g, "/");
+
+				// decode the base64
+				var keyBuffer = new Buffer(key + padding, "base64");
+
+			   return new Response({
+				   body: keyBuffer
+			   });
+		   });
+		});
+	}
+	// set the subscription for the user
+	else if(request.url == "/api/subscription") {
+		// verify the user
+		response = auth.getLoggedInUser(request)
+
+		.then(user => {
+			// not logged in
+		   if(!user) {
+			   return new Response({
+				   status: 401,
+				   body: "Not authenticated"
+			   });
+		   }
+
+		   return request.json();
+	   })
+
+	   .then(sub => {
+		   // set the subscription
+		   reminders.setSubscription(sub);
+
+		   return new Response({
+			   status: 204
+		   });
+	   });
 	}
 	// serve static pages
 	else if(request.url.substr(0, 8) == "/static/" || request.url == "/service-worker.js") {

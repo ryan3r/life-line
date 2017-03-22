@@ -7,6 +7,8 @@ var {config} = require("./data-stores");
 
 // start the server
 module.exports = function() {
+	require("./reminders").start();
+
 	var server;
 
 	return Promise.all([
