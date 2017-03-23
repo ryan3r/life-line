@@ -19,7 +19,8 @@
     "mime-db": "^1.25.0",
     "node-fetch": "^1.6.3",
     "nopt": "^4.0.1",
-    "password-hash-and-salt": "^0.1.4"
+    "password-hash-and-salt": "^0.1.4",
+    "web-push": "^3.2.2"
   },
   "devDependencies": {
     "babel-plugin-check-es2015-constants": "^6.8.0",
