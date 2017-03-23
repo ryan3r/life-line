@@ -2,7 +2,7 @@
  * A list of things todo
  */
 
-var {daysFromNow, isSameDate, stringifyTime, stringifyDate} = require("../util/date");
+var {daysFromNow, isSameDate, stringifyTime, stringifyDate, isSoonerDate} = require("../util/date");
 var {assignments} = require("../data-stores");
 
 lifeLine.nav.register({
@@ -16,7 +16,13 @@ lifeLine.nav.register({
 			assignments.query({
 				done: false,
 				// make sure the assignment is in the future
-				date: date => !date || new Date(date).getTime() > Date.now()
+				date: date => {
+					var today = new Date();
+
+					return !date ||
+						isSoonerDate(today, new Date(date)) ||
+						isSameDate(today, new Date(date));
+				}
 			}, function(data) {
 				// clear the old content
 				content.innerHTML = "";
