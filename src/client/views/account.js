@@ -66,6 +66,62 @@ lifeLine.nav.register({
 				}
 			}
 
+			// add the enable reminders button
+			children.push({
+				tag: "button",
+				classes: "fancy-button",
+				attrs: { style: "display: none;" },
+				text: "Enable reminders",
+				name: "pushBtn",
+				on: {
+					click: () => {
+						navigator.serviceWorker.ready.then(reg => {
+							// get the public key
+							fetch("/api/public-key", {
+								credentials: "include"
+							})
+
+							.then(res => res.arrayBuffer())
+
+							.then(key => {
+								// get a subscription
+								return reg.pushManager.subscribe({
+									userVisibleOnly: true,
+									applicationServerKey: new Uint8Array(key)
+								});
+							})
+
+							.then(sub => {
+								// send the subscription to the server
+								fetch("/api/subscription", {
+									method: "POST",
+									body: JSON.stringify(sub),
+									credentials: "include"
+								})
+
+								// hide the button
+								.then(() => pushBtn.style.display = "none")
+							});
+						});
+					}
+				}
+			});
+
+			// check if they are already enabled
+			if(navigator.serviceWorker) {
+				navigator.serviceWorker.ready.then(reg => {
+					// check that push is supported
+					if(reg.pushManager) {
+						reg.pushManager.getSubscription().then(sub => {
+							// no subscription
+							if(!sub) {
+								pushBtn.style.display = "block";
+							}
+						});
+					}
+				});
+			}
+
 			// create a backup link
 			if(!match[1]) {
 				children.push({ tag: "br" });
@@ -172,7 +228,7 @@ lifeLine.nav.register({
 				});
 			}
 
-			var {msg} = lifeLine.makeDom({
+			var {msg, pushBtn} = lifeLine.makeDom({
 				parent: content,
 				classes: "content-padded",
 				children

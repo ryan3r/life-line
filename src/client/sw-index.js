@@ -2,6 +2,8 @@
 require("../common/global");
 require("./global");
 
+require("./reminders");
+
 var KeyValueStore = require("../common/data-stores/key-value-store");
 var IdbAdaptor = require("./data-stores/idb-adaptor");
 

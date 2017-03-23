@@ -5,7 +5,7 @@
 var Response = require("../response");
 
 module.exports = function(adaptor, permissor = {}) {
-	return function(url, req) {
+	var server = function(url, req) {
 		// get all the values in the adaptor
 		if(req.method == "GET" && url == "/") {
 			return adaptor.getAll()
@@ -127,6 +127,9 @@ module.exports = function(adaptor, permissor = {}) {
 
 					// send the success response
 					.then(() => {
+						// notify anyone who cares that something changed
+						if(server.onchange) server.onchange();
+
 						return new Response({
 							status: 204
 						});
@@ -162,6 +165,9 @@ module.exports = function(adaptor, permissor = {}) {
 
 					// send the success response
 					.then(() => {
+						// notify anyone who cares that something changed
+						if(server.onchange) server.onchange();
+
 						return new Response({
 							status: 204
 						});
@@ -178,4 +184,6 @@ module.exports = function(adaptor, permissor = {}) {
 			);
 		}
 	};
+
+	return server;
 };

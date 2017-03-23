@@ -18,5 +18,9 @@
 				 location.reload();
 			 }
 		 }
+         // a notification was just clicked or something
+         else if(e.data.type == "navigate") {
+             lifeLine.nav.navigate(e.data.url);
+         }
 	 });
  }

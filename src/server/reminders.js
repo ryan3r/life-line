@@ -3,7 +3,10 @@
  */
 
 var {apiKeys, assignments} = require("./data-stores");
+var dsServer = require("./data-stores/server");
 var webpush = require("web-push");
+
+const MAX_TIMEOUT = 2147483647;
 
 // ready is a promise for after start() has been called
 var resolveReady;
@@ -72,7 +75,7 @@ exports.setSubscription = function(subscription) {
 	return apiKeys.set("subscription", subscription)
 
 	// initialize the reminders
-	//.then(() => init());
+	.then(() => init());
 };
 
 var init = function() {
@@ -89,15 +92,31 @@ var init = function() {
 
 		// wait for the next reminder
 		var awaitNext = function() {
-			return nextReminder()
+			nextReminder()
 
 			.then(reminder => {
 				// timer canceled
 				if(!reminder) return;
 
-				console.log("Notify: " + reminder.name);
-			})
+				// if we overflowed just restart the timer
+				if(!reminder.overflowed) {
+					notify(reminder.assignment);
+				}
+
+				// wait for the next reminder
+				awaitNext();
+			});
 		};
+
+		var debounceTimer;
+		// refresh when changes are send
+		dsServer.onchange = () => {
+			clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(awaitNext, 1000);
+		};
+
+		// kick off the loop
+		awaitNext();
 	});
 };
 
@@ -136,10 +155,20 @@ var nextReminder = function() {
 		// no upcomming assignment to remind
 		if(!assignment) return;
 
-		waiting = timeout(assignment.date.getTime() - Date.now() - (60 * 60 * 1000));
+		// calcuate the number of milliseconds to wait
+		var wait = assignment.date.getTime() - Date.now() - (60 * 60 * 1000);
+
+		// set timeout stops working after 2147483647 so we just wait that long and check again
+		var overflowed = wait > MAX_TIMEOUT;
+
+		if(overflowed) {
+			wait = MAX_TIMEOUT;
+		}
+
+		waiting = timeout(wait);
 
 		// resolve with next assignment
-		return waiting.then(finished => finished && assignment);
+		return waiting.then(finished => finished && ({ overflowed, assignment}));
 	});
 };
 
