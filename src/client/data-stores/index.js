@@ -33,25 +33,29 @@ assignmentsAdaptor.accessLevel()
 	}
 });
 
-var progress;
-
-// start the sync
-assignmentsAdaptor.on("sync-start", () => progress = new lifeLine.Progress())
-// update the progress
-assignmentsAdaptor.on("progress", value => progress.set(value));
-// the sync is done
-assignmentsAdaptor.on("sync-complete", value => progress.set(1));
-
 // trigger a sync
 lifeLine.sync = function() {
 	// trigger a sync
 	return assignmentsAdaptor.sync()
 
 	// force a refesh
-	.then(() => lifeLine.nav.navigate(location.pathname));
+	.then(() => {
+		if(typeof window == "object") {
+			lifeLine.nav.navigate(location.pathname);
+		}
+	});
 };
 
 if(typeof window == "object") {
+	let progress;
+
+	// start the sync
+	assignmentsAdaptor.on("sync-start", () => progress = new lifeLine.Progress())
+	// update the progress
+	assignmentsAdaptor.on("progress", value => progress.set(value));
+	// the sync is done
+	assignmentsAdaptor.on("sync-complete", value => progress.set(1));
+
 	// initial sync
 	setTimeout(() => lifeLine.sync());
 

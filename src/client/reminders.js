@@ -2,9 +2,26 @@
  * Handle reminders being pushed from the server
  */
 
+var {assignments} = require("./data-stores");
+
 self.addEventListener("push", function(e) {
+	var assignment;
+
 	// parse the json
-	var assignment = e.data.json();
+	try {
+		assignment = e.data.json();
+	}
+	// test triggered by devtools
+	catch(err) {
+		assignment = {
+			name: "Foo",
+			id: "21480210",
+			class: "Class",
+			type: "assignment",
+			description: "My description",
+			date: new Date()
+		};
+	}
 
 	// get the title for the notification
 	var title = assignment.type == "exam" ?
@@ -19,7 +36,13 @@ self.addEventListener("push", function(e) {
 			registration.showNotification(title, {
 				icon,
 				body: assignment.description || assignment.class,
-				data: assignment
+				data: assignment,
+				actions: [
+					{
+						action: "done",
+						title: "Done"
+					}
+				]
 			});
 		})
 	);
@@ -32,31 +55,48 @@ self.addEventListener("notificationclick", function(e) {
 	// close when they click
 	e.notification.close();
 
-	e.waitUntil(
-		// get all the windows
-		clients.matchAll({ type: "window" })
+	console.log(e)
+	// done button click
+	if(e.action == "done") {
+		// update the item
+		e.notification.data.done = true;
+		e.notification.data.modified = Date.now();
 
-		.then(wins => {
-			for(let win of wins) {
-				// check if we have a window we can focus
-				if(win.focus) {
-					// tell the window to navigate
-					win.postMessage({
-						type: "navigate",
-						url
-					});
+		e.waitUntil(
+			// save the changes
+			assignments.set(e.notification.data)
 
-					win.focus();
-					return;
+			// send the changes back to the server
+			.then(() => lifeLine.sync())
+		);
+	}
+	else {
+		e.waitUntil(
+			// get all the windows
+			clients.matchAll({ type: "window" })
+
+			.then(wins => {
+				for(let win of wins) {
+					// check if we have a window we can focus
+					if(win.focus) {
+						// tell the window to navigate
+						win.postMessage({
+							type: "navigate",
+							url
+						});
+
+						win.focus();
+						return;
+					}
 				}
-			}
 
-			// open a new window
-			if(clients.openWindow) {
-				clients.openWindow(url);
-			}
-		})
-	);
+				// open a new window
+				if(clients.openWindow) {
+					clients.openWindow(url);
+				}
+			})
+		);
+	}
 });
 
 // The code to load an image as a data url is paraphrased from the chrome devsummit site

@@ -138,7 +138,7 @@ class PoolStore extends EventEmitter {
 		value.modified = Date.now();
 
 		// store the value in the adaptor
-		this._adaptor.set(value);
+		var result = this._adaptor.set(value);
 
 		// propogate the change
 		this.emit("change", {
@@ -146,6 +146,8 @@ class PoolStore extends EventEmitter {
 			id: value.id,
 			value
 		});
+
+		return result;
 	}
 
 	/**
@@ -153,13 +155,15 @@ class PoolStore extends EventEmitter {
 	 */
 	remove(id) {
 		// remove the value from the adaptor
-		this._adaptor.remove(id, Date.now());
+		var result = this._adaptor.remove(id, Date.now());
 
 		// propogate the change
 		this.emit("change", {
 			type: "remove",
 			id
 		});
+
+		return result;
 	}
 }
 

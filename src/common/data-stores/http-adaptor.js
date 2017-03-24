@@ -2,7 +2,7 @@
  * An adaptor for http based stores
  */
 
-if(typeof window != "object") {
+if(typeof window != "object" && typeof self != "object") {
 	// polyfill fetch for node
 	fetch = require("node-fetch");
 }
