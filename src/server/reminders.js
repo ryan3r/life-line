@@ -131,6 +131,8 @@ var nextReminder = function() {
 	return assignments.query({
 		// only take things with dates
 		type: t => t == "exam" || t == "assignment",
+		// don't send reminders for things we have completed
+		done: false,
 		// only take dates that are an hour from now
 		date: d => {
 			d = new Date(d);
