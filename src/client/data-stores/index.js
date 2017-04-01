@@ -40,7 +40,7 @@ lifeLine.sync = function() {
 
 	// force a refesh
 	.then(() => {
-		if(typeof window == "object") {
+		if(typeof window == "object" && location.pathname.substr(1, 4) != "edit") {
 			lifeLine.nav.navigate(location.pathname);
 		}
 	});
