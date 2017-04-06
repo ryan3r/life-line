@@ -4,29 +4,25 @@
  * Create a backup or start the server
  */
 
-var nopt = require("nopt");
 var lifeLine = require("..");
 
-// parse the command line arguments
-var parsed = nopt({
-	backup: String,
-	port: Number,
-	localhost: Boolean,
-	devMode: Boolean,
-	key: String,
-	cert: String,
-	dataDir: String
+// pick the command
+switch(process.argv[2]) {
+	// start the server
+	case "serve":
+		lifeLine.startServer();
+		break;
+
+	// backup this directory or backup a remote server
+	case "backup":
+		lifeLine.backup(process.argv[3])
+
+		.on("end", () => console.log("Backup complete"));
+		break;
+}
+
+// handle unhandled rejections (the way the should be)
+process.on("unhandledRejection", err => {
+	console.log(err.stack);
+	process.exit(8);
 });
-
-// update the configuration
-lifeLine.config.setOverrides(parsed);
-
-// run a backup
-if(parsed.backup) {
-	// build and save the backup
-	lifeLine.backup(parsed.backup);
-}
-// start the server
-else {
-	lifeLine.startServer();
-}

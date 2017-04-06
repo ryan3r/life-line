@@ -185,7 +185,7 @@ exports.handle = function(url, req) {
 
 						return new Promise((resolve, reject) => {
 							// hash the password
-						passwordLib(body.password)
+							passwordLib(body.password)
 
 							.hash((err, hash) => {
 								if(err) return reject(err);
