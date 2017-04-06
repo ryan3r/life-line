@@ -33,7 +33,7 @@ module.exports = function() {
 		}
 
 		return Promise.all([
-			config.get("port", 443),
+			config.get("port", key && cert ? 443 : 80),
 			config.get("localhost", false),
 		]);
 	})
