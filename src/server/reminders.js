@@ -150,7 +150,7 @@ var nextReminder = function() {
 			}
 
 			return chosen;
-		});
+		}, undefined);
 	})
 
 	.then(assignment => {
