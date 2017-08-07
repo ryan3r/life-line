@@ -3,6 +3,9 @@ import {TasksWidget} from "./tasks";
 import {Checkbox} from "./checkbox";
 import {EditTaskProp} from "./edit-task-prop";
 
+// the task id that was in focus before it was moved
+let nextActiveElement;
+
 export class EditTask extends Component {
 	constructor() {
 		super();
@@ -78,6 +81,9 @@ export class EditTask extends Component {
 			// no grandparent to add this to
 			if(!parent.parent) return;
 
+			// make sure we foucs this task when we rerender
+			nextActiveElement = this.props.task.id;
+
 			// attach this task to its grandparent after the current parent
 			this.props.task.attachTo(parent.parent, parent);
 		}
@@ -89,6 +95,9 @@ export class EditTask extends Component {
 			let attachTo = this.props.task.getLastSibling();
 
 			if(attachTo) {
+				// make sure we foucs this task when we rerender
+				nextActiveElement = this.props.task.id;
+
 				this.props.task.attachTo(attachTo);
 			}
 		}
@@ -117,6 +126,14 @@ export class EditTask extends Component {
 			else {
 				inlineAddBtn = addBtn;
 			}
+		}
+
+		// this element should be focused
+		if(this.props.task && nextActiveElement == this.props.task.id && this.base) {
+			nextActiveElement = undefined;
+
+			// focus the imput
+			this.base.querySelector("input").focus();
 		}
 
 		return <div>
