@@ -70,8 +70,13 @@ export class EditTask extends Component {
 		}
 		// outdent tasks on tab
 		else if(e.keyCode == 9 && e.shiftKey) {
+			e.preventDefault();
+
 			// get our current parent
 			const {parent} = this.props.task;
+
+			// no grandparent to add this to
+			if(!parent.parent) return;
 
 			// attach this task to its grandparent after the current parent
 			this.props.task.attachTo(parent.parent, parent);
@@ -80,6 +85,7 @@ export class EditTask extends Component {
 		else if(e.keyCode == 9) {
 			e.preventDefault();
 
+			// get the sibling that will become the parent
 			let attachTo = this.props.task.getLastSibling();
 
 			if(attachTo) {
