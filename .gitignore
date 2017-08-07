@@ -36,5 +36,10 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 
-# Ignore dev data
-life-line-data
+# Ignore the builds
+public/js
+public/tests/js
+public/vendor
+
+# The files that I'm not sure what to do with
+tmp

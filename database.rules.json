@@ -1,6 +1,40 @@
 {
   "rules": {
-    ".read": true,
-    ".write": true
+    "lists": {
+      "$listId": {
+        // to create a new list you must at least be logged in
+        ".write": "!data.exists() && auth != null",
+        // to access a list you must be the owner or have read or write access
+        ".read": "auth.uid == data.child('owner').val() || data.child('users/' + auth.uid).val() == 'read' || data.child('users/' + auth.uid).val() == 'write'",
+
+        "owner": {
+          // only the owner can change the owner
+          ".write": "auth.uid == data.val()",
+          // the owner must be a string
+          ".validate": "newData.isString()"
+        },
+
+        "users": {
+          "$user": {
+            // a user's access can only be changed by the owner and that user
+            ".write": "auth.uid == $user || data.parent().parent().child('owner').val() == auth.uid",
+            // only allow read or write for permissions
+            ".validate": "newData.isString() && (newData.val() == 'read' || newData.val() == 'write')"
+          }
+        },
+
+        "tasks": {
+          // only the owner or a user with write permissions can write to tasks
+          ".write": "data.parent().child('owner').val() == auth.uid || data.parent().child('users/' + auth.uid).val() == 'write'"
+        }
+      }
+    },
+    "users": {
+      "$user": {
+        // only a user can modify their own account
+        ".read": "auth.uid == $user",
+        ".write": "auth.uid == $user"
+      }
+    }
   }
 }
