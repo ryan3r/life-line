@@ -9,6 +9,9 @@ export class TaskLink extends Component {
 	}
 
 	open(e) {
+		// let the standard modifiers do their thing
+		if(e.ctrlKey || e.altKey || e.shiftKey) return;
+
 		e.preventDefault();
 
 		// pick the correct type
