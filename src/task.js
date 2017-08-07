@@ -89,15 +89,29 @@ export class Task extends Events {
 	}
 
 	// add this task to a parent
-	attachTo(task) {
-		this._updateParent(task.id);
+	attachTo(task, after) {
+		this._updateParent(task, {after});
 
 		// save the change to firebase
 		this._tasks._ref.child(`${this.id}/parent`).set(this.parent.id);
 	}
 
+	// get the sibling before this one
+	getLastSibling() {
+		// no parent
+		if(!this.parent) return;
+
+		// find this task in the parent
+		const index = this.parent.children.indexOf(this);
+
+		// no sibling before this one
+		if(index === 0) return;
+
+		return this.parent.children[index - 1];
+	}
+
 	// change our parent
-	_updateParent(newParent, {isLastChild} = {}) {
+	_updateParent(newParent, {isLastChild, after} = {}) {
 		// remove the old parent
 		if(this.parent) {
 			// just use pop if we know we are the last child
@@ -117,6 +131,10 @@ export class Task extends Events {
 			if(this.parent.children.length > 0) {
 				this.parent._invalidateState();
 			}
+			// send a state change event so the ui switches back to the task's internal state
+			else {
+				this.parent._stateChange();
+			}
 
 			// notify the parent's listeners that we have been removed
 			this.parent.emit("detach-child", {
@@ -129,8 +147,21 @@ export class Task extends Events {
 		this.parent = newParent;
 
 		if(this.parent) {
-			// add this to the parents children
-			this.parent.children.push(this);
+			// add this to the parents children after the child after
+			if(after) {
+				const index = this.parent.children.indexOf(after);
+
+				if(index !== -1) {
+					this.parent.children.splice(index + 1, 0, this);
+				}
+				else {
+					throw new Error(`${after.id} is not a child of ${this.parent.id}`);
+				}
+			}
+			// add this to the parents children at the end
+			else {
+				this.parent.children.push(this);
+			}
 
 			// force a state refresh
 			this.parent._invalidateState();

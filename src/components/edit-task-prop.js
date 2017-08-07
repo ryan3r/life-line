@@ -42,7 +42,13 @@ export class EditTaskProp extends Component {
 			this.reboot();
 		}
 
+		// if this is a new or empty task draw focus to it
+		if(this.state.task && !this.state.value && this.base) {
+			this.base.focus();
+		}
+
 		return <input class={`editor ${this.props.class}`}
-			value={this.state.value} onInput={this.update}/>;
+			value={this.state.value} onInput={this.update}
+			onKeyDown={this.props.onKeyDown}/>;
 	}
 }

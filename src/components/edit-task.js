@@ -9,6 +9,7 @@ export class EditTask extends Component {
 
 		this.create = this.create.bind(this);
 		this.remove = this.remove.bind(this);
+		this.handleKey = this.handleKey.bind(this);
 	}
 
 	componentDidMount() {
@@ -47,6 +48,46 @@ export class EditTask extends Component {
 		this.props.task.delete();
 	}
 
+	handleKey(e) {
+		// handle the enter key
+		if(e.keyCode == 13) {
+			e.preventDefault();
+
+			// create a new sibling task
+			this.props.task.parent.create();
+		}
+		// handle backspace when the input is empty
+		else if(e.keyCode == 8 && e.target.value === "") {
+			e.preventDefault();
+
+			// focus the last sibling
+			if(this.base.previousElementSibling) {
+				this.base.previousElementSibling.querySelector("input").focus();
+			}
+
+			// delete this task
+			this.props.task.delete();
+		}
+		// outdent tasks on tab
+		else if(e.keyCode == 9 && e.shiftKey) {
+			// get our current parent
+			const {parent} = this.props.task;
+
+			// attach this task to its grandparent after the current parent
+			this.props.task.attachTo(parent.parent, parent);
+		}
+		// indent tasks on tab
+		else if(e.keyCode == 9) {
+			e.preventDefault();
+
+			let attachTo = this.props.task.getLastSibling();
+
+			if(attachTo) {
+				this.props.task.attachTo(attachTo);
+			}
+		}
+	}
+
 	render() {
 		// the task changed
 		if(this.state.task && this.state.task !== this.props.task) {
@@ -75,7 +116,8 @@ export class EditTask extends Component {
 		return <div>
 			<div class="task flex flex-vcenter" style={`margin-right: ${20 * this.props.depth}px`}>
 				<Checkbox task={this.props.task}/>
-				<EditTaskProp class="flex-fill" task={this.props.task} prop="name"/>
+				<EditTaskProp class="flex-fill" task={this.props.task} prop="name"
+					onKeyDown={this.handleKey}/>
 				{inlineAddBtn}
 				<button class="btn" onClick={this.remove}>
 					<i class="material-icons">clear</i>
