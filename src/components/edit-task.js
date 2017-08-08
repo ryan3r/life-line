@@ -56,8 +56,12 @@ export class EditTask extends TaskComponent {
 	handleKey(e) {
 		let preventDefault = true;
 
+		// create a new child on ctrl+enter
+		if(e.keyCode == 13 && e.ctrlKey) {
+			this.task.create();
+		}
 		// handle the enter key
-		if(e.keyCode == 13) {
+		else if(e.keyCode == 13) {
 			// create a new sibling task
 			this.task.parent.create();
 		}
