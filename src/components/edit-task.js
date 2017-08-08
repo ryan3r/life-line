@@ -52,17 +52,15 @@ export class EditTask extends Component {
 	}
 
 	handleKey(e) {
+		let preventDefault = true;
+
 		// handle the enter key
 		if(e.keyCode == 13) {
-			e.preventDefault();
-
 			// create a new sibling task
 			this.props.task.parent.create();
 		}
 		// handle backspace when the input is empty
 		else if(e.keyCode == 8 && e.target.value === "") {
-			e.preventDefault();
-
 			// focus the last sibling
 			if(this.base.previousElementSibling) {
 				this.base.previousElementSibling.querySelector("input").focus();
@@ -73,8 +71,6 @@ export class EditTask extends Component {
 		}
 		// outdent tasks on tab
 		else if(e.keyCode == 9 && e.shiftKey) {
-			e.preventDefault();
-
 			// get our current parent
 			const {parent} = this.props.task;
 
@@ -89,8 +85,6 @@ export class EditTask extends Component {
 		}
 		// indent tasks on tab
 		else if(e.keyCode == 9) {
-			e.preventDefault();
-
 			// get the sibling that will become the parent
 			let attachTo = this.props.task.getLastSibling();
 
@@ -100,6 +94,91 @@ export class EditTask extends Component {
 
 				this.props.task.attachTo(attachTo);
 			}
+		}
+		// up arrow move to the next task
+		else if(e.keyCode == 38) {
+			let target;
+
+			// go to the child above us
+			if(this.base.previousElementSibling) {
+				target = this.base.previousElementSibling;
+
+				// find the last child in this element
+				for(;;) {
+					let subtasks = target.querySelector(".subtasks>div");
+
+					// go to the last child in this element
+					if(subtasks.childElementCount > 0) {
+						target = subtasks.lastElementChild;
+					}
+					// we found the next element
+					else {
+						break;
+					}
+				}
+			}
+			// go to our parent
+			else {
+				// NOTE: Event if we are the first element in the entire list
+				// 		this jumps back to the same element
+
+				target = this.base
+					.parentElement // <div> created by Tasks
+					.parentElement // .subtasks
+					.parentElement // <div> wrapping the parent task
+					.firstElementChild; // the actual task
+			}
+
+			target.querySelector("input").focus();
+		}
+		// down arrow move to the last task
+		else if(e.keyCode == 40) {
+			let target = this.base;
+			let subtasks = this.base.querySelector(".subtasks>div");
+
+			// go to the first child in this element
+			if(subtasks.childElementCount > 0) {
+				target = subtasks.firstElementChild;
+			}
+			// go to the next sibling
+			else if(this.base.nextElementSibling) {
+				target = this.base.nextElementSibling;
+			}
+			// go to our parent
+			else {
+				for(;;) {
+					target = target
+						.parentElement // <div> created by Tasks
+						.parentElement // .subtasks
+						.parentElement; // <div> wrapping the parent task
+
+					// we found a task to go to
+					if(target.nextElementSibling) {
+						target = target.nextElementSibling
+
+						break;
+					}
+					// we are on the last task
+					else if(target.className !== "") {
+						target = undefined;
+
+						break;
+					}
+				}
+			}
+
+			// focus the element
+			if(target) {
+				target.querySelector("input").focus();
+			}
+		}
+		// if none of our handlers were called go with the brower default
+		else {
+			preventDefault = false;
+		}
+
+		if(preventDefault) {
+			e.preventDefault();
 		}
 	}
 
