@@ -1,4 +1,4 @@
-import {Component} from "./component";
+import {TaskComponent} from "./task-component";
 import {TasksWidget} from "./tasks";
 import {Checkbox} from "./checkbox";
 import {EditTaskProp} from "./edit-task-prop";
@@ -6,7 +6,7 @@ import {EditTaskProp} from "./edit-task-prop";
 // the task id that was in focus before it was moved
 let nextActiveElement;
 
-export class EditTask extends Component {
+export class EditTask extends TaskComponent {
 	constructor() {
 		super();
 
@@ -15,29 +15,26 @@ export class EditTask extends Component {
 		this.handleKey = this.handleKey.bind(this);
 	}
 
-	componentDidMount() {
-		// remove old subscriptions
-		this.unsubscribeAll();
-
+	addListeners() {
 		// save the current task
 		this.setState({
-			task: this.props.task
+			task: this.task
 		});
 
 		// a child was added
 		this.addSub(
-			this.props.task.on("attach-child", () => {
+			this.task.on("attach-child", () => {
 				this.setState({
-					task: this.props.task
+					task: this.task
 				});
 			})
 		);
 
 		// a child was removed
 		this.addSub(
-			this.props.task.on("detach-child", () => {
+			this.task.on("detach-child", () => {
 				this.setState({
-					task: this.props.task
+					task: this.task
 				});
 			})
 		);
@@ -183,10 +180,7 @@ export class EditTask extends Component {
 	}
 
 	render() {
-		// the task changed
-		if(this.state.task && this.state.task !== this.props.task) {
-			this.reboot();
-		}
+		let task = this.task || this.props.task;
 
 		// a button to add a subtask
 		const addBtn = <button class="btn nopad" onClick={this.create}>
@@ -198,7 +192,7 @@ export class EditTask extends Component {
 		// display an add button if our children a visible
 		if(this.props.depth > 0) {
 			// if we have children put it at the end
-			if(this.props.task.children.length > 0) {
+			if(task.children.length > 0) {
 				endingAddBtn = addBtn;
 			}
 			// if we don't have children keep it inline to save space
@@ -208,7 +202,7 @@ export class EditTask extends Component {
 		}
 
 		// this element should be focused
-		if(this.props.task && nextActiveElement == this.props.task.id && this.base) {
+		if(task && nextActiveElement == task.id && this.base) {
 			nextActiveElement = undefined;
 
 			// focus the imput
@@ -217,8 +211,8 @@ export class EditTask extends Component {
 
 		return <div>
 			<div class="task flex flex-vcenter" style={`margin-right: ${20 * this.props.depth}px`}>
-				<Checkbox task={this.props.task}/>
-				<EditTaskProp class="flex-fill" task={this.props.task} prop="name"
+				<Checkbox task={task}/>
+				<EditTaskProp class="flex-fill" task={task} prop="name"
 					onKeyDown={this.handleKey}/>
 				{inlineAddBtn}
 				<button class="btn" onClick={this.remove}>
@@ -226,7 +220,7 @@ export class EditTask extends Component {
 				</button>
 			</div>
 			<div class="subtasks">
-				<TasksWidget editMode task={this.props.task} depth={this.props.depth}/>
+				<TasksWidget editMode task={task} depth={this.props.depth}/>
 				{endingAddBtn}
 			</div>
 		</div>;

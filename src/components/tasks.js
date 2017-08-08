@@ -1,4 +1,4 @@
-import {Component} from "./component";
+import {TaskComponent} from "./task-component";
 import {EditTask} from "./edit-task";
 import {TaskWidget} from "./task";
 import {TaskLink} from "./task-link";
@@ -23,7 +23,7 @@ const maxNestingDepth = () => {
 	return depth < 1 ? 1 : depth;
 };
 
-export class TasksWidget extends Component {
+export class TasksWidget extends TaskComponent {
 	constructor() {
 		super();
 
@@ -31,6 +31,8 @@ export class TasksWidget extends Component {
 	}
 
 	componentDidMount() {
+		super.componentDidMount();
+
 		let depth;
 
 		// we calculate the max depth
@@ -54,18 +56,22 @@ export class TasksWidget extends Component {
 			depth = maxNestingDepth();
 		}
 
+		this.setState({
+			depth
+		});
+	}
+
+	addListeners() {
 		// update the state
 		this.setState({
-			children: this.props.task.children,
-			depth
+			children: this.task.children
 		});
 
 		// a child child was removed
 		this.props.task.on("detach-child", () => {
 			// refresh
 			this.setState({
-				children: this.props.task.children,
-				depth: this.state.depth
+				children: this.task.children
 			});
 		});
 
@@ -73,19 +79,13 @@ export class TasksWidget extends Component {
 		this.props.task.on("attach-child", () => {
 			// refresh
 			this.setState({
-				children: this.props.task.children,
-				depth: this.state.depth
+				children: this.task.children
 			});
 		});
 	}
 
 	render() {
 		const {children} = this.state;
-
-		// the task changed
-		if(children && children !== this.props.task.children) {
-			this.reboot();
-		}
 
 		// get the number of layers of subitems we have left
 		const depth = this.props.depth !== undefined ?

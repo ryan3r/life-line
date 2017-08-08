@@ -1,4 +1,4 @@
-import {Component} from "./component";
+import {TaskComponent} from "./task-component";
 
 const TAU = Math.PI * 2;
 
@@ -15,7 +15,7 @@ const RADIUS = ORIGIN - CURVE_WIDTH;
 const RIGHT_X = ORIGIN;
 const RIGHT_Y = ORIGIN - RADIUS;
 
-export class Checkbox extends Component {
+export class Checkbox extends TaskComponent {
 	constructor() {
 		super();
 
@@ -29,19 +29,15 @@ export class Checkbox extends Component {
 		};
 	}
 
-	componentDidMount() {
-		// remove old subscriptions
-		this.unsubscribeAll();
-
+	addListeners() {
 		// get the initial state
 		this.setState({
-			state: this.props.task.state,
-			task: this.props.task
+			state: this.task.state
 		});
 
 		// listen for state changes
 		this.addSub(
-			this.props.task.on("state", value => {
+			this.task.on("state", value => {
 				this.setState({
 					state: value
 				});
@@ -51,15 +47,10 @@ export class Checkbox extends Component {
 
 	// toggle the state
 	toggle() {
-		this.props.task.state = this.state.state.type == "done" ? "none" : "done";
+		this.task.state = this.state.state.type == "done" ? "none" : "done";
 	}
 
 	render() {
-		// the task changed
-		if(this.state.task && this.state.task !== this.props.task) {
-			this.reboot();
-		}
-
 		let {percentDone, type} = this.state.state;
 
 		// the checked state of a checkbox
@@ -90,7 +81,8 @@ export class Checkbox extends Component {
 		}
 
 		return <svg width={SIZE} height={SIZE} class={`checkbox ${type}`} onClick={this.toggle}
-				aria-role="checkbox" aria-checked={ariaState} area-labelledby={`task-${this.props.task.id}`}>
+				aria-role="checkbox" aria-checked={ariaState}
+				area-labelledby={`task-${this.props.task.id}`}>
 			<circle cx={ORIGIN} cy={ORIGIN} r={RADIUS - CURVE_WIDTH * 1.5} class="inner"/>
 			<circle cx={ORIGIN} cy={ORIGIN} r={RADIUS} class="backdrop"/>
 			{doneCircle}

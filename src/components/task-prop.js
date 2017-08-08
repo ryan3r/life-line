@@ -1,18 +1,16 @@
-import {Component} from "./component";
+import {TaskComponent} from "./task-component";
 
-export class TaskProp extends Component {
-	componentDidMount() {
+export class TaskProp extends TaskComponent {
+	addListeners() {
 		// get the initial state
 		this.setState({
-			task: this.props.task,
-			value: this.props.task[this.props.prop]
+			value: this.task[this.props.prop]
 		});
 
 		// listen for changes to the property
 		this.addSub(
-			this.props.task.on(this.props.prop, value => {
+			this.task.on(this.props.prop, value => {
 				this.setState({
-					task: this.props.task,
 					value
 				});
 			})
@@ -20,11 +18,6 @@ export class TaskProp extends Component {
 	}
 
 	render() {
-		// the task changed
-		if(this.state.task && this.state.task !== this.props.task) {
-			this.reboot();
-		}
-
 		return this.state.value;
 	}
 }

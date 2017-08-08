@@ -1,26 +1,24 @@
-import {Component} from "./component";
+import {TaskComponent} from "./task-component";
 
 const DEBOUNCE_TIMER = 500;
 
-export class EditTaskProp extends Component {
+export class EditTaskProp extends TaskComponent {
 	constructor() {
 		super();
 
 		this.update = this.update.bind(this);
 	}
 
-	componentDidMount() {
+	addListeners() {
 		// get the initial state
 		this.setState({
-			task: this.props.task,
-			value: this.props.task[this.props.prop]
+			value: this.task[this.props.prop]
 		});
 
 		// listen for changes to the property
 		this.addSub(
-			this.props.task.on(this.props.prop, value => {
+			this.task.on(this.props.prop, value => {
 				this.setState({
-					task: this.props.task,
 					value
 				});
 			})
@@ -37,11 +35,6 @@ export class EditTaskProp extends Component {
 	}
 
 	render() {
-		// the task changed
-		if(this.state.task && this.state.task !== this.props.task) {
-			this.reboot();
-		}
-
 		// if this is a new or empty task draw focus to it
 		if(this.state.task && !this.state.value && this.base) {
 			this.base.focus();

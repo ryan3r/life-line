@@ -20,12 +20,4 @@ export class Component extends preact.Component {
 	componentWillUnmount() {
 		this.unsubscribeAll();
 	}
-
-	reboot() {/*
-		// remove listeners
-		this.unsubscribeAll();
-
-		// add listeners back
-		this.componentDidMount();
-	*/}
 }

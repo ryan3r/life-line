@@ -1,34 +1,22 @@
-import {Component} from "./component";
+import {TaskComponent} from "./task-component";
 
-export class ProgressBar extends Component {
-	componentDidMount() {
-		// remove old subscriptions
-		this.unsubscribeAll();
-
-		const {task} = this.props;
-
+export class ProgressBar extends TaskComponent {
+	addListeners() {
 		this.setState({
-			task: task,
-			state: task.state
+			state: this.task.state
 		});
 
 		// listen for state changes
 		this.addSub(
-			task.on("state", () => {
+			this.task.on("state", () => {
 				this.setState({
-					task: this.props.task,
-					state: this.props.task.state
+					state: this.task.state
 				});
 			})
 		);
 	}
 
 	render() {
-		// the task changed
-		if(this.state.task && this.state.task !== this.props.task) {
-			this.reboot();
-		}
-
 		let {state} = this.state;
 
 		if(!state) return;
