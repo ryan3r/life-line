@@ -46,11 +46,11 @@ export class EditTask extends TaskComponent {
 	}
 
 	create() {
-		this.props.task.create();
+		this.task.create();
 	}
 
 	remove() {
-		this.props.task.delete();
+		this.task.delete();
 	}
 
 	handleKey(e) {
@@ -59,7 +59,7 @@ export class EditTask extends TaskComponent {
 		// handle the enter key
 		if(e.keyCode == 13) {
 			// create a new sibling task
-			this.props.task.parent.create();
+			this.task.parent.create();
 		}
 		// handle backspace when the input is empty
 		else if(e.keyCode == 8 && e.target.value === "") {
@@ -69,32 +69,32 @@ export class EditTask extends TaskComponent {
 			}
 
 			// delete this task
-			this.props.task.delete();
+			this.task.delete();
 		}
 		// outdent tasks on tab
 		else if(e.keyCode == 9 && e.shiftKey) {
 			// get our current parent
-			const {parent} = this.props.task;
+			const {parent} = this.task;
 
 			// no grandparent to add this to
 			if(!parent.parent) return;
 
 			// make sure we foucs this task when we rerender
-			nextActiveElement = this.props.task.id;
+			nextActiveElement = this.task.id;
 
 			// attach this task to its grandparent after the current parent
-			this.props.task.attachTo(parent.parent, parent);
+			this.task.attachTo(parent.parent, parent);
 		}
 		// indent tasks on tab
 		else if(e.keyCode == 9) {
 			// get the sibling that will become the parent
-			let attachTo = this.props.task.getLastSibling();
+			let attachTo = this.task.getLastSibling();
 
 			if(attachTo) {
 				// make sure we foucs this task when we rerender
-				nextActiveElement = this.props.task.id;
+				nextActiveElement = this.task.id;
 
-				this.props.task.attachTo(attachTo);
+				this.task.attachTo(attachTo);
 			}
 		}
 		// up arrow move to the next task
