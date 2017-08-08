@@ -10,6 +10,14 @@ export class EditTaskProp extends TaskComponent {
 	}
 
 	addListeners() {
+		// save the old task
+		if(this.oldTask) {
+			this.oldTask[this.props.prop] = this.state.value;
+		}
+
+		// make this the old task
+		this.oldTask = this.task;
+
 		// get the initial state
 		this.setState({
 			value: this.task[this.props.prop]
@@ -26,6 +34,11 @@ export class EditTaskProp extends TaskComponent {
 	}
 
 	update(e) {
+		// update the internal value
+		this.setState({
+			value: e.target.value
+		});
+
 		// clear the old timer
 		clearTimeout(this._debounce);
 		// don't save while the user is typing
