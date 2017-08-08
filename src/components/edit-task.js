@@ -16,6 +16,11 @@ export class EditTask extends TaskComponent {
 	}
 
 	addListeners() {
+		// autofocus new tasks
+		if(this.task.name === "" && this.base) {
+			this.base.querySelector("input").focus();
+		}
+
 		// save the current task
 		this.setState({
 			task: this.task
