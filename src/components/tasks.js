@@ -2,7 +2,6 @@ import {TaskComponent} from "./task-component";
 import {EditTask} from "./edit-task";
 import {TaskWidget} from "./task";
 import {TaskLink} from "./task-link";
-import {Subscription} from "../util";
 
 // the approimate width of an edit task widget
 const BASELINE = 305;
@@ -38,19 +37,12 @@ export class TasksWidget extends TaskComponent {
 		// we calculate the max depth
 		if(this.props.depth === undefined) {
 			// recalculate how deep we can go
-			const resize = () => {
+			this.listen(window, "resize", () => {
 				this.setState({
 					children: this.props.task.children,
 					depth: maxNestingDepth()
 				});
-			};
-
-			window.addEventListener("resize", resize);
-
-			// add a subsciption for the listeners
-			this.addSub(new Subscription(() => {
-				window.removeEventListener("resize", resize);
-			}));
+			});
 
 			// calculate the max depth
 			depth = maxNestingDepth();

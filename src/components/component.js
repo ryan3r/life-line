@@ -1,3 +1,5 @@
+import {Subscription} from "../util";
+
 export class Component extends preact.Component {
 	constructor() {
 		super();
@@ -19,5 +21,15 @@ export class Component extends preact.Component {
 
 	componentWillUnmount() {
 		this.unsubscribeAll();
+	}
+
+	// listen to dom events
+	listen(target, type, fn) {
+		target.addEventListener(type, fn);
+
+		// add a subsciption for the listeners
+		this.addSub(new Subscription(() => {
+			target.removeEventListener(type, fn);
+		}));
 	}
 }

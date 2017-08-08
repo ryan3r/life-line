@@ -20,6 +20,24 @@ export class App extends Component {
 	}
 
 	componentDidMount() {
+		// listen for global shortcuts
+		this.listen(window, "keydown", e => {
+			let preventDefault = true;
+
+			// toggle edit mode on ctrl+enter
+			if(e.ctrlKey && e.keyCode == 81) {
+				this.toggleEditMode();
+			}
+			// prevent the default if one of our handlers was triggered
+			else {
+				preventDefault = false;
+			}
+
+			if(preventDefault) {
+				e.preventDefault();
+			}
+		});
+
 		// we have a known task
 		this.setupList();
 
