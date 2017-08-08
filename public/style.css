@@ -30,6 +30,10 @@ html, body {
 	justify-content: center;
 }
 
+.flex-noshrink {
+	flex-shrink: 0;
+}
+
 /* Checkbox styles */
 .checkbox {
 	margin-right: 13px;

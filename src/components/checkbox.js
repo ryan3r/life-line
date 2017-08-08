@@ -80,7 +80,8 @@ export class Checkbox extends TaskComponent {
 				d={`M ${RIGHT_X} ${RIGHT_Y} A ${RADIUS} ${RADIUS} ${+!largeArc} ${+largeArc} 1 ${x} ${y}`}/>
 		}
 
-		return <svg width={SIZE} height={SIZE} class={`checkbox ${type}`} onClick={this.toggle}
+		return <svg width={SIZE} height={SIZE} class={`checkbox flex-noshrink ${type}`}
+				onClick={this.toggle}
 				aria-role="checkbox" aria-checked={ariaState}
 				area-labelledby={`task-${this.props.task.id}`}>
 			<circle cx={ORIGIN} cy={ORIGIN} r={RADIUS - CURVE_WIDTH * 1.5} class="inner"/>
