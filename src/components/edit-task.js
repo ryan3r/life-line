@@ -62,6 +62,19 @@ export class EditTask extends TaskComponent {
 			if(this.base.previousElementSibling) {
 				this.base.previousElementSibling.querySelector("input").focus();
 			}
+			// focus the parent
+			else {
+				const parentInput = this.base
+					.parentElement // <div> created by Tasks
+					.parentElement // .subtasks
+					.parentElement // <div> wrapping the parent task
+					.querySelector("input");
+
+				// if this is not the top level focus the parent
+				if(parentInput) {
+					parentInput.focus();
+				}
+			}
 
 			// delete this task
 			this.task.delete();
