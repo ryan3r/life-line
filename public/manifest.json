@@ -3,6 +3,7 @@
 	"start_url": "/",
 	"display": "standalone",
 	"theme_color": "#333",
+	"background_color": "#000",
 	"icons": [{
 		"src": "/icons/favicon.png",
 		"sizes": "144x144",

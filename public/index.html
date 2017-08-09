@@ -11,6 +11,17 @@
 	<link rel="stylesheet" href="/style.css"/>
 </head>
 <body>
+	<!-- Pick the theme -->
+	<script>
+		var now = new Date();
+
+		// from 9am to 6pm show the light theme
+		if(now.getHours() > 9 && now.getHours() < 18) {
+			document.body.classList.add("light-theme");
+		}
+	</script>
+
+	<!-- Render the frame -->
 	<div class="container flex-column pre-loader">
 		<div class="header flex flex-vcenter">
 			<h2 class="header-title">Loading...</h2>

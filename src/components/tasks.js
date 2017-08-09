@@ -10,8 +10,8 @@ const BASELINE = 305;
 const INDENT_SIZE = 30;
 
 // the sidebar sizing
-const SIDEBAR_OPEN = 650;
-const SIDEBAR_WIDTH = 250;
+const SIDEBAR_OPEN = 700;
+const SIDEBAR_WIDTH = 300;
 
 // calculate the max nesting depth
 // NOTE: the + 1 is because the first row of tasks are not indented

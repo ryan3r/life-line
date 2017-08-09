@@ -70,15 +70,16 @@ export class ListsDrawer extends Component {
 		return <div class={`drawer ${this.props.open ? "open" : ""}`}>
 			{this.state.lists.map(list => {
 				return <div class="list-entry flex flex-vcenter">
-					<TaskLink id={list.id} isList onClick={this.props.onClose} class="flex-fill">
-						{list.name}
+					<TaskLink id={list.id} isList onClick={this.props.onClose}
+						class="flex-fill no-underline">
+							{list.name}
 					</TaskLink>
 					<button class="btn" onClick={this.removeList(list.id)}>
 						<i class="material-icons">clear</i>
 					</button>
 				</div>
 			})}
-			<div class="list-entry">
+			<div class="list-entry no-hover">
 				<form class="flex flex-vcenter" onSubmit={this.addList}>
 					<input class="editor flex-fill" placeholder="New list"
 						value={this.state.newList} onInput={this.newListUpdate}/>
