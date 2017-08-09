@@ -63,7 +63,7 @@ export class App extends Component {
 				this._tasks.dispose();
 			}
 
-			this._tasks = new Tasks(router.listId);
+			this._tasks = new Tasks(this.props.lists, router.listId);
 
 			// an error occured
 			this._tasks.ready.catch(err => {

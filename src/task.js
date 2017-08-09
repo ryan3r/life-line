@@ -318,7 +318,7 @@ export class Task extends Events {
 
 			// if this is the root task
 			if(!this.parent) {
-				db.ref(`/users/foo/${this._tasks.listId}`).set(value);
+				db.ref(`/users/${this._tasks.lists.userId}/${this._tasks.listId}`).set(value);
 			}
 		}
 	}
