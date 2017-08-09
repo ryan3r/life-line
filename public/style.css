@@ -1,6 +1,8 @@
 html, body {
 	height: 100%;
 	margin: 0px;
+	color: #fff;
+	background-color: #555;
 }
 
 /* Flex box */
@@ -38,7 +40,7 @@ html, body {
 .checkbox {
 	margin-right: 13px;
 	fill: rgba(0, 0, 0, 0);
-	stroke: #09f;
+	stroke: #0af;
 	stroke-width: 3px;
 }
 
@@ -47,11 +49,7 @@ html, body {
 }
 
 .checkbox .backdrop {
-	stroke: #ddd;
-}
-
-.checkbox.pending {
-	stroke: #555;
+	stroke: #777;
 }
 
 .checkbox.done {
@@ -64,16 +62,12 @@ html, body {
 
 /* The progress bar */
 .progress {
-	background-color: #ddd;
+	background-color: #777;
 }
 
 .progress-inner {
-	background-color: #09f;
+	background-color: #0af;
 	height: 3px;
-}
-
-.progress-inner.pending {
-	background-color: #555;
 }
 
 .progress-inner.done {
@@ -94,15 +88,16 @@ html, body {
 }
 
 .btn:hover, .btn.nocolor {
-	color: #000;
+	color: #fff;
 }
 
 /* Inputs */
 .editor {
 	border: none;
 	outline: none;
-	border-bottom: 1px solid;
+	border-bottom: 1px solid #ddd;
 	background: inherit;
+	color: inherit;
 }
 
 .editor.invisible {
@@ -111,9 +106,13 @@ html, body {
 	font-family: inherit;
 }
 
+.editor::placeholder {
+	color: #bbb;
+}
+
 /* Header */
 .header {
-	background-color: #f80;
+	background-color: #333;
 	padding: 15px;
 }
 
@@ -136,7 +135,7 @@ html, body {
 
 /* Link styling */
 a {
-	color: #000;
+	color: inherit;
 	text-decoration: none;
 }
 
@@ -146,7 +145,7 @@ a:hover {
 
 /* Text for items not shown */
 .hidden {
-	color: #666;
+	color: #aaa;
 	font-style: italic;
 }
 
@@ -158,7 +157,7 @@ a:hover {
 	width: 250px;
 	height: 100%;
 	/* Add a separator between the sidebar and the page */
-	border-right: 1px solid #000;
+	border-right: 1px solid #ddd;
 }
 
 /* Hide the drawer button when it is locked open */
@@ -176,7 +175,7 @@ a:hover {
 		border-right: none;
 		box-shadow: 0px 0px 5px #000;
 		/* Make sure the sidebar is not transparent */
-		background-color: #fff;
+		background-color: #333;
 		/* Side the sidebar out of view */
 		transform: translateX(calc(-100% - 10px));
 		pointer-events: none;
@@ -231,12 +230,12 @@ a:hover {
 }
 
 .list-entry:hover {
-	background-color: #eee;
+	background-color: #666;
 }
 
 /* Indent subtasks */
 .subtasks {
-	border-left: 2px solid #ddd;
+	border-left: 2px solid #777;
 	margin-left: 11px;
 	padding-left: 17px;
 }
