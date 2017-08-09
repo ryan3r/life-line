@@ -26,18 +26,9 @@ export class EditTask extends TaskComponent {
 			task: this.task
 		});
 
-		// a child was added
+		// a child was changed
 		this.addSub(
-			this.task.on("attach-child", () => {
-				this.setState({
-					task: this.task
-				});
-			})
-		);
-
-		// a child was removed
-		this.addSub(
-			this.task.on("detach-child", () => {
+			this.task.on("children", () => {
 				this.setState({
 					task: this.task
 				});

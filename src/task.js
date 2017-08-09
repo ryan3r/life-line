@@ -137,10 +137,7 @@ export class Task extends Events {
 			}
 
 			// notify the parent's listeners that we have been removed
-			this.parent.emit("detach-child", {
-				parent: this.parent,
-				child: this
-			});
+			this.parent.emit("children", this.parent.children);
 		}
 
 		// update the internal parent reference
@@ -167,10 +164,7 @@ export class Task extends Events {
 			this.parent._invalidateState();
 
 			// notify the parent's listeners that we have been added
-			this.parent.emit("attach-child", {
-				parent: this.parent,
-				child: this
-			});
+			this.parent.emit("children", this.parent.children);
 		}
 	}
 

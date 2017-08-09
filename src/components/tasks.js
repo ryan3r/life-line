@@ -60,15 +60,7 @@ export class TasksWidget extends TaskComponent {
 		});
 
 		// a child child was removed
-		this.props.task.on("detach-child", () => {
-			// refresh
-			this.setState({
-				children: this.task.children
-			});
-		});
-
-		// a child child was added
-		this.props.task.on("attach-child", () => {
+		this.props.task.on("children", () => {
 			// refresh
 			this.setState({
 				children: this.task.children
