@@ -13,12 +13,21 @@
 <body>
 	<!-- Pick the theme -->
 	<script>
-		var now = new Date();
+		function refreshTheme() {
+			var now = new Date();
 
-		// from 9am to 6pm show the light theme
-		if(now.getHours() > 9 && now.getHours() < 18) {
-			document.body.classList.add("light-theme");
+			// from 9am to 6pm show the light theme
+			var method = (now.getHours() > 9 && now.getHours() < 19) ? "add" : "remove";
+
+			// apply the change
+			document.body.classList[method]("light-theme");
 		}
+
+		// set the initial theme
+		refreshTheme();
+
+		// switch themes when the user is not looking
+		window.addEventListener("visibilitychange", refreshTheme);
 	</script>
 
 	<!-- Render the frame -->
