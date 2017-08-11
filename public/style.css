@@ -279,10 +279,6 @@ a:hover {
 	background-color: #ddd;
 }
 
-.light-theme .bread-crumbs {
-	background-color: #ccc;
-}
-
 /* Indent subtasks */
 .subtasks {
 	border-left: 2px solid #777;
@@ -302,12 +298,8 @@ a:hover {
 
 /* The bread crumbs */
 .bread-crumbs {
-	background-color: #777;
+	background-color: inherit;
 	padding: 5px 12px;
-}
-
-.light-theme .bread-crumbs {
-	background-color: #ddd;
 }
 
 .crumb {
