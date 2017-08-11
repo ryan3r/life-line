@@ -301,25 +301,29 @@ export class Task extends Events {
 			}
 		}
 	}
+}
 
-	// get the name
-	get name() {
-		return this._name;
-	}
+for(let prop of TASK_PROPS) {
+	Object.defineProperty(Task.prototype, prop, {
+		// get the name
+		get() {
+			return this["_" + prop];
+		},
 
-	// store the value of the property
-	set name(value) {
-		// update our internal version of prop
-		const changed = this._updateProp("name", value);
+		// store the value of the property
+		set(value) {
+			// update our internal version of prop
+			const changed = this._updateProp(prop, value);
 
-		// save changes to firebase
-		if(changed) {
-			this._tasks._ref.child(`${this.id}/name`).set(value);
+			// save changes to firebase
+			if(changed) {
+				this._tasks._ref.child(`${this.id}/${prop}`).set(value);
 
-			// if this is the root task
-			if(!this.parent) {
-				db.ref(`/users/${this._tasks.lists.userId}/${this._tasks.listId}`).set(value);
+				// if this is the root task
+				if(prop == "name" && !this.parent) {
+					db.ref(`/users/${this._tasks.lists.userId}/${this._tasks.listId}`).set(value);
+				}
 			}
 		}
-	}
+	});
 }
