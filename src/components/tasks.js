@@ -4,7 +4,7 @@ import {TaskWidget} from "./task";
 import {TaskLink} from "./task-link";
 
 // the approimate width of an edit task widget
-const BASELINE = 305;
+const BASELINE = 350;
 
 // the indentation for sub tasks
 const INDENT_SIZE = 30;
@@ -78,16 +78,7 @@ export class TasksWidget extends TaskComponent {
 
 		// we can't add any more children
 		if(depth === 0) {
-			// show the number of children we are hiding
-			if(children.length > 0) {
-				return <TaskLink class="hidden" id={this.props.task.id}>
-					{`${children.length} subtask${children.length == 1 ? "" : "s"} not shown`}
-				</TaskLink>;
-			}
-			// no children are hidden
-			else {
-				return "";
-			}
+			return "";
 		}
 
 		return <div>
