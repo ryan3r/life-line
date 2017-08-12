@@ -53,18 +53,10 @@ export class TasksWidget extends TaskComponent {
 		});
 	}
 
-	addListeners() {
+	onTaskChildren() {
 		// update the state
 		this.setState({
-			children: this.task.children
-		});
-
-		// a child child was removed
-		this.task.on("children", () => {
-			// refresh
-			this.setState({
-				children: this.task.children
-			});
+			children: children
 		});
 	}
 

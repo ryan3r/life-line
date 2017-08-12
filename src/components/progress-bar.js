@@ -1,19 +1,10 @@
 import {TaskComponent} from "./task-component";
 
 export class ProgressBar extends TaskComponent {
-	addListeners() {
+	onTaskState(state) {
 		this.setState({
-			state: this.task.state
+			state
 		});
-
-		// listen for state changes
-		this.addSub(
-			this.task.on("state", () => {
-				this.setState({
-					state: this.task.state
-				});
-			})
-		);
 	}
 
 	render() {

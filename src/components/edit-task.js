@@ -16,24 +16,19 @@ export class EditTask extends TaskComponent {
 	}
 
 	addListeners() {
+		super.addListeners();
+
 		// autofocus new tasks
 		if(this.task.name === "" && this.base) {
 			this.base.querySelector("input").focus();
 		}
+	}
 
+	onTaskChildren() {
 		// save the current task
 		this.setState({
 			task: this.task
 		});
-
-		// a child was changed
-		this.addSub(
-			this.task.on("children", () => {
-				this.setState({
-					task: this.task
-				});
-			})
-		);
 	}
 
 	create() {

@@ -29,20 +29,11 @@ export class Checkbox extends TaskComponent {
 		};
 	}
 
-	addListeners() {
+	onTaskState() {
 		// get the initial state
 		this.setState({
 			state: this.task.state
 		});
-
-		// listen for state changes
-		this.addSub(
-			this.task.on("state", value => {
-				this.setState({
-					state: value
-				});
-			})
-		);
 	}
 
 	// toggle the state
