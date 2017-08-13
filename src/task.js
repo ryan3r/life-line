@@ -76,6 +76,9 @@ export class Task extends Events {
 
 	// delete this task
 	delete(opts) {
+		// mark this task as deleted
+		this._deleted = true;
+
 		this._updateParent(undefined, opts);
 
 		// delete the task from tasks
@@ -316,7 +319,7 @@ for(let prop of TASK_PROPS) {
 			const changed = this._updateProp(prop, value);
 
 			// save changes to firebase
-			if(changed) {
+			if(changed && !this._deleted) {
 				this._tasks._ref.child(`${this.id}/${prop}`).set(value);
 
 				// if this is the root task
