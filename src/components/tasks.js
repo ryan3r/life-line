@@ -53,10 +53,10 @@ export class TasksWidget extends TaskComponent {
 		});
 	}
 
-	onTaskChildren() {
+	onTaskChildren(children) {
 		// update the state
 		this.setState({
-			children: children
+			children
 		});
 	}
 
