@@ -61,6 +61,9 @@ export class TasksWidget extends TaskComponent {
 	}
 
 	render() {
+		// no task yet
+		if(!this.task) return;
+
 		const {children} = this.state;
 
 		// get the number of layers of subitems we have left
@@ -70,7 +73,14 @@ export class TasksWidget extends TaskComponent {
 
 		// we can't add any more children
 		if(depth === 0) {
-			return "";
+			if(children.length > 0) {
+				return <TaskLink id={this.task.id} class="hidden">
+					{`${children.length} subtasks not shown`}
+				</TaskLink>;
+			}
+			else {
+				return "";
+			}
 		}
 
 		return <div>
