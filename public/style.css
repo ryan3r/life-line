@@ -104,6 +104,10 @@ html, body {
 	color: #fff;
 }
 
+.light-theme .btn:not(.nocolor):hover {
+	color: #000;
+}
+
 /* Inputs */
 .editor {
 	border: none;
