@@ -42,7 +42,7 @@ export class TasksWidget extends TaskComponent {
 					children: this.props.task.children,
 					depth: maxNestingDepth()
 				});
-			});
+			}, { passive: true });
 
 			// calculate the max depth
 			depth = maxNestingDepth();

@@ -24,12 +24,12 @@ export class Component extends preact.Component {
 	}
 
 	// listen to dom events
-	listen(target, type, fn) {
-		target.addEventListener(type, fn);
+	listen(target, type, fn, opts) {
+		target.addEventListener(type, fn, opts);
 
 		// add a subsciption for the listeners
 		this.addSub(new Subscription(() => {
-			target.removeEventListener(type, fn);
+			target.removeEventListener(type, fn, opts);
 		}));
 	}
 }
