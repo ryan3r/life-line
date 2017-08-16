@@ -270,6 +270,26 @@ export class Task extends Events {
 		return true;
 	}
 
+	// check if this task is showing more than the maximum number of children
+	childCountExcedes({maxChildren, showCompleted}) {
+		// the number of children that we can have before we exceed the allotment
+		let childrenRemaining = maxChildren;
+
+		for(let child of this.children) {
+			// this child is hidden ignore it
+			if(!showCompleted && child.state.type == "done") continue;
+
+			--childrenRemaining;
+
+			// we have exceded the maximum number of children allowed
+			if(childrenRemaining < 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	// get the state of a task
 	get state() {
 		// get the state of a childless task

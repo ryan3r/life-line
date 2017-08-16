@@ -74,8 +74,14 @@ export class EditTask extends TaskComponent {
 		}
 		// handle the enter key
 		else if(e.keyCode == 13) {
+			// we have all the children
+			const parentIsFull = this.task.parent.childCountExcedes({
+				maxChildren: MAX_CHILDREN,
+				showCompleted: this.props.showCompleted
+			});
+
 			// open the parent since the children are hidden
-			if(this.task.parent.children.length > MAX_CHILDREN) {
+			if(parentIsFull) {
 				router.openTask(this.task.parent.id);
 			}
 
@@ -133,8 +139,13 @@ export class EditTask extends TaskComponent {
 				// make sure we foucs this task when we rerender
 				nextActiveElement = this.task.id;
 
+				const parentIsFull = attachTo.childCountExcedes({
+					maxChildren: MAX_CHILDREN,
+					showCompleted: this.props.showCompleted
+				});
+
 				// this tasks children are hidden open it so we can be seen
-				if(attachTo.children.length > MAX_CHILDREN) {
+				if(parentIsFull) {
 					router.openTask(attachTo.id);
 				}
 
