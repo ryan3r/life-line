@@ -359,3 +359,13 @@ div.hidden {
 	height: 100%;
 	position: fixed;
 }
+
+/* Clearly distinguish completed tasks */
+.task.done {
+	color: #aaa;
+	text-decoration: line-through;
+}
+
+.light-theme .task.done {
+	color: #777;
+}

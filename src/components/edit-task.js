@@ -36,6 +36,13 @@ export class EditTask extends TaskComponent {
 		});
 	}
 
+	onTaskState() {
+		// save the current task
+		this.setState({
+			task: this.task
+		});
+	}
+
 	create() {
 		// we need to change the view
 		if(this.props.depth <= 0) {
@@ -288,7 +295,7 @@ export class EditTask extends TaskComponent {
 		}
 
 		return <div>
-			<div class="task flex flex-vcenter">
+			<div class={`task flex flex-vcenter ${this.task.state.type}`}>
 				<Checkbox task={this.task}/>
 				<EditTaskProp class="flex-fill" task={this.task} prop="name"
 					onKeyDown={this.handleKey} onMouseDown={this.open}/>
