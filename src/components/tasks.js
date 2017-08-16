@@ -56,11 +56,26 @@ export class TasksWidget extends TaskComponent {
 		});
 	}
 
+	onStateChildren(children) {
+		// one of our children has changed state refresh if that matters
+		if(!this.props.showCompleted) return;
+
+		// update the state
+		this.setState({
+			children
+		});
+	}
+
 	render() {
 		// no task yet
 		if(!this.task) return;
 
 		let {children} = this.state;
+
+		// filter out completed tasks
+		if(!this.props.showCompleted) {
+			children = children.filter(task => task.state.type != "done");
+		}
 
 		// get the number of layers of subitems we have left
 		const depth = this.props.depth !== undefined ?
@@ -95,7 +110,10 @@ export class TasksWidget extends TaskComponent {
 		}
 
 		return <div>
-			{children.map(child => <EditTask task={child} depth={depth - 1}/>)}
+			{children.map(child => {
+				return <EditTask task={child} depth={depth - 1}
+					showCompleted={this.props.showCompleted}/>;
+			})}
 			{hiddenMsg}
 		</div>;
 	}

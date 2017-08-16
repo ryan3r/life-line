@@ -6,6 +6,7 @@ import {Tasks} from "../tasks";
 import {ListsDrawer} from "./lists-drawer";
 import {BreadCrumbs} from "./bread-crumbs";
 import {ProgressBar} from "./progress-bar";
+import {Filter} from "./filter";
 
 export class App extends Component {
 	constructor() {
@@ -13,7 +14,6 @@ export class App extends Component {
 
 		// bind event listeners to this class
 		this.closeDrawer = this.closeDrawer.bind(this);
-		this.toggleDrawer = this.toggleDrawer.bind(this);
 		this.createChild = this.createChild.bind(this);
 	}
 
@@ -112,11 +112,13 @@ export class App extends Component {
 		});
 	}
 
-	// toggle the state of the drawer
-	toggleDrawer() {
-		this.setState({
-			drawerOpen: !this.state.drawerOpen
-		});
+	// toggle the state of a boolean
+	toggleState(prop) {
+		return () => {
+			this.setState({
+				[prop]: !this.state[prop]
+			});
+		};
 	}
 
 	// close the drawer
@@ -135,8 +137,9 @@ export class App extends Component {
 	message(header, content) {
 		return <div class="container flex-column">
 			<div class="header flex flex-vcenter">
-				<button class="btn nocolor drawer-btn" onClick={this.toggleDrawer}>
-					<i class="material-icons">menu</i>
+				<button class="btn nocolor drawer-btn"
+					onClick={this.toggleState("drawerOpen")}>
+						<i class="material-icons">menu</i>
 				</button>
 				<h2 class="header-title">{header}</h2>
 			</div>
@@ -146,7 +149,7 @@ export class App extends Component {
 				<div class="content flex-fill">{content}</div>
 			</div>
 			<div class={`shade ${this.state.drawerOpen ? "open" : ""}`}
-				onClick={this.toggleDrawer}></div>
+				onClick={this.toggleState("drawerOpen")}></div>
 		</div>;
 	}
 
@@ -184,15 +187,19 @@ export class App extends Component {
 
 		// show the app
 		return <div class={`container flex-column ${ctrlPressed}`}>
-			<Header task={this.state.task} onHeaderToggle={this.toggleDrawer}/>
+			<Header task={this.state.task}
+				onHeaderToggle={this.toggleState("drawerOpen")}/>
 			<ProgressBar task={this.state.task}/>
 			<div class="flex-fill flex container">
 				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}
 					lists={this.props.lists}/>
 				<div class="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
+					<Filter showCompleted={this.state.showCompleted}
+						onToggleShowCompleted={this.toggleState("showCompleted")}/>
 					<div class="content">
-						<TasksWidget task={this.state.task} toplevel/>
+						<TasksWidget task={this.state.task} toplevel
+							showCompleted={this.state.showCompleted}/>
 						<button class="btn nopad" onClick={this.createChild}>
 							<i class="material-icons">add</i>
 						</button>
@@ -200,7 +207,7 @@ export class App extends Component {
 				</div>
 			</div>
 			<div class={`shade ${this.state.drawerOpen ? "open" : ""}`}
-				onClick={this.toggleDrawer}></div>
+				onClick={this.toggleState("drawerOpen")}></div>
 		</div>;
 	}
 }

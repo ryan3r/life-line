@@ -393,3 +393,33 @@ div.hidden {
 		display: none;
 	}
 }
+
+/* Style the filter options */
+.filter {
+	padding: 10px;
+	padding-bottom: 0px;
+}
+
+/* A button that contains text */
+.text-btn {
+	border: 1px solid #fff;
+	padding: 5px 8px;
+	border-radius: 5px;
+	outline: none;
+	background-color: #333;
+	color: inherit;
+}
+
+.text-btn:hover {
+	background-color: #555;
+}
+
+/* The light theme for the buttons */
+.light-theme .text-btn {
+	border-color: #000;
+	background-color: #fff;
+}
+
+.light-theme .text-btn:hover {
+	background-color: #eee;
+}

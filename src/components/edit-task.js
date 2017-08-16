@@ -305,7 +305,8 @@ export class EditTask extends TaskComponent {
 				{menu}
 			</div>
 			<div class="subtasks">
-				<TasksWidget editMode task={this.task} depth={this.props.depth}/>
+				<TasksWidget editMode task={this.task} depth={this.props.depth}
+					showCompleted={this.props.showCompleted}/>
 			</div>
 		</div>;
 	}
