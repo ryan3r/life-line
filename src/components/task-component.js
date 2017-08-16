@@ -1,11 +1,7 @@
 import {Component} from "./component";
 
 export class TaskComponent extends Component {
-	constructor() {
-		super();
-	}
-
-	componentDidMount() {
+	componentWillMount() {
 		this.task = this.props.task;
 
 		// no task yet

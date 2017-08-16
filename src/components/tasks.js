@@ -28,8 +28,8 @@ export class TasksWidget extends TaskComponent {
 		this.state.children = [];
 	}
 
-	componentDidMount() {
-		super.componentDidMount();
+	componentWillMount() {
+		super.componentWillMount();
 
 		let depth;
 
