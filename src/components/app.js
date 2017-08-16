@@ -171,7 +171,7 @@ export class App extends Component {
 				<div class="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
 					<div class="content">
-						<TasksWidget task={this.state.task}/>
+						<TasksWidget task={this.state.task} toplevel/>
 						<button class="btn nopad" onClick={this.createChild}>
 							<i class="material-icons">add</i>
 						</button>

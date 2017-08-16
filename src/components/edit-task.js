@@ -4,6 +4,7 @@ import {Checkbox} from "./checkbox";
 import {EditTaskProp} from "./edit-task-prop";
 import {TaskLink} from "./task-link";
 import {router} from "../router";
+import {MAX_CHILDREN} from "../constants";
 
 // the task id that was in focus before it was moved
 let nextActiveElement;
@@ -56,6 +57,11 @@ export class EditTask extends TaskComponent {
 		}
 		// handle the enter key
 		else if(e.keyCode == 13) {
+			// open the parent since the children are hidden
+			if(this.task.parent.children.length > MAX_CHILDREN) {
+				router.openTask(this.task.parent.id);
+			}
+
 			// create a new sibling task
 			this.task.parent.create();
 		}
@@ -93,6 +99,11 @@ export class EditTask extends TaskComponent {
 			// make sure we foucs this task when we rerender
 			nextActiveElement = this.task.id;
 
+			// the task we are being moved to is not shown
+			if(parent.id == router.taskId) {
+				router.openTask(parent.parent.id);
+			}
+
 			// attach this task to its grandparent after the current parent
 			this.task.attachTo(parent.parent, parent);
 		}
@@ -104,6 +115,11 @@ export class EditTask extends TaskComponent {
 			if(attachTo) {
 				// make sure we foucs this task when we rerender
 				nextActiveElement = this.task.id;
+
+				// this tasks children are hidden open it so we can be seen
+				if(attachTo.children.length > MAX_CHILDREN) {
+					router.openTask(attachTo.id);
+				}
 
 				this.task.attachTo(attachTo);
 			}
@@ -123,6 +139,11 @@ export class EditTask extends TaskComponent {
 					// go to the last child in this element
 					if(subtasks.childElementCount > 0) {
 						target = subtasks.lastElementChild;
+
+						// we found a not subtasks shown message
+						if(target.classList.contains("hidden")) {
+							target = target.previousElementSibling;
+						}
 					}
 					// we found the next element
 					else {
@@ -154,8 +175,9 @@ export class EditTask extends TaskComponent {
 				target = subtasks.firstElementChild;
 			}
 			// go to the next sibling
-			else if(this.base.nextElementSibling) {
-				target = this.base.nextElementSibling;
+			else if(this.base.nextElementSibling &&
+				this.base.nextElementSibling.classList.contains("hidden")) {
+					target = this.base.nextElementSibling;
 			}
 			// go to our parent
 			else {
@@ -215,6 +237,13 @@ export class EditTask extends TaskComponent {
 
 		// update the state
 		this.setState(toState);
+	}
+
+	componentDidMount() {
+		// check if we should have focus
+		if(this.task.id == nextActiveElement) {
+			this.base.querySelector(".editor").focus();
+		}
 	}
 
 	render() {

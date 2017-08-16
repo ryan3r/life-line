@@ -1,16 +1,13 @@
 import {TaskComponent} from "./task-component";
 import {EditTask} from "./edit-task";
 import {TaskLink} from "./task-link";
-
-// the approimate width of an edit task widget
-const BASELINE = 350;
-
-// the indentation for sub tasks
-const INDENT_SIZE = 30;
-
-// the sidebar sizing
-const SIDEBAR_OPEN = 700;
-const SIDEBAR_WIDTH = 300;
+import {
+	BASELINE,
+	INDENT_SIZE,
+	SIDEBAR_OPEN,
+	SIDEBAR_WIDTH,
+	MAX_CHILDREN
+} from "../constants";
 
 // calculate the max nesting depth
 // NOTE: the + 1 is because the first row of tasks are not indented
@@ -34,7 +31,7 @@ export class TasksWidget extends TaskComponent {
 		let depth;
 
 		// we calculate the max depth
-		if(this.props.depth === undefined) {
+		if(this.props.toplevel) {
 			// recalculate how deep we can go
 			this.listen(window, "resize", () => {
 				this.setState({
@@ -63,7 +60,7 @@ export class TasksWidget extends TaskComponent {
 		// no task yet
 		if(!this.task) return;
 
-		const {children} = this.state;
+		let {children} = this.state;
 
 		// get the number of layers of subitems we have left
 		const depth = this.props.depth !== undefined ?
@@ -82,8 +79,24 @@ export class TasksWidget extends TaskComponent {
 			}
 		}
 
+		let hiddenMsg;
+
+		// limit the children for non-top level tasks
+		if(!this.props.toplevel && children.length > MAX_CHILDREN) {
+			// tell the user we hid some tasks
+			hiddenMsg = <div class="hidden">
+				<TaskLink id={this.task.id} class="hidden">
+					{`${children.length - MAX_CHILDREN} subtasks not shown`}
+				</TaskLink>
+			</div>;
+
+			// hide the tasks
+			children = children.slice(0, MAX_CHILDREN);
+		}
+
 		return <div>
 			{children.map(child => <EditTask task={child} depth={depth - 1}/>)}
+			{hiddenMsg}
 		</div>;
 	}
 }

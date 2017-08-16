@@ -173,13 +173,17 @@ a:hover {
 }
 
 /* Text for items not shown */
-.hidden {
+a.hidden {
 	color: #aaa;
 	font-style: italic;
 }
 
-.light-theme .hidden {
+.light-theme a.hidden {
 	color: #777;
+}
+
+div.hidden {
+	padding: 5px 7px;
 }
 
 /* The drawer */
