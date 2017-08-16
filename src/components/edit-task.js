@@ -15,6 +15,7 @@ export class EditTask extends TaskComponent {
 
 		this.create = this.create.bind(this);
 		this.remove = this.remove.bind(this);
+		this.open = this.open.bind(this);
 		this.handleKey = this.handleKey.bind(this);
 		this.toggleMenu = this.toggleMenu.bind(this);
 	}
@@ -46,6 +47,15 @@ export class EditTask extends TaskComponent {
 
 	remove() {
 		this.task.delete();
+	}
+
+	open(e) {
+		// we were ctrl clicked open this task
+		if(e.ctrlKey) {
+			e.preventDefault();
+
+			router.openTask(this.task.id);
+		}
 	}
 
 	handleKey(e) {
@@ -281,7 +291,7 @@ export class EditTask extends TaskComponent {
 			<div class="task flex flex-vcenter">
 				<Checkbox task={this.task}/>
 				<EditTaskProp class="flex-fill" task={this.task} prop="name"
-					onKeyDown={this.handleKey}/>
+					onKeyDown={this.handleKey} onMouseDown={this.open}/>
 				<button class="btn" onClick={this.toggleMenu}>
 					<i class="material-icons">more_vert</i>
 				</button>

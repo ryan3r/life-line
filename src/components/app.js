@@ -17,6 +17,22 @@ export class App extends Component {
 		this.createChild = this.createChild.bind(this);
 	}
 
+	componentDidMount() {
+		this.listen(window, "keydown", e => {
+			// listen for the ctrl key to be pressed
+			if(e.keyCode == 17) {
+				this.setState({ ctrlPressed: true });
+			}
+		});
+
+		this.listen(window, "keyup", e => {
+			// listen for the ctrl key to be released
+			if(e.keyCode == 17) {
+				this.setState({ ctrlPressed: false });
+			}
+		});
+	}
+
 	componentWillMount() {
 		// we have a known task
 		this.setupList();
@@ -161,8 +177,10 @@ export class App extends Component {
 			return this.message("Loading...", "");
 		}
 
+		const ctrlPressed = this.state.ctrlPressed ? "ctrl-pressed" : "";
+
 		// show the app
-		return <div class="container flex-column">
+		return <div class={`container flex-column ${ctrlPressed}`}>
 			<Header task={this.state.task} onHeaderToggle={this.toggleDrawer}/>
 			<ProgressBar task={this.state.task}/>
 			<div class="flex-fill flex container">

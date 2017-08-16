@@ -134,6 +134,12 @@ body:not(.light-theme) .editor::placeholder {
 	color: #bbb;
 }
 
+/* Make the tasks act as links when ctrl is held down */
+.ctrl-pressed .task .editor:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
 /* Header */
 .header {
 	background-color: #000;

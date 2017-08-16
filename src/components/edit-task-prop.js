@@ -57,7 +57,8 @@ export class EditTaskProp extends TaskComponent {
 	render() {
 		return <div class={`editor ${this.props.class}`} contenteditable
 			onInput={this.update}
-			onKeyDown={this.props.onKeyDown}>
+			onKeyDown={this.props.onKeyDown}
+			onMouseDown={this.props.onMouseDown}>
 				{this.state.value}
 		</div>;
 	}
