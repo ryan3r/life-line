@@ -218,16 +218,6 @@ export class EditTask extends TaskComponent {
 	}
 
 	render() {
-		let task = this.task || this.props.task;
-
-		// this element should be focused
-		if(task && nextActiveElement == task.id && this.base) {
-			nextActiveElement = undefined;
-
-			// focus the imput
-			this.base.querySelector(".editor").focus();
-		}
-
 		// show the menu
 		let menu;
 
@@ -247,7 +237,7 @@ export class EditTask extends TaskComponent {
 			menu = [
 				<div class="menu-overlay" onClick={this.toggleMenu}></div>,
 				<div class="menu" style={menuStyle} onClick={this.toggleMenu}>
-					<TaskLink id={task.id} class="no-underline">
+					<TaskLink id={this.task.id} class="no-underline">
 						<div class="menu-item">Open</div>
 					</TaskLink>
 					<div class="menu-item" onClick={this.create}>
@@ -260,8 +250,8 @@ export class EditTask extends TaskComponent {
 
 		return <div>
 			<div class="task flex flex-vcenter">
-				<Checkbox task={task}/>
-				<EditTaskProp class="flex-fill" task={task} prop="name"
+				<Checkbox task={this.task}/>
+				<EditTaskProp class="flex-fill" task={this.task} prop="name"
 					onKeyDown={this.handleKey}/>
 				<button class="btn" onClick={this.toggleMenu}>
 					<i class="material-icons">more_vert</i>
@@ -269,7 +259,7 @@ export class EditTask extends TaskComponent {
 				{menu}
 			</div>
 			<div class="subtasks">
-				<TasksWidget editMode task={task} depth={this.props.depth}/>
+				<TasksWidget editMode task={this.task} depth={this.props.depth}/>
 			</div>
 		</div>;
 	}

@@ -47,12 +47,14 @@ export class EditTaskProp extends TaskComponent {
 		}, DEBOUNCE_TIMER);
 	}
 
-	render() {
+	componentDidMount() {
 		// if this is a new or empty task draw focus to it
-		if(this.state.task && !this.state.value && this.base) {
+		if(this.task && !this.state.value) {
 			this.base.focus();
 		}
+	}
 
+	render() {
 		return <div class={`editor ${this.props.class}`} contenteditable
 			onInput={this.update}
 			onKeyDown={this.props.onKeyDown}>
