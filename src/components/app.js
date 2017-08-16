@@ -15,29 +15,9 @@ export class App extends Component {
 		this.toggleEditMode = this.toggleEditMode.bind(this);
 		this.toggleDrawer = this.toggleDrawer.bind(this);
 		this.createChild = this.createChild.bind(this);
-
-		this.state.editMode = false;
 	}
 
 	componentDidMount() {
-		// listen for global shortcuts
-		this.listen(window, "keydown", e => {
-			let preventDefault = true;
-
-			// toggle edit mode on ctrl+enter
-			if(e.ctrlKey && e.keyCode == 81) {
-				this.toggleEditMode();
-			}
-			// prevent the default if one of our handlers was triggered
-			else {
-				preventDefault = false;
-			}
-
-			if(preventDefault) {
-				e.preventDefault();
-			}
-		});
-
 		// we have a known task
 		this.setupList();
 
@@ -118,9 +98,7 @@ export class App extends Component {
 
 	// switch between viewing and edit modes
 	toggleEditMode() {
-		this.setState({
-			editMode: !this.state.editMode
-		});
+		console.log("You missed one");
 	}
 
 	toggleDrawer() {
@@ -185,8 +163,7 @@ export class App extends Component {
 
 		// show the app
 		return <div class="container flex-column">
-			<Header task={this.state.task} editMode={this.state.editMode}
-				onToggle={this.toggleEditMode} onHeaderToggle={this.toggleDrawer}/>
+			<Header task={this.state.task} onHeaderToggle={this.toggleDrawer}/>
 			<ProgressBar task={this.state.task}/>
 			<div class="flex-fill flex container">
 				<ListsDrawer open={this.state.drawerOpen} onClose={this.toggleDrawer}
@@ -194,12 +171,10 @@ export class App extends Component {
 				<div class="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
 					<div class="content">
-						<TasksWidget task={this.state.task} editMode={this.state.editMode}/>
-						{this.state.editMode ?
-							<button class="btn nopad" onClick={this.createChild}>
-								<i class="material-icons">add</i>
-							</button>
-							: undefined}
+						<TasksWidget task={this.state.task}/>
+						<button class="btn nopad" onClick={this.createChild}>
+							<i class="material-icons">add</i>
+						</button>
 					</div>
 				</div>
 			</div>

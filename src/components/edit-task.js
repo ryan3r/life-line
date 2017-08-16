@@ -2,6 +2,8 @@ import {TaskComponent} from "./task-component";
 import {TasksWidget} from "./tasks";
 import {Checkbox} from "./checkbox";
 import {EditTaskProp} from "./edit-task-prop";
+import {TaskLink} from "./task-link";
+import {router} from "../router";
 
 // the task id that was in focus before it was moved
 let nextActiveElement;
@@ -13,6 +15,7 @@ export class EditTask extends TaskComponent {
 		this.create = this.create.bind(this);
 		this.remove = this.remove.bind(this);
 		this.handleKey = this.handleKey.bind(this);
+		this.toggleMenu = this.toggleMenu.bind(this);
 	}
 
 	addListeners() {
@@ -20,7 +23,7 @@ export class EditTask extends TaskComponent {
 
 		// autofocus new tasks
 		if(this.task.name === "" && this.base) {
-			this.base.querySelector("input").focus();
+			this.base.querySelector(".editor").focus();
 		}
 	}
 
@@ -32,6 +35,11 @@ export class EditTask extends TaskComponent {
 	}
 
 	create() {
+		// we need to change the view
+		if(this.props.depth <= 0) {
+			router.openTask(this.task.id);
+		}
+
 		this.task.create();
 	}
 
@@ -52,10 +60,10 @@ export class EditTask extends TaskComponent {
 			this.task.parent.create();
 		}
 		// handle backspace when the input is empty
-		else if(e.keyCode == 8 && e.target.value === "") {
+		else if(e.keyCode == 8 && e.target.innerText === "") {
 			// focus the last sibling
 			if(this.base.previousElementSibling) {
-				this.base.previousElementSibling.querySelector("input").focus();
+				this.base.previousElementSibling.querySelector(".editor").focus();
 			}
 			// focus the parent
 			else {
@@ -63,7 +71,7 @@ export class EditTask extends TaskComponent {
 					.parentElement // <div> created by Tasks
 					.parentElement // .subtasks
 					.parentElement // <div> wrapping the parent task
-					.querySelector("input");
+					.querySelector(".editor");
 
 				// if this is not the top level focus the parent
 				if(parentInput) {
@@ -134,7 +142,7 @@ export class EditTask extends TaskComponent {
 					.firstElementChild; // the actual task
 			}
 
-			target.querySelector("input").focus();
+			target.querySelector(".editor").focus();
 		}
 		// down arrow move to the last task
 		else if(e.keyCode == 40) {
@@ -174,7 +182,7 @@ export class EditTask extends TaskComponent {
 
 			// focus the element
 			if(target) {
-				target.querySelector("input").focus();
+				target.querySelector(".editor").focus();
 			}
 		}
 		// if none of our handlers were called go with the brower default
@@ -187,49 +195,81 @@ export class EditTask extends TaskComponent {
 		}
 	}
 
+ 	// toggle the menu for this task
+	toggleMenu(e) {
+		// toggle the menu state
+		let toState = {
+			menuOpen: !this.state.menuOpen
+		};
+
+		// we are opening the menu
+		if(toState.menuOpen) {
+			const {top, right} = e.target.getBoundingClientRect();
+
+			toState.menuX = innerWidth - right;
+			toState.menuY = top;
+
+			// too close to the bottom
+			toState.menuCoordsAreBottom = top > innerHeight / 2;
+		}
+
+		// update the state
+		this.setState(toState);
+	}
+
 	render() {
 		let task = this.task || this.props.task;
-
-		// a button to add a subtask
-		const addBtn = <button class="btn nopad" onClick={this.create}>
-			<i class="material-icons">add</i>
-		</button>;
-
-		let endingAddBtn, inlineAddBtn;
-
-		// display an add button if our children a visible
-		if(this.props.depth > 0) {
-			// if we have children put it at the end
-			if(task.children.length > 0) {
-				endingAddBtn = addBtn;
-			}
-			// if we don't have children keep it inline to save space
-			else {
-				inlineAddBtn = addBtn;
-			}
-		}
 
 		// this element should be focused
 		if(task && nextActiveElement == task.id && this.base) {
 			nextActiveElement = undefined;
 
 			// focus the imput
-			this.base.querySelector("input").focus();
+			this.base.querySelector(".editor").focus();
+		}
+
+		// show the menu
+		let menu;
+
+		if(this.state.menuOpen) {
+			const {menuX, menuY} = this.state;
+
+			let menuStyle = `right: ${menuX}px;`;
+
+			// position the menu correctly
+			if(this.state.menuCoordsAreBottom) {
+				menuStyle += `bottom: ${innerHeight - menuY}px;`;
+			}
+			else {
+				menuStyle += `top: ${menuY}px;`;
+			}
+
+			menu = [
+				<div class="menu-overlay" onClick={this.toggleMenu}></div>,
+				<div class="menu" style={menuStyle} onClick={this.toggleMenu}>
+					<TaskLink id={task.id} class="no-underline">
+						<div class="menu-item">Open</div>
+					</TaskLink>
+					<div class="menu-item" onClick={this.create}>
+						Add subtask
+					</div>
+					<div class="menu-item" onClick={this.remove}>Delete</div>
+				</div>
+			];
 		}
 
 		return <div>
-			<div class="task flex flex-vcenter" style={`margin-right: ${20 * this.props.depth}px`}>
+			<div class="task flex flex-vcenter">
 				<Checkbox task={task}/>
 				<EditTaskProp class="flex-fill" task={task} prop="name"
 					onKeyDown={this.handleKey}/>
-				{inlineAddBtn}
-				<button class="btn" onClick={this.remove}>
-					<i class="material-icons">clear</i>
+				<button class="btn" onClick={this.toggleMenu}>
+					<i class="material-icons">more_vert</i>
 				</button>
+				{menu}
 			</div>
 			<div class="subtasks">
 				<TasksWidget editMode task={task} depth={this.props.depth}/>
-				{endingAddBtn}
 			</div>
 		</div>;
 	}

@@ -36,14 +36,14 @@ export class EditTaskProp extends TaskComponent {
 	update(e) {
 		// update the internal value
 		this.setState({
-			value: e.target.value
+			value: e.target.innerText
 		});
 
 		// clear the old timer
 		clearTimeout(this._debounce);
 		// don't save while the user is typing
 		this._debounce = setTimeout(() => {
-			this.props.task[this.props.prop] = e.target.value;
+			this.props.task[this.props.prop] = e.target.innerText;
 		}, DEBOUNCE_TIMER);
 	}
 
@@ -53,8 +53,10 @@ export class EditTaskProp extends TaskComponent {
 			this.base.focus();
 		}
 
-		return <input class={`editor ${this.props.class}`}
-			value={this.state.value} onInput={this.update}
-			onKeyDown={this.props.onKeyDown}/>;
+		return <div class={`editor ${this.props.class}`} contenteditable
+			onInput={this.update}
+			onKeyDown={this.props.onKeyDown}>
+				{this.state.value}
+		</div>;
 	}
 }

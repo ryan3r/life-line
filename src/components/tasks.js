@@ -1,6 +1,5 @@
 import {TaskComponent} from "./task-component";
 import {EditTask} from "./edit-task";
-import {TaskWidget} from "./task";
 import {TaskLink} from "./task-link";
 
 // the approimate width of an edit task widget
@@ -84,14 +83,7 @@ export class TasksWidget extends TaskComponent {
 		}
 
 		return <div>
-			{children.map(child => {
-				if(this.props.editMode) {
-					return <EditTask task={child} depth={depth - 1}/>;
-				}
-				else {
-					return <TaskWidget task={child} depth={depth - 1}/>;
-				}
-			})}
+			{children.map(child => <EditTask task={child} depth={depth - 1}/>)}
 		</div>;
 	}
 }
