@@ -5,6 +5,11 @@ class Router extends Events {
 		super();
 
 		this._parseUrl();
+
+		// no list in the url
+		if(!this.listId) {
+			this.listId = localStorage.getItem("last-list");
+		}
 	}
 
 	// parse the current url
@@ -17,6 +22,11 @@ class Router extends Events {
 
 		// notify listeners that we navigated
 		this.emit("navigate", this);
+
+		// save the new list when we navigate to it
+		if(this.listId) {
+			localStorage.setItem("last-list", this.listId);
+		}
 	}
 
 	// switch tasks
@@ -35,6 +45,9 @@ class Router extends Events {
 		this.taskId = undefined;
 
 		this._updateUrl();
+
+		// save the new list
+		localStorage.setItem("last-list", this.listId);
 	}
 
 	_updateUrl() {
