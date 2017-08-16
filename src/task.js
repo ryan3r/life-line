@@ -290,6 +290,22 @@ export class Task extends Events {
 		return false;
 	}
 
+	// delete all the children that have been completed
+	deleteCompleted() {
+		for(let i = this.children.length - 1; i >= 0; --i) {
+			const child = this.children[i];
+
+			// delete any children that are done
+			if(child.state.type == "done") {
+				child.delete();
+			}
+			// delete that child's completed tasks
+			else {
+				child.deleteCompleted();
+			}
+		}
+	}
+
 	// get the state of a task
 	get state() {
 		// get the state of a childless task

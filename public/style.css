@@ -408,6 +408,7 @@ div.hidden {
 	outline: none;
 	background-color: #333;
 	color: inherit;
+	margin: 0px 5px;
 }
 
 .text-btn:hover {

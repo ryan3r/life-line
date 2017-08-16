@@ -196,7 +196,8 @@ export class App extends Component {
 				<div class="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
 					<Filter showCompleted={this.state.showCompleted}
-						onToggleShowCompleted={this.toggleState("showCompleted")}/>
+						onToggleShowCompleted={this.toggleState("showCompleted")}
+						task={this.state.task}/>
 					<div class="content">
 						<TasksWidget task={this.state.task} toplevel
 							showCompleted={this.state.showCompleted}/>
