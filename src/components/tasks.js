@@ -6,7 +6,8 @@ import {
 	INDENT_SIZE,
 	SIDEBAR_OPEN,
 	SIDEBAR_WIDTH,
-	MAX_CHILDREN
+	MAX_CHILDREN,
+	HIDE_COMPLETED_TIMEOUT
 } from "../constants";
 
 // calculate the max nesting depth
@@ -56,14 +57,17 @@ export class TasksWidget extends TaskComponent {
 		});
 	}
 
-	onStateChildren(children) {
+	onTaskState() {
 		// one of our children has changed state refresh if that matters
-		if(!this.props.showCompleted) return;
+		if(this.props.showCompleted) return;
 
-		// update the state
-		this.setState({
-			children
-		});
+		// delay the update so the task doesn't just disappear
+		setTimeout(() => {
+			// update the state
+			this.setState({
+				children: this.task.children
+			});
+		}, HIDE_COMPLETED_TIMEOUT);
 	}
 
 	render() {

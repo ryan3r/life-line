@@ -10,3 +10,6 @@ export const SIDEBAR_WIDTH = 300;
 
 // the maximum number of children to show for a non-toplevel task
 export const MAX_CHILDREN = 5;
+
+// the number of milliseconds to wait before hiding a completed task
+export const HIDE_COMPLETED_TIMEOUT = 500;
