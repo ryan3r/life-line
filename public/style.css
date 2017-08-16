@@ -369,3 +369,27 @@ div.hidden {
 .light-theme .task.done {
 	color: #777;
 }
+
+/* The user's profile picture */
+.profile-image {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.profile {
+	display: flex;
+	align-items: center;
+}
+
+.profile-name {
+	margin-right: 5px;
+}
+
+/* Hide the user's greeting on small screens */
+@media all and (max-width: 500px) {
+	.profile-name {
+		display: none;
+	}
+}
