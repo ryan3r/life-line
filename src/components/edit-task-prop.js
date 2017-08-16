@@ -43,7 +43,7 @@ export class EditTaskProp extends TaskComponent {
 		clearTimeout(this._debounce);
 		// don't save while the user is typing
 		this._debounce = setTimeout(() => {
-			this.props.task[this.props.prop] = e.target.innerText;
+			this.props.task[this.props.prop] = this.state.value;
 		}, DEBOUNCE_TIMER);
 	}
 
