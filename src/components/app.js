@@ -12,7 +12,7 @@ export class App extends Component {
 		super();
 
 		// bind event listeners to this class
-		this.toggleEditMode = this.toggleEditMode.bind(this);
+		this.closeDrawer = this.closeDrawer.bind(this);
 		this.toggleDrawer = this.toggleDrawer.bind(this);
 		this.createChild = this.createChild.bind(this);
 	}
@@ -112,14 +112,17 @@ export class App extends Component {
 		});
 	}
 
-	// switch between viewing and edit modes
-	toggleEditMode() {
-		console.log("You missed one");
-	}
-
+	// toggle the state of the drawer
 	toggleDrawer() {
 		this.setState({
 			drawerOpen: !this.state.drawerOpen
+		});
+	}
+
+	// close the drawer
+	closeDrawer() {
+		this.setState({
+			drawerOpen: false
 		});
 	}
 
@@ -138,7 +141,7 @@ export class App extends Component {
 				<h2 class="header-title">{header}</h2>
 			</div>
 			<div class="flex-fill flex container">
-				<ListsDrawer open={this.state.drawerOpen} onClose={this.toggleDrawer}
+				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}
 					lists={this.props.lists}/>
 				<div class="content flex-fill">{content}</div>
 			</div>
@@ -184,7 +187,7 @@ export class App extends Component {
 			<Header task={this.state.task} onHeaderToggle={this.toggleDrawer}/>
 			<ProgressBar task={this.state.task}/>
 			<div class="flex-fill flex container">
-				<ListsDrawer open={this.state.drawerOpen} onClose={this.toggleDrawer}
+				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}
 					lists={this.props.lists}/>
 				<div class="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
