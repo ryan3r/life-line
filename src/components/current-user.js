@@ -7,7 +7,7 @@ export class CurrentUser extends Component {
 		this.logout = this.logout.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		// show the current user
 		firebase.auth().onAuthStateChanged(user => {
 			// no user is logged in wait to be redirected
@@ -28,9 +28,6 @@ export class CurrentUser extends Component {
 	}
 
 	render() {
-		// the user info is still loading
-		if(!this.state.name) return;
-
 		let name = `Hi, ${this.state.name.match(/(.+?)\s/)[1]}`;
 
 		return <div class="profile">
