@@ -22,7 +22,7 @@ export class CurrentUser extends Component {
 
 	logout() {
 		// log the current user out
-		if(confirm("Would you like to logout?")) {
+		if(confirm("You are about to be logged out")) {
 			firebase.auth().signOut();
 		}
 	}
