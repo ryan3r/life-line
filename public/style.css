@@ -319,7 +319,8 @@ a:hover {
 .menu {
 	position: fixed;
 	width: 200px;
-	background-color: #555;
+	background-color: #333;
+	border: 1px solid #444;
 }
 
 .menu-item {
@@ -327,7 +328,17 @@ a:hover {
 }
 
 .menu-item:hover {
-	background-color: #777;
+	background-color: #555;
+}
+
+/* Light styling for the menu */
+.light-theme .menu {
+	background-color: #fff;
+	border-color: #ddd;
+}
+
+.light-theme .menu-item:hover {
+	background-color: #ddd;
 }
 
 /* Cover the screen when the menu is open */
