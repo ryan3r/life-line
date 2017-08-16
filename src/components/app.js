@@ -17,7 +17,7 @@ export class App extends Component {
 		this.createChild = this.createChild.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		// we have a known task
 		this.setupList();
 
