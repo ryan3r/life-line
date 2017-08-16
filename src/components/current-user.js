@@ -29,7 +29,7 @@ export class CurrentUser extends Component {
 
 	render() {
 		// the user info has not loaded yet
-		if(this.state.name) return;
+		if(!this.state.name) return;
 
 		let name = `Hi, ${this.state.name.match(/(.+?)\s/)[1]}`;
 
