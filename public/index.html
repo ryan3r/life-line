@@ -45,12 +45,12 @@
 
 	<!-- Load preact -->
 	<script src="/vendor/preact.min.js"></script>
-	<script src="/vendor/require.js"></script>
 
 	<!-- Bootstrap the app -->
-	<script>
-		requirejs(["js/index.js"]);
+	<script src="/bundle.js"></script>
 
+	<!-- Install the service worker -->
+	<script>
 		// install the service worker
 		if("serviceWorker" in navigator) {
 			navigator.serviceWorker.register("/sw.js");

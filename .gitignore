@@ -37,9 +37,7 @@ jspm_packages
 .node_repl_history
 
 # Ignore the builds
-public/js
-public/tests/js
-public/vendor
+public/bundle.*
 
 # The files that I'm not sure what to do with
 tmp
