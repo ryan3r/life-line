@@ -1,10 +1,12 @@
 import {Subscription} from "../util";
+import React from "react";
 
-export class Component extends preact.Component {
+export class Component extends React.Component {
 	constructor() {
 		super();
 
 		this._subscriptions = [];
+		this.state = {};
 	}
 
 	// add a subscription

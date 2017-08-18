@@ -1,6 +1,7 @@
 import {TaskComponent} from "./task-component";
 import {EditTask} from "./edit-task";
 import {TaskLink} from "./task-link";
+import React from "react";
 import {
 	BASELINE,
 	INDENT_SIZE,
@@ -61,13 +62,10 @@ export class TasksWidget extends TaskComponent {
 		// one of our children has changed state refresh if that matters
 		if(this.props.showCompleted) return;
 
-		// delay the update so the task doesn't just disappear
-		setTimeout(() => {
-			// update the state
-			this.setState({
-				children: this.task.children
-			});
-		}, HIDE_COMPLETED_TIMEOUT);
+		// update the state
+		this.setState({
+			children: this.task.children
+		});
 	}
 
 	render() {
@@ -89,12 +87,12 @@ export class TasksWidget extends TaskComponent {
 		// we can't add any more children
 		if(depth === 0) {
 			if(children.length > 0) {
-				return <TaskLink id={this.task.id} class="hidden">
+				return <TaskLink id={this.task.id} className="hidden">
 					{`${children.length} subtasks not shown`}
 				</TaskLink>;
 			}
 			else {
-				return "";
+				return null;
 			}
 		}
 
@@ -103,8 +101,8 @@ export class TasksWidget extends TaskComponent {
 		// limit the children for non-top level tasks
 		if(!this.props.toplevel && children.length > MAX_CHILDREN) {
 			// tell the user we hid some tasks
-			hiddenMsg = <div class="hidden">
-				<TaskLink id={this.task.id} class="hidden">
+			hiddenMsg = <div className="hidden">
+				<TaskLink id={this.task.id} className="hidden">
 					{`${children.length - MAX_CHILDREN} subtasks not shown`}
 				</TaskLink>
 			</div>;
@@ -115,7 +113,10 @@ export class TasksWidget extends TaskComponent {
 
 		return <div>
 			{children.map(child => {
-				return <EditTask task={child} depth={depth - 1}
+				return <EditTask
+					key={child.id}
+					task={child}
+					depth={depth - 1}
 					showCompleted={this.props.showCompleted}/>;
 			})}
 			{hiddenMsg}

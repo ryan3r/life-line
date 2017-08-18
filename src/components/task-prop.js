@@ -1,4 +1,5 @@
 import {TaskComponent} from "./task-component";
+import React from "react";
 
 export class TaskProp extends TaskComponent {
 	addListeners() {
@@ -18,6 +19,6 @@ export class TaskProp extends TaskComponent {
 	}
 
 	render() {
-		return this.state.value;
+		return <span>{this.state.value}</span>;
 	}
 }

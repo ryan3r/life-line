@@ -1,5 +1,6 @@
 import {Component} from "./component";
 import {router} from "../router";
+import React from "react";
 
 export class TaskLink extends Component {
 	constructor() {
@@ -39,7 +40,7 @@ export class TaskLink extends Component {
 			href = `/${router.listId}/${this.props.id}`;
 		}
 
-		return <a href={href} class={this.props.class} onCLick={this.open}>
+		return <a href={href} className={this.props.className} onClick={this.open}>
 			{this.props.children}
 		</a>;
 	}

@@ -5,6 +5,11 @@ import {EditTaskProp} from "./edit-task-prop";
 import {TaskLink} from "./task-link";
 import {router} from "../router";
 import {MAX_CHILDREN} from "../constants";
+import React from "react";
+import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
+import IconMenu from "material-ui/IconMenu";
+import MenuItem from "material-ui/MenuItem";
+import IconButton from "material-ui/IconButton";
 
 // the task id that was in focus before it was moved
 let nextActiveElement;
@@ -17,7 +22,6 @@ export class EditTask extends TaskComponent {
 		this.remove = this.remove.bind(this);
 		this.open = this.open.bind(this);
 		this.handleKey = this.handleKey.bind(this);
-		this.toggleMenu = this.toggleMenu.bind(this);
 	}
 
 	addListeners() {
@@ -61,8 +65,12 @@ export class EditTask extends TaskComponent {
 		if(e.ctrlKey) {
 			e.preventDefault();
 
-			router.openTask(this.task.id);
+			this.actualOpen();
 		}
+	}
+
+	actualOpen = () => {
+		router.openTask(this.task.id);
 	}
 
 	handleKey(e) {
@@ -245,28 +253,6 @@ export class EditTask extends TaskComponent {
 		}
 	}
 
- 	// toggle the menu for this task
-	toggleMenu(e) {
-		// toggle the menu state
-		let toState = {
-			menuOpen: !this.state.menuOpen
-		};
-
-		// we are opening the menu
-		if(toState.menuOpen) {
-			const {top, right} = e.target.getBoundingClientRect();
-
-			toState.menuX = innerWidth - right;
-			toState.menuY = top;
-
-			// too close to the bottom
-			toState.menuCoordsAreBottom = top > innerHeight / 2;
-		}
-
-		// update the state
-		this.setState(toState);
-	}
-
 	componentDidMount() {
 		// check if we should have focus
 		if(this.task.id == nextActiveElement) {
@@ -275,47 +261,32 @@ export class EditTask extends TaskComponent {
 	}
 
 	render() {
-		// show the menu
-		let menu;
+		// the styles to apply to the menu icon
+		const iconStyles = {
+		    width: 24,
+		    height: 24,
+		    padding: 0
+		};
 
-		if(this.state.menuOpen) {
-			const {menuX, menuY} = this.state;
+		const menuIcon = <IconButton
+			style={iconStyles}
+			iconStyle={iconStyles}>
+				<MoreVertIcon/>
+		</IconButton>;
 
-			let menuStyle = `right: ${menuX}px;`;
-
-			// position the menu correctly
-			if(this.state.menuCoordsAreBottom) {
-				menuStyle += `bottom: ${innerHeight - menuY}px;`;
-			}
-			else {
-				menuStyle += `top: ${menuY}px;`;
-			}
-
-			menu = [
-				<div class="menu-overlay" onClick={this.toggleMenu}></div>,
-				<div class="menu" style={menuStyle} onClick={this.toggleMenu}>
-					<TaskLink id={this.task.id} class="no-underline">
-						<div class="menu-item">Open</div>
-					</TaskLink>
-					<div class="menu-item" onClick={this.create}>
-						Add subtask
-					</div>
-					<div class="menu-item" onClick={this.remove}>Delete</div>
-				</div>
-			];
-		}
-
-		return <div>
-			<div class={`task flex flex-vcenter ${this.task.state.type}`}>
+		return <div ref={base => this.base = base}>
+			<div className={`task flex flex-vcenter ${this.task.state.type}`}>
 				<Checkbox task={this.task}/>
-				<EditTaskProp class="flex-fill" task={this.task} prop="name"
+				<EditTaskProp className="flex-fill" task={this.task} prop="name"
 					onKeyDown={this.handleKey} onMouseDown={this.open}/>
-				<button class="btn" onClick={this.toggleMenu}>
-					<i class="material-icons">more_vert</i>
-				</button>
-				{menu}
+				<IconMenu
+					iconButtonElement={menuIcon}>
+						<MenuItem primaryText="Open" onClick={this.actualOpen}/>
+						<MenuItem primaryText="Add subtask" onClick={this.create}/>
+						<MenuItem primaryText="Delete" onClick={this.remove}/>
+				</IconMenu>
 			</div>
-			<div class="subtasks">
+			<div className="subtasks">
 				<TasksWidget editMode task={this.task} depth={this.props.depth}
 					showCompleted={this.props.showCompleted}/>
 			</div>

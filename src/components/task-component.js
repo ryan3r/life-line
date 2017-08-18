@@ -1,4 +1,5 @@
 import {Component} from "./component";
+import React from "react";
 
 export class TaskComponent extends Component {
 	componentWillMount() {

@@ -26,11 +26,13 @@ function build(watch) {
 			rules: [
 				{
 					test: /\.js$/,
+					exclude: /node_modules/,
 					loader: "babel-loader",
 					options: {
-						presets: ["es2015"],
+						presets: ["es2015", "stage-1"],
 						plugins: [
-							["transform-react-jsx", { pragma: "preact.h" }],
+							// ["transform-react-jsx", { pragma: "preact.h" }],
+							"transform-react-jsx",
 							"transform-es2015-modules-amd"
 						]
 					}

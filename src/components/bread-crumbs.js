@@ -1,9 +1,10 @@
 import {TaskProp} from "./task-prop";
 import {TaskLink} from "./task-link";
+import React from "react";
 
 export let BreadCrumbs = function({task}) {
 	// don't display anything on the root
-	if(!task.parent) return;
+	if(!task.parent) return null;
 
 	// the list of tasks
 	let tasks = [];
@@ -19,22 +20,22 @@ export let BreadCrumbs = function({task}) {
 		++collected;
 	}
 
-	return <div class="bread-crumbs flex flex-vcenter">
+	return <div className="bread-crumbs flex flex-vcenter">
 		{tasks.map((task, index) => {
 			// display a link and a carrot
 			if(index < tasks.length - 1) {
-				return [
+				return <div key={task.id} className="flex flex-vcenter">
 					<TaskLink id={task.id}>
 						<TaskProp task={task} prop="name"/>
-					</TaskLink>,
-					<div class="crumb">
-						<i class="material-icons">keyboard_arrow_right</i>
+					</TaskLink>
+					<div className="crumb">
+						<i className="material-icons">keyboard_arrow_right</i>
 					</div>
-				];
+				</div>;
 			}
 			// just display the name of the last task
 			else {
-				return <TaskProp task={task} prop="name"/>;
+				return <TaskProp key={task.id} task={task} prop="name"/>;
 			}
 		})}
 	</div>;

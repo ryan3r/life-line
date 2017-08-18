@@ -11,40 +11,14 @@
 	<link rel="stylesheet" href="/style.css"/>
 </head>
 <body>
-	<!-- Pick the theme -->
-	<script>
-		function refreshTheme() {
-			var now = new Date();
-
-			// from 9am to 6pm show the light theme
-			var method = (now.getHours() > 9 && now.getHours() < 19) ? "add" : "remove";
-
-			// apply the change
-			document.body.classList[method]("light-theme");
-		}
-
-		// set the initial theme
-		refreshTheme();
-
-		// switch themes when the user is not looking
-		window.addEventListener("visibilitychange", refreshTheme);
-	</script>
-
 	<!-- Render the frame -->
-	<div class="container flex-column pre-loader">
-		<div class="header flex flex-vcenter">
-			<h2 class="header-title">Loading...</h2>
-		</div>
-	</div>
+	<div class="app-wrapper"></div>
 
 	<!-- Load firebase -->
 	<script src="/__/firebase/4.1.3/firebase-app.js"></script>
     <script src="/__/firebase/4.1.3/firebase-auth.js"></script>
     <script src="/__/firebase/4.1.3/firebase-database.js"></script>
     <script src="/__/firebase/init.js"></script>
-
-	<!-- Load preact -->
-	<script src="/vendor/preact.min.js"></script>
 
 	<!-- Bootstrap the app -->
 	<script src="/bundle.js"></script>

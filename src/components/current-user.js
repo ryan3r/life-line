@@ -1,4 +1,6 @@
 import {Component} from "./component";
+import React from "react";
+import IconButton from "material-ui/IconButton";
 
 export class CurrentUser extends Component {
 	constructor() {
@@ -29,13 +31,10 @@ export class CurrentUser extends Component {
 
 	render() {
 		// the user info has not loaded yet
-		if(!this.state.name) return;
+		if(!this.state.photoUrl) return null;
 
-		let name = `Hi, ${this.state.name.match(/(.+?)\s/)[1]}`;
-
-		return <div class="profile">
-			<span class="profile-name">{name}</span>
-			<img src={this.state.photoUrl} class="profile-image" onClick={this.logout}/>
-		</div>;
+		return <IconButton>
+			<img src={this.state.photoUrl} width="30" height="30" onClick={this.logout}/>
+		</IconButton>;
 	}
 }

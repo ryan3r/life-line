@@ -1,6 +1,14 @@
 import {Component} from "./component";
 import {TaskLink} from "./task-link";
 import {router} from "../router";
+import React from "react";
+import Drawer from "material-ui/Drawer";
+import {SIDEBAR_WIDTH} from "../constants";
+import {List, ListItem} from "material-ui/List";
+import IconButton from "material-ui/IconButton";
+import ClearIcon from "material-ui/svg-icons/content/clear";
+import AddIcon from "material-ui/svg-icons/content/add";
+import TextField from "material-ui/TextField";
 
 export class ListsDrawer extends Component {
 	constructor() {
@@ -10,6 +18,7 @@ export class ListsDrawer extends Component {
 		this.newListUpdate = this.newListUpdate.bind(this);
 
 		this.state.lists = [];
+		this.state.newList = "";
 	}
 
 	componentDidMount() {
@@ -66,28 +75,43 @@ export class ListsDrawer extends Component {
 		this.props.onClose();
 	}
 
+	// switch lists
+	openList(id) {
+		return () => router.openList(id);
+	}
+
 	render() {
-		return <div class={`drawer ${this.props.open ? "open" : ""}`}>
-			{this.state.lists.map(list => {
-				return <div class="list-entry flex flex-vcenter">
-					<TaskLink id={list.id} isList onClick={this.props.onClose}
-						class="flex-fill no-underline">
-							{list.name}
-					</TaskLink>
-					<button class="btn" onClick={this.removeList(list.id)}>
-						<i class="material-icons">clear</i>
-					</button>
-				</div>
-			})}
-			<div class="list-entry no-hover">
-				<form class="flex flex-vcenter" onSubmit={this.addList}>
-					<input class="editor flex-fill" placeholder="New list"
-						value={this.state.newList} onInput={this.newListUpdate}/>
-					<button class="btn">
-						<i class="material-icons">add</i>
-					</button>
+		return <Drawer
+				docked={false}
+				width={SIDEBAR_WIDTH}
+				open={this.props.open}
+				onRequestChange={this.props.onClose}>
+			<List>
+				{this.state.lists.map(list => {
+					const deleteBtn = <IconButton onClick={this.removeList(list.id)}>
+						<ClearIcon/>
+					</IconButton>;
+
+					return <ListItem
+						key={list.id}
+						primaryText={list.name}
+						rightIconButton={deleteBtn}
+						onClick={this.openList(list.id)}/>
+				})}
+			</List>
+			<div className="list-entry">
+				<form className="flex flex-vcenter" onSubmit={this.addList}>
+					<TextField
+						placeholder="New list"
+						value={this.state.newList}
+						onChange={this.newListUpdate}
+						type="text"
+						id="new-list"/>
+					<IconButton onClick={this.addList}>
+						<AddIcon/>
+					</IconButton>
 				</form>
 			</div>
-		</div>;
+		</Drawer>;
 	}
 }

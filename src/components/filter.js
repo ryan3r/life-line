@@ -1,4 +1,6 @@
 import {Component} from "./component";
+import React from "react";
+import RaisedButton from "material-ui/RaisedButton";
 
 export let Filter = ({showCompleted, onToggleShowCompleted, task}) => {
 	// detect the show/hide completed state
@@ -7,12 +9,17 @@ export let Filter = ({showCompleted, onToggleShowCompleted, task}) => {
 	// delete completed children
 	const deleteCompleted = () => task.deleteCompleted();
 
-	return <div class="filter">
-		<button class="text-btn" onClick={onToggleShowCompleted}>
-			{btnMsg} completed
-		</button>
-		<button class="text-btn" onClick={deleteCompleted}>
-			Delete completed
-		</button>
+	// set the margins
+	const style = { margin: "10px" };
+
+	return <div className="filter">
+		<RaisedButton
+			onClick={onToggleShowCompleted}
+			label={`${btnMsg} completed`}
+			style={style}/>
+		<RaisedButton
+			onClick={deleteCompleted}
+			label="Delete completed"
+			style={style}/>
 	</div>;
 };
