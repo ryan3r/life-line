@@ -6,7 +6,6 @@ import {Tasks} from "../tasks";
 import {ListsDrawer} from "./lists-drawer";
 import {BreadCrumbs} from "./bread-crumbs";
 import {ProgressBar} from "./progress-bar";
-import {Filter} from "./filter";
 import React from "react";
 import AppBar from "material-ui/AppBar";
 import CircularProgress from "material-ui/CircularProgress";
@@ -221,16 +220,15 @@ export class App extends Component {
 		return <div className={`container flex-column ${ctrlPressed}`}
 				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
 			<Header task={this.state.task}
-				onHeaderToggle={this.toggleState("drawerOpen")}/>
+				onHeaderToggle={this.toggleState("drawerOpen")}
+				showCompleted={this.state.showCompleted}
+				toggleState={this.toggleState("showCompleted")}/>
 			<ProgressBar task={this.state.task}/>
 			<div className="flex-fill flex container">
 				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}
 					lists={this.props.lists}/>
 				<div className="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
-					<Filter showCompleted={this.state.showCompleted}
-						onToggleShowCompleted={this.toggleState("showCompleted")}
-						task={this.state.task}/>
 					<div className="content">
 						<TasksWidget task={this.state.task} toplevel
 							showCompleted={this.state.showCompleted}/>

@@ -1,6 +1,10 @@
 import {Component} from "./component";
 import React from "react";
 import RaisedButton from "material-ui/RaisedButton";
+import MenuItem from "material-ui/MenuItem";
+import IconMenu from "material-ui/IconMenu";
+import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
+import IconButton from "material-ui/IconButton";
 
 export let Filter = ({showCompleted, onToggleShowCompleted, task}) => {
 	// detect the show/hide completed state
@@ -9,17 +13,17 @@ export let Filter = ({showCompleted, onToggleShowCompleted, task}) => {
 	// delete completed children
 	const deleteCompleted = () => task.deleteCompleted();
 
-	// set the margins
-	const style = { margin: "10px" };
+	// the icon for the filter menu
+	const menuIcon = <IconButton iconStyle={{ storke: "#fff", fill: "#fff" }}>
+			<MoreVertIcon/>
+	</IconButton>;
 
-	return <div className="filter">
-		<RaisedButton
+	return <IconMenu iconButtonElement={menuIcon}>
+		<MenuItem
 			onClick={onToggleShowCompleted}
-			label={`${btnMsg} completed`}
-			style={style}/>
-		<RaisedButton
+			primaryText={`${btnMsg} completed`}/>
+		<MenuItem
 			onClick={deleteCompleted}
-			label="Delete completed"
-			style={style}/>
-	</div>;
+			primaryText="Delete completed"/>
+	</IconMenu>;
 };

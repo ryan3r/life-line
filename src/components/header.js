@@ -3,6 +3,7 @@ import AppBar from "material-ui/AppBar";
 import React from "react";
 import {SIDEBAR_OPEN} from "../constants";
 import {Component} from "./component";
+import {Filter} from "./filter";
 
 export class Header extends Component {
 	constructor() {
@@ -20,9 +21,14 @@ export class Header extends Component {
 		this.setState({
 			docked: innerWidth > SIDEBAR_OPEN
 		});
-	}
+	};
 
 	render() {
+		const filterMenu = <Filter
+			showCompleted={this.props.showCompleted}
+			onToggleShowCompleted={this.props.toggleState}
+			task={this.props.task}/>;
+
 		return <AppBar
 			title={<EditTaskProp
 				className="invisible"
@@ -30,6 +36,7 @@ export class Header extends Component {
 				prop="name"/>}
 			onLeftIconButtonTouchTap={this.props.onHeaderToggle}
 			style={{flexShrink: 0}}
-			iconElementLeft={this.state.docked ? <span></span> : null}/>
+			iconElementLeft={this.state.docked ? <span></span> : null}
+			iconElementRight={filterMenu}/>
 	}
 }
