@@ -60,3 +60,6 @@ export class FocusController extends Events {
 		return this._id == id;
 	}
 }
+
+// create the global focus controller
+export let focusController = new FocusController();

@@ -13,6 +13,7 @@ import CircularProgress from "material-ui/CircularProgress";
 import IconButton from "material-ui/IconButton";
 import AddIcon from "material-ui/svg-icons/content/add";
 import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../constants";
+import {focusController} from "../focus-controller";
 
 export class App extends Component {
 	constructor() {
@@ -138,7 +139,10 @@ export class App extends Component {
 
 	// create a new child task for the root task
 	createChild = () => {
-		return this.state.task.create();
+		const task = this.state.task.create();
+
+		// focus that child
+		focusController.focusTask(task.id, 0);
 	}
 
 	// update the docked state
@@ -206,6 +210,13 @@ export class App extends Component {
 
 		const ctrlPressed = this.state.ctrlPressed ? "ctrl-pressed" : "";
 
+		// the styles for the add button
+		const addBtnStyle = {
+			padding: 0,
+			width: 24,
+			height: 24
+		};
+
 		// show the app
 		return <div className={`container flex-column ${ctrlPressed}`}
 				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
@@ -223,8 +234,11 @@ export class App extends Component {
 					<div className="content">
 						<TasksWidget task={this.state.task} toplevel
 							showCompleted={this.state.showCompleted}/>
-						<IconButton onClick={this.createChild}>
-							<AddIcon/>
+						<IconButton
+							onClick={this.createChild}
+							style={addBtnStyle}
+							iconStyle={addBtnStyle}>
+								<AddIcon/>
 						</IconButton>
 					</div>
 				</div>

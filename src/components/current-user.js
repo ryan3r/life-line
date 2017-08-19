@@ -36,8 +36,7 @@ export class CurrentUser extends Component {
 				src={this.state.photoUrl}
 				width="30"
 				height="30"
-				onClick={this.logout}
-				style={{ borderRadius: "50%" }}/>
+				onClick={this.logout}/>
 		</IconButton>;
 	}
 }

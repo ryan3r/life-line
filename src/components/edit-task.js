@@ -2,7 +2,6 @@ import {TaskComponent} from "./task-component";
 import {TasksWidget} from "./tasks";
 import {Checkbox} from "./checkbox";
 import {EditTaskProp} from "./edit-task-prop";
-import {TaskLink} from "./task-link";
 import {router} from "../router";
 import {MAX_CHILDREN} from "../constants";
 import React from "react";
@@ -10,10 +9,7 @@ import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
 import IconMenu from "material-ui/IconMenu";
 import MenuItem from "material-ui/MenuItem";
 import IconButton from "material-ui/IconButton";
-import {FocusController} from "../focus-controller";
-
-// the task id that was in focus before it was moved
-let focusController = new FocusController();
+import {focusController} from "../focus-controller";
 
 // split the currently selected text field (removing the selected parts)
 const splitSelectedText = () => {
@@ -281,7 +277,16 @@ export class EditTask extends TaskComponent {
 	onFocus() {
 		const {startAt, endAt} = focusController.getRangeInfo();
 		// get the text node for the editor
-		const textNode = this.base.querySelector(".editor").childNodes[0];
+		const editor = this.base.querySelector(".editor");
+		let textNode = editor.childNodes[0];
+
+		// if there is no text node create one
+		if(!textNode) {
+			textNode = document.createTextNode("");
+
+			// add it to the editor
+			editor.appendChild(textNode);
+		}
 
 		let range = document.createRange();
 
