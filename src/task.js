@@ -58,10 +58,10 @@ export class Task extends Events {
 	}
 
 	// create a child task
-	create() {
+	create(name = "") {
 		// create the new task
 		const task = this._tasks.create({
-			name: "",
+			name,
 			state: "none",
 			parent: this.id
 		});

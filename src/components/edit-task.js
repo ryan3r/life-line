@@ -10,9 +10,35 @@ import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
 import IconMenu from "material-ui/IconMenu";
 import MenuItem from "material-ui/MenuItem";
 import IconButton from "material-ui/IconButton";
+import {FocusController} from "../focus-controller";
 
 // the task id that was in focus before it was moved
-let nextActiveElement;
+let focusController = new FocusController();
+
+// split the currently selected text field (removing the selected parts)
+const splitSelectedText = () => {
+	const range = getSelection().getRangeAt(0);
+
+	// get the parts of the selection
+	return [
+		range.startContainer.textContent.substr(0, range.startOffset),
+		range.endContainer.textContent.substr(range.endOffset)
+	];
+};
+
+// check if a task's children are hiden and open it if they are
+const openIfFull = parent => {
+	// check if with this next child we will hide the subtasks
+	const parentIsFull = parent.childCountExcedes({
+		maxChildren: MAX_CHILDREN - 1,
+		showCompleted: this.props.showCompleted
+	});
+
+	// open the parent since the children are hidden
+	if(parentIsFull) {
+		router.openTask(parent.id);
+	}
+};
 
 export class EditTask extends TaskComponent {
 	constructor() {
@@ -27,10 +53,14 @@ export class EditTask extends TaskComponent {
 	addListeners() {
 		super.addListeners();
 
-		// autofocus new tasks
-		if(this.task.name === "" && this.base) {
-			this.base.querySelector(".editor").focus();
-		}
+		// listen to focus changes
+		this.addSub(
+			focusController.onFocus(this.task.id, () => {
+				if(!this.base) return;
+
+				this.onFocus();
+			})
+		)
 	}
 
 	onTaskChildren() {
@@ -76,25 +106,28 @@ export class EditTask extends TaskComponent {
 	handleKey(e) {
 		let preventDefault = true;
 
-		// create a new child on ctrl+enter
-		if(e.keyCode == 13 && e.ctrlKey) {
-			this.task.create();
-		}
-		// handle the enter key
-		else if(e.keyCode == 13) {
-			// we have all the children
-			const parentIsFull = this.task.parent.childCountExcedes({
-				maxChildren: MAX_CHILDREN,
-				showCompleted: this.props.showCompleted
-			});
+		// handle the enter key (ctrl to create a child)
+		if(e.keyCode == 13) {
+			const [selfName, newName] = splitSelectedText();
 
-			// open the parent since the children are hidden
-			if(parentIsFull) {
-				router.openTask(this.task.parent.id);
-			}
+			// update the name for this task
+			this.task.name = selfName;
+
+			// force the editor to refresh
+			this.base.querySelector(".editor").innerText = selfName;
+
+			// the parent for the new task
+			// ctrlKey to create a child for this task
+			const parent = e.ctrlKey ? this.task : this.task.parent;
 
 			// create a new sibling task
-			this.task.parent.create();
+			const newTask = parent.create(newName);
+
+			// focus the new task
+			focusController.focusTask(newTask.id, 0);
+
+			// make sure the new task is visible
+			openIfFull(parent);
 		}
 		// handle backspace when the input is empty
 		else if(e.keyCode == 8 && e.target.innerText === "") {
@@ -128,7 +161,7 @@ export class EditTask extends TaskComponent {
 			if(!parent.parent) return;
 
 			// make sure we foucs this task when we rerender
-			nextActiveElement = this.task.id;
+			focusController.focusTaskWithCurrentRange(this.task.id);
 
 			// the task we are being moved to is not shown
 			if(parent.id == router.taskId) {
@@ -145,17 +178,10 @@ export class EditTask extends TaskComponent {
 
 			if(attachTo) {
 				// make sure we foucs this task when we rerender
-				nextActiveElement = this.task.id;
+				focusController.focusTaskWithCurrentRange(this.task.id);
 
-				const parentIsFull = attachTo.childCountExcedes({
-					maxChildren: MAX_CHILDREN,
-					showCompleted: this.props.showCompleted
-				});
-
-				// this tasks children are hidden open it so we can be seen
-				if(parentIsFull) {
-					router.openTask(attachTo.id);
-				}
+				// make sure this task remains visible
+				openIfFull(attachTo);
 
 				this.task.attachTo(attachTo);
 			}
@@ -255,9 +281,30 @@ export class EditTask extends TaskComponent {
 
 	componentDidMount() {
 		// check if we should have focus
-		if(this.task.id == nextActiveElement) {
-			this.base.querySelector(".editor").focus();
+		if(focusController.hasFocus(this.task.id)) {
+			this.onFocus();
 		}
+	}
+
+	// focus this task
+	onFocus() {
+		const {startAt, endAt} = focusController.getRangeInfo();
+		// get the text node for the editor
+		const textNode = this.base.querySelector(".editor").childNodes[0];
+
+		let range = document.createRange();
+
+		// select the text
+		range.setStart(textNode, startAt);
+		range.setEnd(textNode, endAt);
+
+		let selection = getSelection();
+
+		// clear the current selection (if any)
+		selection.removeAllRanges();
+
+		// add the new selection
+		selection.addRange(range);
 	}
 
 	render() {
