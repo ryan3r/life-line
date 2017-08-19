@@ -22,21 +22,21 @@ const splitSelectedText = () => {
 	];
 };
 
-// check if a task's children are hiden and open it if they are
-const openIfFull = parent => {
-	// check if with this next child we will hide the subtasks
-	const parentIsFull = parent.childCountExcedes({
-		maxChildren: MAX_CHILDREN - 1,
-		showCompleted: this.props.showCompleted
-	});
-
-	// open the parent since the children are hidden
-	if(parentIsFull) {
-		router.openTask(parent.id);
-	}
-};
-
 export class EditTask extends TaskComponent {
+	// check if a task's children are hiden and open it if they are
+	openIfFull = parent => {
+		// check if with this next child we will hide the subtasks
+		const parentIsFull = parent.childCountExcedes({
+			maxChildren: MAX_CHILDREN - 1,
+			showCompleted: this.props.showCompleted
+		});
+
+		// open the parent since the children are hidden
+		if(parentIsFull) {
+			router.openTask(parent.id);
+		}
+	};
+
 	addListeners() {
 		super.addListeners();
 
@@ -114,7 +114,7 @@ export class EditTask extends TaskComponent {
 			focusController.focusTask(newTask.id, 0);
 
 			// make sure the new task is visible
-			openIfFull(parent);
+			this.openIfFull(parent);
 		}
 		// handle backspace when the input is empty
 		else if(e.keyCode == 8 && e.target.innerText === "") {
@@ -168,7 +168,7 @@ export class EditTask extends TaskComponent {
 				focusController.focusTaskWithCurrentRange(this.task.id);
 
 				// make sure this task remains visible
-				openIfFull(attachTo);
+				this.openIfFull(attachTo);
 
 				this.task.attachTo(attachTo);
 			}
