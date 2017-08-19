@@ -3,6 +3,7 @@ import {Lists} from "./lists";
 import ReactDom from "react-dom";
 import React from "react";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
+import {theme} from "./theme";
 
 firebase.auth().onAuthStateChanged(function(user) {
 	// make the user authenticate them self
@@ -14,7 +15,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 	let lists = new Lists(user.uid);
 
 	// render the app
-	ReactDom.render(<MuiThemeProvider>
+	ReactDom.render(<MuiThemeProvider muiTheme={theme}>
 		<App lists={lists}/>
 	</MuiThemeProvider>, document.querySelector(".app-wrapper"));
 });

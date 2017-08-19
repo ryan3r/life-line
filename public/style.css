@@ -42,7 +42,7 @@ html, body {
 .checkbox {
 	margin-right: 13px;
 	fill: rgba(0, 0, 0, 0);
-	stroke: #0af;
+	stroke: #2196F3;
 	stroke-width: 3px;
 }
 
@@ -55,11 +55,11 @@ html, body {
 }
 
 .checkbox.done {
-	stroke: #0a0;
+	stroke: #4CAF50;
 }
 
 .checkbox.done .inner {
-	fill: #0a0;
+	fill: #4CAF50;
 }
 
 /* A style for tasks */
