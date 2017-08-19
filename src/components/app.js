@@ -10,7 +10,6 @@ import {Filter} from "./filter";
 import React from "react";
 import AppBar from "material-ui/AppBar";
 import CircularProgress from "material-ui/CircularProgress";
-import {CurrentUser} from "./current-user";
 import IconButton from "material-ui/IconButton";
 import AddIcon from "material-ui/svg-icons/content/add";
 import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../constants";
@@ -155,7 +154,8 @@ export class App extends Component {
 				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
 			<AppBar title={header}
 				onLeftIconButtonTouchTap={this.toggleState("drawerOpen")}
-				iconElementRight={<CurrentUser/>}/>
+				iconElementLeft={this.state.docked ? <span></span> : null}
+				style={{flexShrink: 0}}/>
 			<div className="flex-fill flex container">
 				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}
 					lists={this.props.lists}/>
