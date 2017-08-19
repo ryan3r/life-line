@@ -1,6 +1,7 @@
 import {TaskProp} from "./task-prop";
 import {TaskLink} from "./task-link";
 import React from "react";
+import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
 
 export let BreadCrumbs = function({task}) {
 	// don't display anything on the root
@@ -29,7 +30,7 @@ export let BreadCrumbs = function({task}) {
 						<TaskProp task={task} prop="name"/>
 					</TaskLink>
 					<div className="crumb">
-						<i className="material-icons">keyboard_arrow_right</i>
+						<KeyboardArrowRightIcon/>
 					</div>
 				</div>;
 			}
