@@ -13,8 +13,19 @@ import CircularProgress from "material-ui/CircularProgress";
 import {CurrentUser} from "./current-user";
 import IconButton from "material-ui/IconButton";
 import AddIcon from "material-ui/svg-icons/content/add";
+import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../constants";
 
 export class App extends Component {
+	constructor() {
+		super();
+
+		// listen to window resizes
+		this.listen(window, "resize", this.resize);
+
+		// set the initial size
+		this.state.docked = innerWidth > SIDEBAR_OPEN;
+	}
+
 	componentDidMount() {
 		this.listen(window, "keydown", e => {
 			// listen for the ctrl key to be pressed
@@ -131,9 +142,17 @@ export class App extends Component {
 		return this.state.task.create();
 	}
 
+	// update the docked state
+	resize = () => {
+		this.setState({
+			docked: innerWidth > SIDEBAR_OPEN
+		});
+	}
+
 	// display a minimal app frame with a message
 	message(header, content) {
-		return <div className="container flex-column">
+		return <div className="container flex-column"
+				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
 			<AppBar title={header}
 				onLeftIconButtonTouchTap={this.toggleState("drawerOpen")}
 				iconElementRight={<CurrentUser/>}/>
@@ -188,7 +207,8 @@ export class App extends Component {
 		const ctrlPressed = this.state.ctrlPressed ? "ctrl-pressed" : "";
 
 		// show the app
-		return <div className={`container flex-column ${ctrlPressed}`}>
+		return <div className={`container flex-column ${ctrlPressed}`}
+				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
 			<Header task={this.state.task}
 				onHeaderToggle={this.toggleState("drawerOpen")}/>
 			<ProgressBar task={this.state.task}/>

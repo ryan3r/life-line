@@ -10,5 +10,6 @@ export let Header = ({task, onHeaderToggle}) => {
 			className="invisible"
 			task={task}
 			prop="name"/>}
-		onLeftIconButtonTouchTap={onHeaderToggle}/>
+		onLeftIconButtonTouchTap={onHeaderToggle}
+		style={{flexShrink: 0}}/>
 }

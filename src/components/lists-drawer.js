@@ -1,7 +1,7 @@
 import {Component} from "./component";
 import React from "react";
 import Drawer from "material-ui/Drawer";
-import {SIDEBAR_WIDTH} from "../constants";
+import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../constants";
 import AppBar from "material-ui/AppBar";
 import {CurrentUser} from "./current-user";
 import {Tabs, Tab} from "material-ui/Tabs";
@@ -12,6 +12,12 @@ export class ListsDrawer extends Component {
 		super();
 
 		this.state.title = "Lists";
+
+		// listen to window resizes
+		this.listen(window, "resize", this.resize);
+
+		// set the initial size
+		this.state.docked = innerWidth > SIDEBAR_OPEN;
 	}
 
 	// update the title
@@ -19,9 +25,23 @@ export class ListsDrawer extends Component {
 		return () => this.setState({ title });
 	}
 
+	// dock/undock the drawer
+	resize = () => {
+		this.setState({
+			docked: innerWidth > SIDEBAR_OPEN
+		});
+	}
+
+	// close the side bar if we are not docked
+	onClose = () => {
+		if(!this.state.docked) {
+			this.props.onClose();
+		}
+	}
+
 	render() {
 		return <Drawer
-				docked={false}
+				docked={this.state.docked}
 				width={SIDEBAR_WIDTH}
 				open={this.props.open}
 				onRequestChange={this.props.onClose}>
@@ -31,7 +51,7 @@ export class ListsDrawer extends Component {
 				iconElementRight={<CurrentUser/>}/>
 			{/*<Tabs>
 				<Tab label="Lists" onActive={this.openTab("Lists")}>*/}
-					<Lists lists={this.props.lists} onClose={this.props.onClose}/>
+					<Lists lists={this.props.lists} onClose={this.onClose}/>
 				{/*</Tab>
 				<Tab label="Other" onActive={this.openTab("Other")}>
 					Filler content

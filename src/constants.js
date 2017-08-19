@@ -5,7 +5,7 @@ export const BASELINE = 350;
 export const INDENT_SIZE = 30;
 
 // the sidebar sizing
-export const SIDEBAR_OPEN = 700;
+export const SIDEBAR_OPEN = 750;
 export const SIDEBAR_WIDTH = 300;
 
 // the maximum number of children to show for a non-toplevel task
