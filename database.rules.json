@@ -3,7 +3,7 @@
     "lists": {
       "$listId": {
         // to create a new list you must at least be logged in
-        ".write": "!data.exists() && auth != null",
+        ".write": "(!data.exists() && auth != null) || auth.uid == data.child('owner').val()",
         // to access a list you must be the owner or have read or write access
         ".read": "auth.uid == data.child('owner').val() || data.child('users/' + auth.uid).val() == 'read' || data.child('users/' + auth.uid).val() == 'write'",
 
