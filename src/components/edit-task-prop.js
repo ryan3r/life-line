@@ -62,11 +62,6 @@ export class EditTaskProp extends TaskComponent {
 
 		// set the content
 		this.el.innerText = this.task[this.props.prop];
-
-		// if this is a new or empty task draw focus to it
-		if(this.task && !this.el.innerText) {
-			this.el.focus();
-		}
 	}
 
 	componentWillUnmount() {
