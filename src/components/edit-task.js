@@ -212,7 +212,7 @@ export class EditTask extends TaskComponent {
 			}
 			// go to the next sibling
 			else if(this.base.nextElementSibling &&
-				this.base.nextElementSibling.classList.contains("hidden")) {
+				!this.base.nextElementSibling.classList.contains("hidden")) {
 					target = this.base.nextElementSibling;
 			}
 			// go to our parent

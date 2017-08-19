@@ -1,6 +1,5 @@
 import {Subscription} from "../util";
 import React from "react";
-import {Subscription} from "../util";
 
 export class Component extends React.Component {
 	constructor() {
