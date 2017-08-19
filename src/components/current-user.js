@@ -2,6 +2,8 @@ import {Component} from "./component";
 import React from "react";
 import IconButton from "material-ui/IconButton";
 
+const auth = firebase.auth();
+
 export class CurrentUser extends Component {
 	constructor() {
 		super();
@@ -11,21 +13,23 @@ export class CurrentUser extends Component {
 
 	componentWillMount() {
 		// show the current user
-		firebase.auth().onAuthStateChanged(user => {
-			// no user is logged in wait to be redirected
-			if(!user) return;
+		this.addSub(
+			auth.onAuthStateChanged(user => {
+				// no user is logged in wait to be redirected
+				if(!user || !this.updater.isMounted(this)) return;
 
-			this.setState({
-				name: user.displayName,
-				photoUrl: user.photoURL
-			});
-		});
+				this.setState({
+					name: user.displayName,
+					photoUrl: user.photoURL
+				});
+			})
+		);
 	}
 
 	logout() {
 		// log the current user out
 		if(confirm("You are about to be logged out")) {
-			firebase.auth().signOut();
+			auth.signOut();
 		}
 	}
 

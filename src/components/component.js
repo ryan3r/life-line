@@ -1,5 +1,6 @@
 import {Subscription} from "../util";
 import React from "react";
+import {Subscription} from "../util";
 
 export class Component extends React.Component {
 	constructor() {
@@ -11,6 +12,11 @@ export class Component extends React.Component {
 
 	// add a subscription
 	addSub(subscription) {
+		// wrap the function in a subscription
+		if(typeof subscription == "function") {
+			subscription = new Subscription(subscription);
+		}
+
 		this._subscriptions.push(subscription);
 	}
 
