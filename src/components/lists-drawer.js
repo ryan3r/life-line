@@ -77,7 +77,13 @@ export class ListsDrawer extends Component {
 
 	// switch lists
 	openList(id) {
-		return () => router.openList(id);
+		return () => {
+			// open the list
+			router.openList(id);
+
+			// close the sidebar
+			this.props.onClose();
+		};
 	}
 
 	render() {
