@@ -5,12 +5,6 @@ import IconButton from "material-ui/IconButton";
 const auth = firebase.auth();
 
 export class CurrentUser extends Component {
-	constructor() {
-		super();
-
-		this.logout = this.logout.bind(this);
-	}
-
 	componentWillMount() {
 		// show the current user
 		this.addSub(
@@ -26,7 +20,7 @@ export class CurrentUser extends Component {
 		);
 	}
 
-	logout() {
+	logout = () => {
 		// log the current user out
 		if(confirm("You are about to be logged out")) {
 			auth.signOut();

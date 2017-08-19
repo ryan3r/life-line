@@ -20,9 +20,6 @@ export class Checkbox extends TaskComponent {
 	constructor() {
 		super();
 
-		// bind event listeners
-		this.toggle = this.toggle.bind(this);
-
 		// set the preloaded state
 		this.state.state = {
 			type: "none",
@@ -38,7 +35,7 @@ export class Checkbox extends TaskComponent {
 	}
 
 	// toggle the state
-	toggle() {
+	toggle = () => {
 		this.task.state = this.state.state.type == "done" ? "none" : "done";
 	}
 

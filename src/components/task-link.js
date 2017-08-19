@@ -3,13 +3,7 @@ import {router} from "../router";
 import React from "react";
 
 export class TaskLink extends Component {
-	constructor() {
-		super();
-
-		this.open = this.open.bind(this);
-	}
-
-	open(e) {
+	open = e => {
 		// let the standard modifiers do their thing
 		if(e.ctrlKey || e.altKey || e.shiftKey) return;
 

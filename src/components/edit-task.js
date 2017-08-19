@@ -41,15 +41,6 @@ const openIfFull = parent => {
 };
 
 export class EditTask extends TaskComponent {
-	constructor() {
-		super();
-
-		this.create = this.create.bind(this);
-		this.remove = this.remove.bind(this);
-		this.open = this.open.bind(this);
-		this.handleKey = this.handleKey.bind(this);
-	}
-
 	addListeners() {
 		super.addListeners();
 
@@ -77,7 +68,7 @@ export class EditTask extends TaskComponent {
 		});
 	}
 
-	create() {
+	create = () => {
 		// we need to change the view
 		if(this.props.depth <= 0) {
 			router.openTask(this.task.id);
@@ -86,11 +77,11 @@ export class EditTask extends TaskComponent {
 		this.task.create();
 	}
 
-	remove() {
+	remove = () => {
 		this.task.delete();
 	}
 
-	open(e) {
+	open = e => {
 		// we were ctrl clicked open this task
 		if(e.ctrlKey) {
 			e.preventDefault();
@@ -103,7 +94,7 @@ export class EditTask extends TaskComponent {
 		router.openTask(this.task.id);
 	}
 
-	handleKey(e) {
+	handleKey = e => {
 		let preventDefault = true;
 
 		// handle the enter key (ctrl to create a child)

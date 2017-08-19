@@ -15,14 +15,6 @@ import IconButton from "material-ui/IconButton";
 import AddIcon from "material-ui/svg-icons/content/add";
 
 export class App extends Component {
-	constructor() {
-		super();
-
-		// bind event listeners to this class
-		this.closeDrawer = this.closeDrawer.bind(this);
-		this.createChild = this.createChild.bind(this);
-	}
-
 	componentDidMount() {
 		this.listen(window, "keydown", e => {
 			// listen for the ctrl key to be pressed
@@ -128,14 +120,14 @@ export class App extends Component {
 	}
 
 	// close the drawer
-	closeDrawer() {
+	closeDrawer = () => {
 		this.setState({
 			drawerOpen: false
 		});
 	}
 
 	// create a new child task for the root task
-	createChild() {
+	createChild = () => {
 		return this.state.task.create();
 	}
 

@@ -14,9 +14,6 @@ export class ListsDrawer extends Component {
 	constructor() {
 		super();
 
-		this.addList = this.addList.bind(this);
-		this.newListUpdate = this.newListUpdate.bind(this);
-
 		this.state.lists = [];
 		this.state.newList = "";
 	}
@@ -45,14 +42,14 @@ export class ListsDrawer extends Component {
 	}
 
 	// update the state with changes to the new list name
-	newListUpdate(e) {
+	newListUpdate = e => {
 		this.setState({
 			newList: e.target.value
 		});
 	}
 
 	// add a new list
-	addList(e) {
+	addList = e => {
 		e.preventDefault();
 
 		// no list name

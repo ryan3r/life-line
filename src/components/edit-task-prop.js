@@ -4,12 +4,6 @@ import React from "react";
 const DEBOUNCE_TIMER = 500;
 
 export class EditTaskProp extends TaskComponent {
-	constructor() {
-		super();
-
-		this.update = this.update.bind(this);
-	}
-
 	addListeners() {
 		// clear any old save timers
 		clearTimeout(this._debounce);
@@ -41,7 +35,7 @@ export class EditTaskProp extends TaskComponent {
 		);
 	}
 
-	update(e) {
+	update = (e) => {
 		// clear the old timer
 		clearTimeout(this._debounce);
 		// don't save while the user is typing
