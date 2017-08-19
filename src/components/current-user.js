@@ -32,7 +32,12 @@ export class CurrentUser extends Component {
 		if(!this.state.photoUrl) return null;
 
 		return <IconButton>
-			<img src={this.state.photoUrl} width="30" height="30" onClick={this.logout}/>
+			<img
+				src={this.state.photoUrl}
+				width="30"
+				height="30"
+				onClick={this.logout}
+				style={{ borderRadius: "50%" }}/>
 		</IconButton>;
 	}
 }
