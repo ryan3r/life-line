@@ -29,14 +29,14 @@ export class ListsDrawer extends Component {
 				title={this.state.title}
 				iconElementLeft={<span></span>}
 				iconElementRight={<CurrentUser/>}/>
-			<Tabs>
-				<Tab label="Lists" onActive={this.openTab("Lists")}>
+			{/*<Tabs>
+				<Tab label="Lists" onActive={this.openTab("Lists")}>*/}
 					<Lists lists={this.props.lists} onClose={this.props.onClose}/>
-				</Tab>
+				{/*</Tab>
 				<Tab label="Other" onActive={this.openTab("Other")}>
 					Filler content
 				</Tab>
-			</Tabs>
+			</Tabs>*/}
 		</Drawer>;
 	}
 }
