@@ -31,7 +31,10 @@ export class EditTaskProp extends TaskComponent {
 		this.addSub(
 			this.task.on(this.props.prop, value => {
 				// if we are not in focus
-				if(value != this.el.innerText && document.activeElement != this.el) {
+				if(this.el &&
+					value != this.el.innerText &&
+					document.activeElement != this.el) {
+					// set the new value
 					this.el.innerText = value;
 				}
 			})
