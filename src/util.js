@@ -11,24 +11,32 @@ export function genId() {
 	return `${date}-${Math.floor(random).toString(ID_BASE)}`;
 }
 
-export class Subscription {
-	constructor(fn) {
-		this._fn = fn;
-		this.active = true;
+export function taggedSub(tag) {
+	class Subscription {
+		constructor(fn) {
+			this._fn = fn;
+			this.active = true;
+			this.tag = tag;
+		}
+
+		// remove the subscription
+		unsubscribe() {
+			// already unsubscribed
+			if(!this.active) return;
+
+			// call the unsubscribe function
+			this._fn();
+
+			// mark the subscription as inactive
+			this.active = false;
+		}
 	}
 
-	// remove the subscription
-	unsubscribe() {
-		// already unsubscribed
-		if(!this.active) return;
-
-		// call the unsubscribe function
-		this._fn();
-
-		// mark the subscription as inactive
-		this.active = false;
-	}
+	return Subscription;
 }
+
+// the default subscription
+export let Subscription = taggedSub();
 
 // create a deferred promise
 export function defer() {
@@ -67,8 +75,9 @@ export function defer() {
 }
 
 export class Events {
-	constructor() {
+	constructor(tag) {
 		this._listeners = new Map();
+		this._Subscription = taggedSub(tag);
 	}
 
 	// listen to an event of type {type}
@@ -82,7 +91,7 @@ export class Events {
 		this._listeners.get(type).push(fn);
 
 		// create a subscription for this listener
-		return new Subscription(() => {
+		return new this._Subscription(() => {
 			const index = this._listeners.get(type).indexOf(fn);
 
 			// remove the listener

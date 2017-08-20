@@ -20,9 +20,17 @@ export class Component extends React.Component {
 	}
 
 	// remove all subscriptions when the component is destroyed
-	unsubscribeAll() {
-		while(this._subscriptions.length) {
-			this._subscriptions.pop().unsubscribe();
+	unsubscribeAll(tag) {
+		for(let i = this._subscriptions.length - 1; i >= 0; --i) {
+			const subscription = this._subscriptions[i]
+
+			// check if we want to remove this subscription
+			if(!tag || subscription.tag == tag) {
+				subscription.unsubscribe();
+
+				// remove the subscription from the list
+				this._subscriptions.splice(i, 1);
+			}
 		}
 	}
 

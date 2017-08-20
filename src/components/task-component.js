@@ -16,7 +16,7 @@ export class TaskComponent extends Component {
 		// we changed tasks
 		if(this.task != props.task) {
 			// remove all task listeners
-			this.unsubscribeAll();
+			this.unsubscribeAll("task");
 
 			this.task = props.task;
 
