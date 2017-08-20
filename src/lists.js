@@ -1,16 +1,44 @@
-import {Events, genId} from "./util";
+import {Events, genId, defer} from "./util";
 import {router} from "./router";
 
 const db = firebase.database();
 
 export class Lists extends Events {
-	constructor(userId) {
+	constructor() {
 		super();
 
+		// start the loaders
+		this.emit("loading");
+
+		this._loaded = false;
+	}
+
+	// listen for the uid to be set
+	onLoaded(fn) {
+		// already loaded
+		if(this._loaded) {
+			fn();
+		}
+
+		// listen for changes
+		return this.on("loaded", fn);
+	}
+
+	// set the uid and login
+	setUid(userId) {
+		// remove the old ref
+		if(this._ref) {
+			this.dispose();
+		}
+
+		// set the internal state
 		this._lists = new Map();
 		this.userId = userId;
-
 		this._isFirstList = true;
+		this._loaded = true;
+
+		// hide the loaders
+		this.emit("loaded");
 
 		// get the firebase ref
 		this._ref = db.ref(`/users/${userId}`);
@@ -68,6 +96,8 @@ export class Lists extends Events {
 	// disconnect the listeners
 	dispose() {
 		this._ref.off();
+
+		this._ref = undefined;
 	}
 
 	// create a list
@@ -103,6 +133,9 @@ export class Lists extends Events {
 
 	// get all the lists
 	get lists() {
-		return Array.from(this._lists.values());
+		return this._lists ? Array.from(this._lists.values()) : [];
 	}
 };
+
+// create the global lists instance
+export let lists = new Lists();

@@ -4,12 +4,9 @@ import {Task} from "./task";
 const db = firebase.database();
 
 export class Tasks {
-	constructor(lists, listId) {
+	constructor(listId) {
 		this._tasks = new Map();
 		this._pending = new Map();
-
-		// save a reference to the lists object
-		this.lists = lists;
 
 		// save the id for this list
 		this.listId = listId;

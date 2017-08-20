@@ -4,24 +4,14 @@ import React from "react";
 import {SIDEBAR_OPEN} from "../constants";
 import {Component} from "./component";
 import {Filter} from "./filter";
+import {dockedStore} from "../stores/states";
 
 export class Header extends Component {
 	constructor() {
 		super();
 
-		// listen to window resizes
-		this.listen(window, "resize", this.resize);
-
-		// set the initial size
-		this.state.docked = innerWidth > SIDEBAR_OPEN;
+		dockedStore.bind(this);
 	}
-
-	// dock/undock the drawer
-	resize = () => {
-		this.setState({
-			docked: innerWidth > SIDEBAR_OPEN
-		});
-	};
 
 	render() {
 		const filterMenu = <Filter

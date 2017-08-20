@@ -6,6 +6,7 @@ import AppBar from "material-ui/AppBar";
 import {CurrentUser} from "./current-user";
 import {Tabs, Tab} from "material-ui/Tabs";
 import {Lists} from "./lists";
+import {dockedStore} from "../stores/states";
 
 export class ListsDrawer extends Component {
 	constructor() {
@@ -13,23 +14,12 @@ export class ListsDrawer extends Component {
 
 		this.state.title = "Lists";
 
-		// listen to window resizes
-		this.listen(window, "resize", this.resize);
-
-		// set the initial size
-		this.state.docked = innerWidth > SIDEBAR_OPEN;
+		dockedStore.bind(this);
 	}
 
 	// update the title
 	openTab(title) {
 		return () => this.setState({ title });
-	}
-
-	// dock/undock the drawer
-	resize = () => {
-		this.setState({
-			docked: innerWidth > SIDEBAR_OPEN
-		});
 	}
 
 	// close the side bar if we are not docked
@@ -51,7 +41,7 @@ export class ListsDrawer extends Component {
 				iconElementRight={<CurrentUser/>}/>
 			{/*<Tabs>
 				<Tab label="Lists" onActive={this.openTab("Lists")}>*/}
-					<Lists lists={this.props.lists} onClose={this.onClose}/>
+					<Lists onClose={this.onClose}/>
 				{/*</Tab>
 				<Tab label="Other" onActive={this.openTab("Other")}>
 					Filler content

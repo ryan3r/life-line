@@ -6,6 +6,8 @@ import IconButton from "material-ui/IconButton";
 import ClearIcon from "material-ui/svg-icons/content/clear";
 import AddIcon from "material-ui/svg-icons/content/add";
 import TextField from "material-ui/TextField";
+import {lists} from "../lists";
+import LinearProgress from "material-ui/LinearProgress";
 
 export class Lists extends Component {
 	constructor() {
@@ -13,11 +15,10 @@ export class Lists extends Component {
 
 		this.state.lists = [];
 		this.state.newList = "";
+		this.state.loading = true;
 	}
 
 	componentWillMount() {
-		let {lists} = this.props;
-
 		// get the initial lists
 		this.setState({
 			lists: lists.lists
@@ -31,11 +32,20 @@ export class Lists extends Component {
 				});
 			})
 		);
+
+		// wait for the lists to load
+		this.addSub(
+			lists.onLoaded(() => {
+				this.setState({
+					loading: false
+				});
+			})
+		);
 	}
 
 	removeList(id) {
 		// delete the list
-		return () => this.props.lists.delete(id);
+		return () => lists.delete(id);
 	}
 
 	// update the state with changes to the new list name
@@ -55,7 +65,7 @@ export class Lists extends Component {
 		}
 
 		// create the list
-		const id = this.props.lists.create(this.state.newList);
+		const id = lists.create(this.state.newList);
 
 		// clear the input
 		this.setState({
@@ -81,6 +91,11 @@ export class Lists extends Component {
 	}
 
 	render() {
+		// show the loader
+		if(this.state.loading) {
+			return null;
+		}
+
 		return <div>
 			<List>
 				{this.state.lists.map(list => {

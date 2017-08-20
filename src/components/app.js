@@ -2,7 +2,6 @@ import {Component} from "./component";
 import {Header} from "./header";
 import {TasksWidget} from "./tasks";
 import {router} from "../router";
-import {Tasks} from "../tasks";
 import {ListsDrawer} from "./lists-drawer";
 import {BreadCrumbs} from "./bread-crumbs";
 import {ProgressBar} from "./progress-bar";
@@ -13,16 +12,14 @@ import IconButton from "material-ui/IconButton";
 import AddIcon from "material-ui/svg-icons/content/add";
 import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../constants";
 import {focusController} from "../focus-controller";
+import {lists} from "../lists";
+import {dockedStore} from "../stores/states";
 
 export class App extends Component {
 	constructor() {
 		super();
 
-		// listen to window resizes
-		this.listen(window, "resize", this.resize);
-
-		// set the initial size
-		this.state.docked = innerWidth > SIDEBAR_OPEN;
+		dockedStore.bind(this);
 	}
 
 	componentDidMount() {
@@ -42,82 +39,34 @@ export class App extends Component {
 	}
 
 	componentWillMount() {
-		// we have a known task
-		this.setupList();
+		// get the current task
+		this.addSub(
+			router.onCurrentRootTask(task => {
+				this.setState({
+					task,
+					loaded: true
+				});
+			})
+		);
 
 		// listen for navigations
 		this.addSub(
-			router.on("navigate", () => this.setupList())
+			router.on("navigate", () => {
+				// clear current task and show the loader
+				this.setState({
+					task: undefined,
+					loaded: false,
+					errorType: undefined
+				});
+			})
 		);
-	}
 
-	// setup the current list
-	setupList() {
-		// clear old errors
-		if(this.state.errorType !== undefined) {
-			this.setState({
-				errorType: undefined
-			});
-		}
-
-		// if we have a new list load it
-		if(router.listId && (!this._tasks || this._tasks.listId != router.listId)) {
-			// dispose of the old tasks object
-			if(this._tasks) {
-				this._tasks.dispose();
-			}
-
-			this._tasks = new Tasks(this.props.lists, router.listId);
-
-			// an error occured
-			this._tasks.ready.catch(err => {
-				// not allowed to access or it does not exist
-				if(err.code == "PERMISSION_DENIED") {
-					this.setState({
-						errorType: "access"
-					});
-				}
-				// unexpected error
-				else {
-					this.setState({
-						errorType: "unknown",
-						errorMessage: err.message
-					});
-				}
-			});
-		}
-
-		// load the current task
-		if(this._tasks) {
-			this.loadRoot();
-		}
-	}
-
-	// load the root task
-	loadRoot() {
-		let task;
-
-		// clear current task
-		this.setState({
-			task: undefined,
-			loaded: false
-		});
-
-		// load the requested task
-		if(!router.taskId) {
-			task = this._tasks.getRootAsync();
-		}
-		else {
-			task = this._tasks.getAsync(router.taskId);
-		}
-
-		// update the component
-		task.then(root => {
-			this.setState({
-				task: root,
-				loaded: true
-			});
-		});
+		// handle the error
+		this.addSub(
+			router.on("tasks-error", e => {
+				this.setState(e);
+			})
+		);
 	}
 
 	// toggle the state of a boolean
@@ -144,13 +93,6 @@ export class App extends Component {
 		focusController.focusTask(task.id, 0);
 	}
 
-	// update the docked state
-	resize = () => {
-		this.setState({
-			docked: innerWidth > SIDEBAR_OPEN
-		});
-	}
-
 	// display a minimal app frame with a message
 	message(header, content) {
 		return <div className="container flex-column"
@@ -160,8 +102,7 @@ export class App extends Component {
 				iconElementLeft={this.state.docked ? <span></span> : null}
 				style={{flexShrink: 0}}/>
 			<div className="flex-fill flex container">
-				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}
-					lists={this.props.lists}/>
+				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}/>
 				<div className="scrollable flex-fill flex">
 					<div className="content flex flex-fill flex-vcenter flex-hcenter">
 						{content}
@@ -225,8 +166,7 @@ export class App extends Component {
 				toggleState={this.toggleState("showCompleted")}/>
 			<ProgressBar task={this.state.task}/>
 			<div className="flex-fill flex container">
-				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}
-					lists={this.props.lists}/>
+				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}/>
 				<div className="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
 					<div className="content">
