@@ -12,7 +12,15 @@ export class Store extends Events {
 	set(state) {
 		this._state = state;
 
-		this.emit("state-change");
+		this.emit("state-change", state);
+	}
+
+	// get the current state and listen for changes
+	onStateChange(fn) {
+		// emit the current state
+		fn(this._state);
+
+		return this.on("state-change", fn);
 	}
 
 	// bind a store to the react state

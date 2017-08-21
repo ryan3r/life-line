@@ -1,5 +1,6 @@
 import {defer, genId} from "./util";
 import {Task} from "./task";
+import {Filter} from "./filter";
 
 const db = firebase.database();
 
@@ -10,6 +11,9 @@ export class Tasks {
 
 		// save the id for this list
 		this.listId = listId;
+
+		// create the filter
+		this.filter = new Filter();
 
 		// get the firebase ref
 		this._ref = db.ref(`/lists/${listId}/tasks`);

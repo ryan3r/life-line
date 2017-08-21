@@ -40,7 +40,6 @@ export class TasksWidget extends TaskComponent {
 			// recalculate how deep we can go
 			this.listen(window, "resize", () => {
 				this.setState({
-					children: this.props.task.children,
 					depth: maxNestingDepth()
 				});
 			}, { passive: true });
@@ -54,7 +53,7 @@ export class TasksWidget extends TaskComponent {
 		});
 	}
 
-	onTaskChildren(children) {
+	onTaskVisibleChildren(children) {
 		// update the state
 		this.setState({
 			children
@@ -67,7 +66,7 @@ export class TasksWidget extends TaskComponent {
 
 		// update the state
 		this.setState({
-			children: this.task.children
+			children: this.task.visibleChildren
 		});
 	}
 
@@ -76,11 +75,6 @@ export class TasksWidget extends TaskComponent {
 		if(!this.task) return;
 
 		let {children} = this.state;
-
-		// filter out completed tasks
-		if(!this.state.showCompleted) {
-			children = children.filter(task => task.state.type != "done");
-		}
 
 		// get the number of layers of subitems we have left
 		const depth = this.props.depth !== undefined ?
@@ -102,16 +96,13 @@ export class TasksWidget extends TaskComponent {
 		let hiddenMsg;
 
 		// limit the children for non-top level tasks
-		if(!this.props.toplevel && children.length > MAX_CHILDREN) {
+		if(this.task.children.length !== children.length) {
 			// tell the user we hid some tasks
 			hiddenMsg = <div className="hidden">
 				<TaskLink id={this.task.id} className="hidden">
-					{`${children.length - MAX_CHILDREN} subtasks not shown`}
+					{`${this.task.children.length - children.length} subtasks not shown`}
 				</TaskLink>
 			</div>;
-
-			// hide the tasks
-			children = children.slice(0, MAX_CHILDREN);
 		}
 
 		return <div>

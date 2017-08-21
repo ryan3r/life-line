@@ -34,6 +34,14 @@ export class Task extends Events {
 
 		// set up the list of children
 		this.children = [];
+
+		// reset the filtered children
+		this._filterRefresh = this._tasks.filter.on("refresh", () => {
+			// clear the visible children cache
+			this._visibleChildren = undefined;
+
+			this.emit("visibleChildren", this.visibleChildren);
+		});
 	}
 
 	// recieve updates from firebase
@@ -169,6 +177,16 @@ export class Task extends Events {
 			// notify the parent's listeners that we have been added
 			this.parent.emit("children", this.parent.children);
 		}
+	}
+
+	// get the children that are visible
+	get visibleChildren() {
+		// filter out the invisible children
+		if(!this._visibleChildren) {
+			this._visibleChildren = this.children.filter(this._tasks.filter.isVisible);
+		}
+
+		return this._visibleChildren;
 	}
 
 	// update the value of a property

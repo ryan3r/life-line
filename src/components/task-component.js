@@ -32,7 +32,10 @@ export class TaskComponent extends Component {
 		for(let key of methods) {
 			// we found a task related method
 			if(key.substr(0, 6) == "onTask") {
-				let prop = key.substr(6).toLowerCase();
+				let prop = key.substr(6);
+
+				// convert the first letter to lower case
+				prop = prop[0].toLowerCase() + prop.substr(1);
 
 				// add the listener
 				this.addSub(
