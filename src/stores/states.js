@@ -8,3 +8,9 @@ export let dockedStore = new Store("docked", innerWidth > SIDEBAR_OPEN);
 window.addEventListener("resize", () => {
 	dockedStore.set(innerWidth > SIDEBAR_OPEN);
 });
+
+// the state of the side bar
+export let drawerOpen = new Store("drawerOpen");
+
+// show or don't show completed tasks
+export let showCompleted = new Store("showCompleted");

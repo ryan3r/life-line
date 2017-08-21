@@ -6,7 +6,7 @@ import AppBar from "material-ui/AppBar";
 import {CurrentUser} from "./current-user";
 import {Tabs, Tab} from "material-ui/Tabs";
 import {Lists} from "./lists";
-import {dockedStore} from "../stores/states";
+import {dockedStore, drawerOpen} from "../stores/states";
 
 export class ListsDrawer extends Component {
 	constructor() {
@@ -15,6 +15,7 @@ export class ListsDrawer extends Component {
 		this.state.title = "Lists";
 
 		dockedStore.bind(this);
+		drawerOpen.bind(this);
 	}
 
 	// update the title
@@ -25,7 +26,7 @@ export class ListsDrawer extends Component {
 	// close the side bar if we are not docked
 	onClose = () => {
 		if(!this.state.docked) {
-			this.props.onClose();
+			drawerOpen.set(false);
 		}
 	}
 
@@ -33,8 +34,8 @@ export class ListsDrawer extends Component {
 		return <Drawer
 				docked={this.state.docked}
 				width={SIDEBAR_WIDTH}
-				open={this.props.open}
-				onRequestChange={this.props.onClose}>
+				open={this.state.drawerOpen}
+				onRequestChange={() => drawerOpen.set(false)}>
 			<AppBar
 				title={this.state.title}
 				iconElementLeft={<span></span>}

@@ -2,6 +2,7 @@ import {TaskComponent} from "./task-component";
 import {EditTask} from "./edit-task";
 import {TaskLink} from "./task-link";
 import React from "react";
+import {showCompleted} from "../stores/states";
 import {
 	BASELINE,
 	INDENT_SIZE,
@@ -25,6 +26,8 @@ export class TasksWidget extends TaskComponent {
 		super();
 
 		this.state.children = [];
+
+		showCompleted.bind(this);
 	}
 
 	componentWillMount() {
@@ -60,7 +63,7 @@ export class TasksWidget extends TaskComponent {
 
 	onTaskState() {
 		// one of our children has changed state refresh if that matters
-		if(this.props.showCompleted) return;
+		if(this.state.showCompleted) return;
 
 		// update the state
 		this.setState({
@@ -75,7 +78,7 @@ export class TasksWidget extends TaskComponent {
 		let {children} = this.state;
 
 		// filter out completed tasks
-		if(!this.props.showCompleted) {
+		if(!this.state.showCompleted) {
 			children = children.filter(task => task.state.type != "done");
 		}
 
@@ -117,7 +120,7 @@ export class TasksWidget extends TaskComponent {
 					key={child.id}
 					task={child}
 					depth={depth - 1}
-					showCompleted={this.props.showCompleted}/>;
+					showCompleted={this.state.showCompleted}/>;
 			})}
 			{hiddenMsg}
 		</div>;

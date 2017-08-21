@@ -69,22 +69,6 @@ export class App extends Component {
 		);
 	}
 
-	// toggle the state of a boolean
-	toggleState(prop) {
-		return () => {
-			this.setState({
-				[prop]: !this.state[prop]
-			});
-		};
-	}
-
-	// close the drawer
-	closeDrawer = () => {
-		this.setState({
-			drawerOpen: false
-		});
-	}
-
 	// create a new child task for the root task
 	createChild = () => {
 		const task = this.state.task.create();
@@ -98,19 +82,17 @@ export class App extends Component {
 		return <div className="container flex-column"
 				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
 			<AppBar title={header}
-				onLeftIconButtonTouchTap={this.toggleState("drawerOpen")}
+				onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
 				iconElementLeft={this.state.docked ? <span></span> : null}
 				style={{flexShrink: 0}}/>
 			<div className="flex-fill flex container">
-				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}/>
+				<ListsDrawer/>
 				<div className="scrollable flex-fill flex">
 					<div className="content flex flex-fill flex-vcenter flex-hcenter">
 						{content}
 					</div>
 				</div>
 			</div>
-			<div className={`shade ${this.state.drawerOpen ? "open" : ""}`}
-				onClick={this.toggleState("drawerOpen")}></div>
 		</div>;
 	}
 
@@ -160,18 +142,14 @@ export class App extends Component {
 		// show the app
 		return <div className={`container flex-column ${ctrlPressed}`}
 				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
-			<Header task={this.state.task}
-				onHeaderToggle={this.toggleState("drawerOpen")}
-				showCompleted={this.state.showCompleted}
-				toggleState={this.toggleState("showCompleted")}/>
+			<Header task={this.state.task}/>
 			<ProgressBar task={this.state.task}/>
 			<div className="flex-fill flex container">
-				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}/>
+				<ListsDrawer/>
 				<div className="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
 					<div className="content">
-						<TasksWidget task={this.state.task} toplevel
-							showCompleted={this.state.showCompleted}/>
+						<TasksWidget task={this.state.task} toplevel/>
 						<IconButton
 							onClick={this.createChild}
 							style={addBtnStyle}
@@ -181,8 +159,6 @@ export class App extends Component {
 					</div>
 				</div>
 			</div>
-			<div className={`shade ${this.state.drawerOpen ? "open" : ""}`}
-				onClick={this.toggleState("drawerOpen")}></div>
 		</div>;
 	}
 }
