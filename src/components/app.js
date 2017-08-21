@@ -10,7 +10,7 @@ import AppBar from "material-ui/AppBar";
 import CircularProgress from "material-ui/CircularProgress";
 import IconButton from "material-ui/IconButton";
 import AddIcon from "material-ui/svg-icons/content/add";
-import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../constants";
+import {SIDEBAR_WIDTH} from "../constants";
 import {focusController} from "../focus-controller";
 import {lists} from "../lists";
 import {dockedStore} from "../stores/states";
