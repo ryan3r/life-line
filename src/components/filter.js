@@ -23,7 +23,7 @@ export class Filter extends Component {
 		let btnMsg = this.state.showCompleted ? "Hide" : "Show";
 
 		// delete completed children
-		const deleteCompleted = () => task.deleteCompleted();
+		const deleteCompleted = () => this.props.task.deleteCompleted();
 
 		// the icon for the filter menu
 		const menuIcon = <IconButton iconStyle={{ storke: "#fff", fill: "#fff" }}>
