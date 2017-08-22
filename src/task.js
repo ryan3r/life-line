@@ -266,6 +266,14 @@ export class Task extends Events {
 			);
 		}
 
+		// clear any old state value when we get children
+		if(this._state) {
+			delete this._state;
+
+			// update firebase
+			this._tasks._ref.child(`${this.id}/state`).remove();
+		}
+
 		// set the default state
 		this._cachedState = {
 			type: "done",
