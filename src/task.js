@@ -39,9 +39,7 @@ export class Task extends Events {
 			// reset the filtered children
 			this._tasks.filter.on("refresh", () => {
 				this._refreshVisibleChildren();
-			}),
-			// listen to changes to the actual children
-			this.on("children", () => this._refreshVisibleChildren())
+			})
 		];
 	}
 
@@ -163,6 +161,9 @@ export class Task extends Events {
 
 			// notify the parent's listeners that we have been removed
 			this.parent.emit("children", this.parent.children);
+
+			// update the parent's visible children
+			this.parent._refreshVisibleChildren();
 		}
 
 		// update the internal parent reference
@@ -190,6 +191,9 @@ export class Task extends Events {
 
 			// notify the parent's listeners that we have been added
 			this.parent.emit("children", this.parent.children);
+
+			// update the parent's visible children
+			this.parent._refreshVisibleChildren();
 		}
 	}
 
@@ -292,6 +296,11 @@ export class Task extends Events {
 	// emit a state change event
 	_stateChange() {
 		this.emit("state", this.state);
+
+		// update the parent's visible children
+		if(this.parent) {
+			this.parent._refreshVisibleChildren();
+		}
 	}
 
 	// update the state
