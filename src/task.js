@@ -35,13 +35,14 @@ export class Task extends Events {
 		// set up the list of children
 		this.children = [];
 
-		// reset the filtered children
-		this._filterRefresh = this._tasks.filter.on("refresh", () => {
-			// clear the visible children cache
-			this._visibleChildren = undefined;
-
-			this.emit("visibleChildren", this.visibleChildren);
-		});
+		this._subscriptions = [
+			// reset the filtered children
+			this._tasks.filter.on("refresh", () => {
+				this._refreshVisibleChildren();
+			}),
+			// listen to changes to the actual children
+			this.on("children", () => this._refreshVisibleChildren())
+		];
 	}
 
 	// recieve updates from firebase
@@ -62,6 +63,9 @@ export class Task extends Events {
 
 	// remove this task
 	_remove() {
+		// remove any for this task subscriptions
+		this.dispose();
+
 		this._updateParent();
 	}
 
@@ -92,10 +96,20 @@ export class Task extends Events {
 		// delete the task from tasks
 		this._tasks.delete(this.id);
 
+		// remove any for this task subscriptions
+		this.dispose();
+
 		// Delete all the children as well
 		// I iterate backwards because children will be deleting themselvs from this array
 		for(let i = this.children.length - 1; i >= 0; --i) {
 			this.children[i].delete({ isLastChild: true });
+		}
+	}
+
+	// remove any subscriptions
+	dispose() {
+		while(this._subscriptions.length) {
+			this._subscriptions.shift().unsubscribe();
 		}
 	}
 
@@ -177,6 +191,15 @@ export class Task extends Events {
 			// notify the parent's listeners that we have been added
 			this.parent.emit("children", this.parent.children);
 		}
+	}
+
+	// force the visible children to be refreshed
+	_refreshVisibleChildren() {
+		// clear the visible children cache
+		this._visibleChildren = undefined;
+
+		// emit the change event
+		this.emit("visibleChildren", this.visibleChildren);
 	}
 
 	// get the children that are visible
