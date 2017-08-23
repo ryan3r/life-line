@@ -58,7 +58,9 @@ const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
 	}
 	// focus the task with the current selection
 	else if(keepSelection) {
-		focusController.focusTaskWithCurrentRange(to.id);
+		focusController.focusTaskWithCurrentRange(to.id, {
+			length: fromTask.name.length
+		});
 	}
 	// move to the next task
 	else {
@@ -68,6 +70,8 @@ const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
 
 // find the task that is visually below the current task
 const previousVisibleChild = fromTask => {
+	// save the length of the current task
+	const currentLength = fromTask.name.length;
 	// the deepest we can go
 	const maxDepth = router._tasks.get(router.taskId).depth + maxNestingDepth();
 
@@ -107,7 +111,9 @@ const previousVisibleChild = fromTask => {
 		}
 	}
 
-	focusController.focusTaskWithCurrentRange(fromTask.id);
+	focusController.focusTaskWithCurrentRange(fromTask.id, {
+		length: currentLength
+	});
 };
 
 export class EditTask extends TaskComponent {
@@ -285,7 +291,7 @@ export class EditTask extends TaskComponent {
 
 	// focus this task
 	onFocus() {
-		let {startAt, endAt} = focusController.getRangeInfo();
+		let {startAt, endAt} = focusController.getRangeInfo(this.task.name);
 		// get the text node for the editor
 		const editor = this.base.querySelector(".editor");
 		let textNode = editor.childNodes[0];

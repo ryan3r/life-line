@@ -20,8 +20,17 @@ export class FocusController extends Events {
 	}
 
 	// select a task and keep the currenly selected range
-	focusTaskWithCurrentRange(id) {
-		this.focusTask(id, getSelection().getRangeAt(0));
+	focusTaskWithCurrentRange(id, {length} = {}) {
+		// get the current position
+		const selection = getSelection();
+		let position = selection.getRangeAt(0);
+
+		// if we are at the end of a line stay there
+		if(selection.type == "Caret" && position.startOffset === length) {
+			position = -1;
+		}
+
+		this.focusTask(id, position);
 	}
 
 	// check if a task has focus and listen for focus changes
