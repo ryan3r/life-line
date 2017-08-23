@@ -3,23 +3,7 @@ import {EditTask} from "./edit-task";
 import {TaskLink} from "./task-link";
 import React from "react";
 import {showCompleted} from "../stores/states";
-import {
-	BASELINE,
-	INDENT_SIZE,
-	SIDEBAR_OPEN,
-	SIDEBAR_WIDTH,
-	MAX_CHILDREN,
-	HIDE_COMPLETED_TIMEOUT
-} from "../constants";
-
-// calculate the max nesting depth
-// NOTE: the + 1 is because the first row of tasks are not indented
-const maxNestingDepth = () => {
-	const baseline = BASELINE + (innerWidth > SIDEBAR_OPEN ? SIDEBAR_WIDTH : 0);
-	const depth = ((innerWidth - baseline) / INDENT_SIZE | 0) + 1;
-
-	return depth < 1 ? 1 : depth;
-};
+import {maxNestingDepth} from "../constants";
 
 export class TasksWidget extends TaskComponent {
 	constructor() {

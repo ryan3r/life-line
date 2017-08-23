@@ -10,6 +10,7 @@ import IconMenu from "material-ui/IconMenu";
 import MenuItem from "material-ui/MenuItem";
 import IconButton from "material-ui/IconButton";
 import {focusController} from "../focus-controller";
+import {maxNestingDepth} from "../constants";
 
 // split the currently selected text field (removing the selected parts)
 const splitSelectedText = () => {
@@ -20,6 +21,93 @@ const splitSelectedText = () => {
 		range.startContainer.textContent.substr(0, range.startOffset),
 		range.endContainer.textContent.substr(range.endOffset)
 	];
+};
+
+// focus the next visible task
+const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
+	// find our position in the current parent
+	const index = fromTask.parent.visibleChildren.indexOf(fromTask);
+	// the deepest we can go
+	const maxDepth = router._tasks.get(router.taskId).depth + maxNestingDepth();
+
+	let to;
+
+	if(index === 0) {
+		// the parent is not visible
+		if(fromTask.id == router.taskId) {
+			return;
+		}
+		// move to the parent
+		else {
+			to = fromTask.parent;
+		}
+	}
+	else {
+		// go to the previous child
+		to = fromTask.parent.visibleChildren[index - 1];
+
+		while(to.visibleChildren.length > 0 && to.depth <= maxDepth) {
+			// go to the last child
+			to = to.visibleChildren[to.visibleChildren.length - 1];
+		}
+	}
+
+	// return the task
+	if(getTask) {
+		return to;
+	}
+	// focus the task with the current selection
+	else if(keepSelection) {
+		focusController.focusTaskWithCurrentRange(to.id);
+	}
+	// move to the next task
+	else {
+		focusController.focusTask(to.id, startIndex);
+	}
+};
+
+// find the task that is visually below the current task
+const previousVisibleChild = fromTask => {
+	// the deepest we can go
+	const maxDepth = router._tasks.get(router.taskId).depth + maxNestingDepth();
+
+	// find our position in the current parent
+	const index = fromTask.parent.visibleChildren.indexOf(fromTask);
+
+	// move to our first child if it is visible
+	if(fromTask.visibleChildren.length > 0 && fromTask.depth + 1 < maxDepth) {
+		fromTask = fromTask.visibleChildren[0];
+	}
+	// go to the previous child
+	else if(fromTask.parent.visibleChildren.length - 1 > index) {
+		fromTask = fromTask.parent.visibleChildren[index + 1];
+	}
+	// go to the parent and try again
+	else {
+		for(;;) {
+			// no more tasks
+			if(!fromTask.parent || !fromTask.parent.parent) return;
+
+			// find the parent
+			const index = fromTask.parent.parent.visibleChildren.indexOf(
+				fromTask.parent
+			);
+
+			// this parent has no siblings after it repeat this setp
+			if(fromTask.parent.parent.visibleChildren.length - 1 === index) {
+				fromTask = fromTask.parent;
+
+				continue;
+			}
+
+			// go to the sibling after our parent
+			fromTask = fromTask.parent.parent.visibleChildren[index + 1];
+
+			break;
+		}
+	}
+
+	focusController.focusTaskWithCurrentRange(fromTask.id);
 };
 
 export class EditTask extends TaskComponent {
@@ -113,28 +201,25 @@ export class EditTask extends TaskComponent {
 			// make sure the new task is visible
 			this.openIfFull(parent);
 		}
-		// handle backspace when the input is empty
-		else if(e.keyCode == 8 && e.target.innerText === "") {
-			// focus the last sibling
-			if(this.base.previousElementSibling) {
-				this.base.previousElementSibling.querySelector(".editor").focus();
-			}
-			// focus the parent
-			else {
-				const parentInput = this.base
-					.parentElement // <div> created by Tasks
-					.parentElement // .subtasks
-					.parentElement // <div> wrapping the parent task
-					.querySelector(".editor");
+		// handle backspace when the cursor is at the beginning
+		else if(e.keyCode == 8 &&
+			getSelection().rangeCount > 0 &&
+			getSelection().getRangeAt(0).startOffset === 0) {
+			// get the next visible task
+			let toTask = nextVisibleTask(this.task, { getTask: true });
 
-				// if this is not the top level focus the parent
-				if(parentInput) {
-					parentInput.focus();
-				}
-			}
+			if(toTask) {
+				let index = toTask.name.length;
 
-			// delete this task
-			this.task.delete();
+				// move our name to the to task
+				toTask.name += this.task.name;
+
+				// go to the current end of the to task
+				focusController.focusTask(toTask.id, index);
+
+				// delete this task
+				this.task.delete();
+			}
 		}
 		// outdent tasks on tab
 		else if(e.keyCode == 9 && e.shiftKey) {
@@ -172,86 +257,13 @@ export class EditTask extends TaskComponent {
 		}
 		// up arrow move to the next task
 		else if(e.keyCode == 38) {
-			let target;
-
-			// go to the child above us
-			if(this.base.previousElementSibling) {
-				target = this.base.previousElementSibling;
-
-				// find the last child in this element
-				for(;;) {
-					let subtasks = target.querySelector(".subtasks>div");
-
-					// go to the last child in this element
-					if(subtasks.childElementCount > 0) {
-						target = subtasks.lastElementChild;
-
-						// we found a not subtasks shown message
-						if(target.classList.contains("hidden")) {
-							target = target.previousElementSibling;
-						}
-					}
-					// we found the next element
-					else {
-						break;
-					}
-				}
-			}
-			// go to our parent
-			else {
-				// NOTE: Event if we are the first element in the entire list
-				// 		this jumps back to the same element
-
-				target = this.base
-					.parentElement // <div> created by Tasks
-					.parentElement // .subtasks
-					.parentElement // <div> wrapping the parent task
-					.firstElementChild; // the actual task
-			}
-
-			target.querySelector(".editor").focus();
+			nextVisibleTask(this.task, {
+				keepSelection: true
+			});
 		}
 		// down arrow move to the last task
 		else if(e.keyCode == 40) {
-			let target = this.base;
-			let subtasks = this.base.querySelector(".subtasks>div");
-
-			// go to the first child in this element
-			if(subtasks.childElementCount > 0) {
-				target = subtasks.firstElementChild;
-			}
-			// go to the next sibling
-			else if(this.base.nextElementSibling &&
-				!this.base.nextElementSibling.classList.contains("hidden")) {
-					target = this.base.nextElementSibling;
-			}
-			// go to our parent
-			else {
-				for(;;) {
-					target = target
-						.parentElement // <div> created by Tasks
-						.parentElement // .subtasks
-						.parentElement; // <div> wrapping the parent task
-
-					// we found a task to go to
-					if(target.nextElementSibling) {
-						target = target.nextElementSibling
-
-						break;
-					}
-					// we are on the last task
-					else if(target.className !== "") {
-						target = undefined;
-
-						break;
-					}
-				}
-			}
-
-			// focus the element
-			if(target) {
-				target.querySelector(".editor").focus();
-			}
+			previousVisibleChild(this.task);
 		}
 		// if none of our handlers were called go with the brower default
 		else {
@@ -272,7 +284,7 @@ export class EditTask extends TaskComponent {
 
 	// focus this task
 	onFocus() {
-		const {startAt, endAt} = focusController.getRangeInfo();
+		let {startAt, endAt} = focusController.getRangeInfo();
 		// get the text node for the editor
 		const editor = this.base.querySelector(".editor");
 		let textNode = editor.childNodes[0];
@@ -286,6 +298,14 @@ export class EditTask extends TaskComponent {
 		}
 
 		let range = document.createRange();
+
+		if(startAt > textNode.textContent.length) {
+			startAt = textNode.textContent.length;
+		}
+
+		if(endAt > textNode.textContent.length) {
+			endAt = textNode.textContent.length;
+		}
 
 		// select the text
 		range.setStart(textNode, startAt);

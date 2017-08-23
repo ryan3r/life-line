@@ -37,9 +37,9 @@ export class Task extends Events {
 		this.children = [];
 
 		// create the disposable for this task
-		this.disposable = new Disposable();
+		this._disposable = new Disposable();
 
-		this.disposable.add(
+		this._disposable.add(
 			// reset the filtered children
 			this._tasks.filter.on("refresh", () => {
 				this._refreshVisibleChildren();
@@ -98,11 +98,10 @@ export class Task extends Events {
 
 		this._updateParent(undefined, opts);
 
+		this.dispose();
+
 		// delete the task from tasks
 		this._tasks.delete(this.id);
-
-		// remove any for this task subscriptions
-		this.dispose();
 
 		// Delete all the children as well
 		// I iterate backwards because children will be deleting themselvs from this array

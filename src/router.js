@@ -130,10 +130,13 @@ class Router extends Events {
 				}
 
 				current.then(task => {
-					// make sure they still want this
-					if(subscription.active) {
-						// make sure this is still the current task
-						if(task.id == this.taskId || (!task.parent && !this.taskId)) {
+					// make sure this is still the current task
+					if(task.id == this.taskId || (!task.parent && !this.taskId)) {
+						// update the task id
+						this.taskId = task.id;
+
+						// make sure they still want this
+						if(subscription.active) {
 							fn(task);
 						}
 					}
