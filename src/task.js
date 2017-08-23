@@ -45,6 +45,9 @@ export class Task extends Events {
 				this._refreshVisibleChildren();
 			})
 		);
+
+		// start with a depth of 0
+		this.depth = 0;
 	}
 
 	// recieve updates from firebase
@@ -172,6 +175,9 @@ export class Task extends Events {
 		this.parent = newParent;
 
 		if(this.parent) {
+			// update our depth
+			this.depth = this.parent.depth + 1;
+
 			// add this to the parents children after the child after
 			if(after) {
 				const index = this.parent.children.indexOf(after);
