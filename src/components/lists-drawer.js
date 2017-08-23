@@ -40,14 +40,17 @@ export class ListsDrawer extends Component {
 				title={this.state.title}
 				iconElementLeft={<span></span>}
 				iconElementRight={<CurrentUser/>}/>
-			{/*<Tabs>
-				<Tab label="Lists" onActive={this.openTab("Lists")}>*/}
-					<Lists onClose={this.onClose}/>
-				{/*</Tab>
-				<Tab label="Other" onActive={this.openTab("Other")}>
-					Filler content
-				</Tab>
-			</Tabs>*/}
+			<div style={{ minHeight: "calc(100% - 106px)" }}>
+				{/*<Tabs>
+					<Tab label="Lists" onActive={this.openTab("Lists")}>*/}
+						<Lists onClose={this.onClose}/>
+					{/*</Tab>
+					<Tab label="Other" onActive={this.openTab("Other")}>
+						Filler content
+					</Tab>
+				</Tabs>*/}
+			</div>
+			<div className="version">Life line v{VERSION}</div>
 		</Drawer>;
 	}
 }

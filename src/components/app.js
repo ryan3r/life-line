@@ -157,7 +157,6 @@ export class App extends Component {
 								<AddIcon/>
 						</IconButton>
 					</div>
-					<div className="version">Life line v{VERSION}</div>
 				</div>
 			</div>
 		</div>;
