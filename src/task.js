@@ -1,5 +1,6 @@
 import {Events} from "./util";
 import {Disposable} from "./util";
+import {lists} from "./lists";
 
 const db = firebase.database();
 
@@ -429,7 +430,7 @@ for(let prop of TASK_PROPS) {
 
 				// if this is the root task
 				if(prop == "name" && !this.parent) {
-					db.ref(`/users/${this._tasks.lists.userId}/${this._tasks.listId}`).set(value);
+					db.ref(`/users/${lists.userId}/${this._tasks.listId}`).set(value);
 				}
 			}
 		}
