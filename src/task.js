@@ -297,11 +297,10 @@ export class Task extends Events {
 		// set the default state
 		this._cachedState = {
 			type: "done",
-			percentDone: 0
+			percentDone: 0,
+			completed: 0,
+			total: 0
 		};
-
-		// the percent of the overall percentDone each child gets
-		const taskPercent = 1 / this.children.length;
 
 		// combine the state of our children
 		for(const child of this.children) {
@@ -314,11 +313,23 @@ export class Task extends Events {
 			}
 
 			// add the child's percentDone
-			this._cachedState.percentDone += taskPercent * child.state.percentDone;
+			if(child.children.length > 0) {
+				this._cachedState.completed += child.state.completed;
+				this._cachedState.total += child.state.total;
+			}
+			else {
+				this._cachedState.completed += child.state.type == "done";
+				++this._cachedState.total;
+			}
 		}
 
+		// calculate the percent done
+		this._cachedState.percentDone =
+			this._cachedState.completed / this._cachedState.total;
+
 		// round to the 5th decimal place to avild floating point errors
-		this._cachedState.percentDone = Math.round(this._cachedState.percentDone * 100000) / 100000;
+		this._cachedState.percentDone =
+			Math.round(this._cachedState.percentDone * 100000) / 100000;
 	}
 
 	// emit a state change event
