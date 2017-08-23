@@ -11,6 +11,9 @@ class Router extends Events {
 		if(!this.listId) {
 			this.listId = localStorage.getItem("last-list");
 		}
+
+		// refresh the visible children for the current task
+		this.onCurrentRootTask(task => task._refreshVisibleChildren());
 	}
 
 	// parse the current url

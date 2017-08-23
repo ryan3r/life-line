@@ -159,5 +159,8 @@ export class Tasks {
 		for(let [_, task] of this._tasks) {
 			task.dispose();
 		}
+
+		// dispose of the filter
+		this.filter.dispose();
 	}
 };

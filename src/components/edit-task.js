@@ -26,10 +26,7 @@ export class EditTask extends TaskComponent {
 	// check if a task's children are hiden and open it if they are
 	openIfFull = parent => {
 		// check if with this next child we will hide the subtasks
-		const parentIsFull = parent.childCountExcedes({
-			maxChildren: MAX_CHILDREN - 1,
-			showCompleted: this.props.showCompleted
-		});
+		const parentIsFull = parent.visibleChildren.length >= MAX_CHILDREN;
 
 		// open the parent since the children are hidden
 		if(parentIsFull) {

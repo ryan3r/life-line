@@ -1,4 +1,5 @@
 import {Events} from "./util";
+import {Disposable} from "./util";
 
 const db = firebase.database();
 
@@ -35,12 +36,15 @@ export class Task extends Events {
 		// set up the list of children
 		this.children = [];
 
-		this._subscriptions = [
+		// create the disposable for this task
+		this.disposable = new Disposable();
+
+		this.disposable.add(
 			// reset the filtered children
 			this._tasks.filter.on("refresh", () => {
 				this._refreshVisibleChildren();
 			})
-		];
+		);
 	}
 
 	// recieve updates from firebase
@@ -106,9 +110,7 @@ export class Task extends Events {
 
 	// remove any subscriptions
 	dispose() {
-		while(this._subscriptions.length) {
-			this._subscriptions.shift().unsubscribe();
-		}
+		this._disposable.dispose();
 	}
 
 	// add this task to a parent
@@ -210,7 +212,20 @@ export class Task extends Events {
 	get visibleChildren() {
 		// filter out the invisible children
 		if(!this._visibleChildren) {
-			this._visibleChildren = this.children.filter(this._tasks.filter.isVisible);
+			this._visibleChildren = [];
+
+			// pick the tasks to keep
+			for(let task of this.children) {
+				// check if we should keep this task
+				if(this._tasks.filter.isVisible(task)) {
+					this._visibleChildren.push(task);
+				}
+
+				// check if we should continue filtering tasks
+				if(!this._tasks.filter.shouldContinue(this._visibleChildren, this)) {
+					break;
+				}
+			}
 		}
 
 		return this._visibleChildren;
@@ -326,26 +341,6 @@ export class Task extends Events {
 		this.parent._invalidateState();
 
 		return true;
-	}
-
-	// check if this task is showing more than the maximum number of children
-	childCountExcedes({maxChildren, showCompleted}) {
-		// the number of children that we can have before we exceed the allotment
-		let childrenRemaining = maxChildren;
-
-		for(let child of this.children) {
-			// this child is hidden ignore it
-			if(!showCompleted && child.state.type == "done") continue;
-
-			--childrenRemaining;
-
-			// we have exceded the maximum number of children allowed
-			if(childrenRemaining < 0) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	// delete all the children that have been completed

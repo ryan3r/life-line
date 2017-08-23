@@ -1,41 +1,22 @@
 import {Subscription} from "../util";
 import React from "react";
+import {Disposable} from "../util";
 
 export class Component extends React.Component {
 	constructor() {
 		super();
 
-		this._subscriptions = [];
 		this.state = {};
+		this.disposable = new Disposable();
 	}
 
 	// add a subscription
 	addSub(subscription) {
-		// wrap the function in a subscription
-		if(typeof subscription == "function") {
-			subscription = new Subscription(subscription);
-		}
-
-		this._subscriptions.push(subscription);
-	}
-
-	// remove all subscriptions when the component is destroyed
-	unsubscribeAll(tag) {
-		for(let i = this._subscriptions.length - 1; i >= 0; --i) {
-			const subscription = this._subscriptions[i]
-
-			// check if we want to remove this subscription
-			if(!tag || subscription.tag == tag) {
-				subscription.unsubscribe();
-
-				// remove the subscription from the list
-				this._subscriptions.splice(i, 1);
-			}
-		}
+		this.disposable.add(subscription);
 	}
 
 	componentWillUnmount() {
-		this.unsubscribeAll();
+		this.disposable.dispose();
 	}
 
 	// listen to dom events
