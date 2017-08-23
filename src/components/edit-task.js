@@ -212,7 +212,8 @@ export class EditTask extends TaskComponent {
 				let index = toTask.name.length;
 
 				// move our name to the to task
-				toTask.name += this.task.name;
+				// we go to the DOM to make sure we have the latest name
+				toTask.name += this.base.querySelector(".editor").innerText;
 
 				// go to the current end of the to task
 				focusController.focusTask(toTask.id, index);
