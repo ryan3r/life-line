@@ -6,6 +6,7 @@ export let dockedStore = new Store("docked", innerWidth > SIDEBAR_OPEN);
 
 // listen for window size changes
 window.addEventListener("resize", () => {
+	drawerOpen.set(undefined);
 	dockedStore.set(innerWidth > SIDEBAR_OPEN);
 });
 
