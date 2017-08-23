@@ -1,7 +1,14 @@
 import {Component} from "./component";
 import React from "react";
+import {Disposable} from "../util";
 
 export class TaskComponent extends Component {
+	constructor() {
+		super();
+
+		this.taskDisposable = new Disposable();
+	}
+
 	componentWillMount() {
 		this.task = this.props.task;
 
@@ -16,7 +23,7 @@ export class TaskComponent extends Component {
 		// we changed tasks
 		if(this.task != props.task) {
 			// remove all task listeners
-			this.disposable.dispose("task");
+			this.taskDisposable.dispose();
 
 			this.task = props.task;
 
@@ -46,5 +53,11 @@ export class TaskComponent extends Component {
 				this[key](this.task[prop]);
 			}
 		}
+	}
+
+	componentWillUnmount() {
+		super.componentWillUnmount();
+
+		this.taskDisposable.dispose();
 	}
 }

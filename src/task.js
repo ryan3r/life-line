@@ -7,7 +7,7 @@ const TASK_PROPS = ["name"];
 
 export class Task extends Events {
 	constructor({id, raw, tasks}) {
-		super("task");
+		super();
 
 		// save a reference to the tasks object
 		this._tasks = tasks;

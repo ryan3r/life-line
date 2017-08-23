@@ -11,32 +11,24 @@ export function genId() {
 	return `${date}-${Math.floor(random).toString(ID_BASE)}`;
 }
 
-export function taggedSub(tag) {
-	class Subscription {
-		constructor(fn) {
-			this._fn = fn;
-			this.active = true;
-			this.tag = tag;
-		}
-
-		// remove the subscription
-		unsubscribe() {
-			// already unsubscribed
-			if(!this.active) return;
-
-			// call the unsubscribe function
-			this._fn();
-
-			// mark the subscription as inactive
-			this.active = false;
-		}
+export class Subscription {
+	constructor(fn) {
+		this._fn = fn;
+		this.active = true;
 	}
 
-	return Subscription;
-}
+	// remove the subscription
+	unsubscribe() {
+		// already unsubscribed
+		if(!this.active) return;
 
-// the default subscription
-export let Subscription = taggedSub();
+		// call the unsubscribe function
+		this._fn();
+
+		// mark the subscription as inactive
+		this.active = false;
+	}
+}
 
 // create a deferred promise
 export function defer() {
@@ -77,7 +69,6 @@ export function defer() {
 export class Events {
 	constructor(tag) {
 		this._listeners = new Map();
-		this._Subscription = taggedSub(tag);
 	}
 
 	// listen to an event of type {type}
@@ -91,7 +82,7 @@ export class Events {
 		this._listeners.get(type).push(fn);
 
 		// create a subscription for this listener
-		return new this._Subscription(() => {
+		return new Subscription(() => {
 			const index = this._listeners.get(type).indexOf(fn);
 
 			// remove the listener
@@ -134,17 +125,9 @@ export class Disposable {
 	}
 
 	// remove all subscriptions when the component is destroyed
-	dispose(tag) {
-		for(let i = this._subscriptions.length - 1; i >= 0; --i) {
-			const subscription = this._subscriptions[i]
-
-			// check if we want to remove this subscription
-			if(!tag || subscription.tag == tag) {
-				subscription.unsubscribe();
-
-				// remove the subscription from the list
-				this._subscriptions.splice(i, 1);
-			}
+	dispose() {
+		while(this._subscriptions.length) {
+			this._subscriptions.shift().unsubscribe();
 		}
 	}
 }
