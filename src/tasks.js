@@ -154,5 +154,10 @@ export class Tasks {
 	// disconnect the listeners
 	dispose() {
 		this._ref.off();
+
+		// dispose of the tasks
+		for(let [_, task] of this._tasks) {
+			task.dispose();
+		}
 	}
 };
