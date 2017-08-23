@@ -38,6 +38,3 @@ jspm_packages
 
 # Ignore the builds
 public/bundle.*
-
-# The files that I'm not sure what to do with
-tmp

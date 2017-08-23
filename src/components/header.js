@@ -1,16 +1,29 @@
-import {TaskProp} from "./task-prop";
 import {EditTaskProp} from "./edit-task-prop";
-import {ListsDrawer} from "./lists-drawer";
-import {CurrentUser} from "./current-user";
+import AppBar from "material-ui/AppBar";
+import React from "react";
+import {SIDEBAR_OPEN} from "../constants";
+import {Component} from "./component";
+import {Filter} from "./filter";
+import {dockedStore, drawerOpen} from "../stores/states";
 
-export let Header = ({task, onHeaderToggle}) => {
-	return <div class="header flex flex-vcenter">
-		<button class="btn nocolor drawer-btn" onClick={onHeaderToggle}>
-			<i class="material-icons">menu</i>
-		</button>
-		<h2 class="header-title flex-fill flex">
-			<EditTaskProp class="flex-fill invisible" task={task} prop="name"/>
-		</h2>
-		<CurrentUser/>
-	</div>;
+export class Header extends Component {
+	constructor() {
+		super();
+
+		dockedStore.bind(this);
+	}
+
+	render() {
+		const filterMenu = <Filter task={this.props.task}/>;
+
+		return <AppBar
+			title={<EditTaskProp
+				className="invisible"
+				task={this.props.task}
+				prop="name"/>}
+			onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
+			style={{flexShrink: 0}}
+			iconElementLeft={this.state.docked ? <span></span> : null}
+			iconElementRight={filterMenu}/>
+	}
 }

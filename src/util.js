@@ -67,7 +67,7 @@ export function defer() {
 }
 
 export class Events {
-	constructor() {
+	constructor(tag) {
 		this._listeners = new Map();
 	}
 
@@ -105,5 +105,29 @@ export class Events {
 	// check if an event has any listeners attached
 	hasListeners(type) {
 		return this._listeners.has(type) && this._listeners.get(type).length > 0;
+	}
+}
+
+// a collection of subscriptions to be disposed together
+export class Disposable {
+	constructor() {
+		this._subscriptions = [];
+	}
+
+	// add a subscription
+	add(subscription) {
+		// wrap the function in a subscription
+		if(typeof subscription == "function") {
+			subscription = new Subscription(subscription);
+		}
+
+		this._subscriptions.push(subscription);
+	}
+
+	// remove all subscriptions when the component is destroyed
+	dispose() {
+		while(this._subscriptions.length) {
+			this._subscriptions.shift().unsubscribe();
+		}
 	}
 }

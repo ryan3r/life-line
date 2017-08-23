@@ -1,13 +1,10 @@
 html, body {
 	height: 100%;
 	margin: 0px;
-	color: #fff;
-	background-color: #333;
 }
 
-.light-theme {
-	color: #000;
-	background-color: #fff;
+.app-wrapper {
+	height: 100%;
 }
 
 /* Flex box */
@@ -45,7 +42,7 @@ html, body {
 .checkbox {
 	margin-right: 13px;
 	fill: rgba(0, 0, 0, 0);
-	stroke: #0af;
+	stroke: #2196F3;
 	stroke-width: 3px;
 }
 
@@ -54,58 +51,20 @@ html, body {
 }
 
 .checkbox .backdrop {
-	stroke: #777;
-}
-
-.light-theme .checkbox .backdrop {
 	stroke: #ddd;
 }
 
 .checkbox.done {
-	stroke: #0a0;
+	stroke: #4CAF50;
 }
 
 .checkbox.done .inner {
-	fill: #0a0;
-}
-
-/* The progress bar */
-.progress {
-	background-color: #555;
-}
-
-.light-theme .progress {
-	background-color: #ccc;
-}
-
-.progress-inner {
-	background-color: #0af;
-	height: 3px;
-}
-
-.progress-inner.done {
-	background-color: #0a0;
+	fill: #4CAF50;
 }
 
 /* A style for tasks */
 .task {
 	padding: 8px 0px;
-}
-
-/* Buttons */
-.btn {
-	background: inherit;
-	border: none;
-	outline: none;
-	color: #888;
-}
-
-.btn:hover, .btn.nocolor {
-	color: #fff;
-}
-
-.light-theme .btn:not(.nocolor):hover {
-	color: #000;
 }
 
 /* Inputs */
@@ -114,44 +73,15 @@ html, body {
 	outline: none;
 	background: inherit;
 	color: inherit;
-}
-
-.light-theme .editor {
-	border-bottom-color: #333;
-}
-
-.light-theme .header .editor {
-	border-bottom-color: #ddd;
-}
-
-.editor.invisible {
 	font-size: inherit;
 	font-weight: inherit;
 	font-family: inherit;
-}
-
-body:not(.light-theme) .editor::placeholder {
-	color: #bbb;
 }
 
 /* Make the tasks act as links when ctrl is held down */
 .ctrl-pressed .task .editor:hover {
 	text-decoration: underline;
 	cursor: pointer;
-}
-
-/* Header */
-.header {
-	background-color: #000;
-	color: #fff;
-	padding: 15px;
-}
-
-.header-title {
-	margin: 0px 5px;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
 }
 
 /* The page content */
@@ -174,99 +104,14 @@ a:hover {
 	text-decoration: underline;
 }
 
-.no-underline:hover {
-	text-decoration: none;
-}
-
 /* Text for items not shown */
 a.hidden {
-	color: #aaa;
-	font-style: italic;
-}
-
-.light-theme a.hidden {
 	color: #777;
+	font-style: italic;
 }
 
 div.hidden {
 	padding: 5px 7px;
-}
-
-/* The drawer */
-.drawer {
-	/* Show scroll bars */
-	overflow-y: auto;
-	/* Size the side bar */
-	width: 300px;
-	height: 100%;
-	/* Add a separator between the sidebar and the page */
-	border-right: 1px solid #555;
-}
-
-.light-theme .drawer {
-	border-right-color: #ddd;
-}
-
-/* Hide the drawer button when it is locked open */
-.drawer-btn {
-	display: none;
-}
-
-@media all and (max-width: 700px) {
-	.drawer {
-		/* Fill the screen */
-		top: 0px;
-		left: 0px;
-		position: fixed;
-		/* Use a shadow to overlay the sidebar */
-		border-right: none;
-		box-shadow: 0px 0px 5px #000;
-		/* Make sure the sidebar is not transparent */
-		background-color: #333;
-		/* Side the sidebar out of view */
-		transform: translateX(calc(-100% - 10px));
-		pointer-events: none;
-		/* Animate opening the sidebar */
-		transition: transform 300ms;
-		z-index: 2;
-	}
-
-	.light-theme .drawer {
-		background-color: #fff;
-	}
-
-	/* Open the sidebar */
-	.drawer.open {
-		transform: translateX(0px);
-		pointer-events: all;
-	}
-
-	.shade {
-		/* Fill the screen */
-		top: 0px;
-		left: 0px;
-		width: 100%;
-		height: 100%;
-		position: fixed;
-		background-color: #000;
-		/* Hide the shade */
-		opacity: 0;
-		pointer-events: none;
-		/* Animate opening the shade */
-		transition: opacity 300ms;
-		z-index: 1;
-	}
-
-	/* Cover the page */
-	.shade.open {
-		pointer-events: all;
-		opacity: 0.3;
-	}
-
-	/* Show the drawer button */
-	.drawer-btn {
-		display: initial;
-	}
 }
 
 /* A container that matches its parents height */
@@ -277,36 +122,14 @@ div.hidden {
 
 /* The sidebar lists */
 .list-entry {
-	padding: 10px 15px;
-}
-
-.list-entry:hover {
-	background-color: #444;
-}
-
-.list-entry.no-hover:hover {
-	background-color: inherit;
-}
-
-.light-theme .list-entry:hover {
-	background-color: #ddd;
+	padding: 0px 15px;
 }
 
 /* Indent subtasks */
 .subtasks {
-	border-left: 2px solid #777;
+	border-left: 2px solid #ddd;
 	margin-left: 11px;
 	padding-left: 17px;
-}
-
-.light-theme .subtasks {
-	border-left-color: #ddd;
-}
-
-/* Remove padding and margins */
-.nopad {
-	padding: 0px;
-	margin: 0px;
 }
 
 /* The bread crumbs */
@@ -320,78 +143,10 @@ div.hidden {
 	margin-top: 3px;
 }
 
-/* Don't show a cursor on edge */
-.material-icons {
-	cursor: pointer;
-}
-
-/* A context menu */
-.menu {
-	position: fixed;
-	width: 200px;
-	background-color: #333;
-	border: 1px solid #444;
-}
-
-.menu-item {
-	padding: 10px;
-}
-
-.menu-item:hover {
-	background-color: #555;
-}
-
-/* Light styling for the menu */
-.light-theme .menu {
-	background-color: #fff;
-	border-color: #ddd;
-}
-
-.light-theme .menu-item:hover {
-	background-color: #ddd;
-}
-
-/* Cover the screen when the menu is open */
-.menu-overlay {
-	top: 0px;
-	left: 0px;
-	width: 100%;
-	height: 100%;
-	position: fixed;
-}
-
 /* Clearly distinguish completed tasks */
 .task.done {
-	color: #aaa;
-	text-decoration: line-through;
-}
-
-.light-theme .task.done {
 	color: #777;
-}
-
-/* The user's profile picture */
-.profile-image {
-	width: 30px;
-	height: 30px;
-	border-radius: 50%;
-	cursor: pointer;
-}
-
-.profile {
-	display: flex;
-	align-items: center;
-}
-
-.profile-name {
-	margin-right: 5px;
-}
-
-/* Hide the user's greeting on small screens */
-@media all and (max-width: 500px) {
-	.profile-name {
-		display: none;
-	}
+	text-decoration: line-through;
 }
 
 /* Style the filter options */
@@ -400,27 +155,9 @@ div.hidden {
 	padding-bottom: 0px;
 }
 
-/* A button that contains text */
-.text-btn {
-	border: 1px solid #fff;
-	padding: 5px 8px;
-	border-radius: 5px;
-	outline: none;
-	background-color: #333;
-	color: inherit;
-	margin: 0px 5px;
-}
-
-.text-btn:hover {
-	background-color: #555;
-}
-
-/* The light theme for the buttons */
-.light-theme .text-btn {
-	border-color: #000;
-	background-color: #fff;
-}
-
-.light-theme .text-btn:hover {
-	background-color: #eee;
+/* Put the version at the bottom of the page */
+.version {
+	padding: 10px;
+	color: #aaa;
+	text-align: center;
 }

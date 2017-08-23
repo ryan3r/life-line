@@ -1,29 +1,17 @@
 import {TaskComponent} from "./task-component";
 import {EditTask} from "./edit-task";
 import {TaskLink} from "./task-link";
-import {
-	BASELINE,
-	INDENT_SIZE,
-	SIDEBAR_OPEN,
-	SIDEBAR_WIDTH,
-	MAX_CHILDREN,
-	HIDE_COMPLETED_TIMEOUT
-} from "../constants";
-
-// calculate the max nesting depth
-// NOTE: the + 1 is because the first row of tasks are not indented
-const maxNestingDepth = () => {
-	const baseline = BASELINE + (innerWidth > SIDEBAR_OPEN ? SIDEBAR_WIDTH : 0);
-	const depth = ((innerWidth - baseline) / INDENT_SIZE | 0) + 1;
-
-	return depth < 1 ? 1 : depth;
-};
+import React from "react";
+import {showCompleted} from "../stores/states";
+import {maxNestingDepth} from "../constants";
 
 export class TasksWidget extends TaskComponent {
 	constructor() {
 		super();
 
 		this.state.children = [];
+
+		showCompleted.bind(this);
 	}
 
 	componentWillMount() {
@@ -36,7 +24,6 @@ export class TasksWidget extends TaskComponent {
 			// recalculate how deep we can go
 			this.listen(window, "resize", () => {
 				this.setState({
-					children: this.props.task.children,
 					depth: maxNestingDepth()
 				});
 			}, { passive: true });
@@ -50,7 +37,7 @@ export class TasksWidget extends TaskComponent {
 		});
 	}
 
-	onTaskChildren(children) {
+	onTaskVisibleChildren(children) {
 		// update the state
 		this.setState({
 			children
@@ -59,15 +46,12 @@ export class TasksWidget extends TaskComponent {
 
 	onTaskState() {
 		// one of our children has changed state refresh if that matters
-		if(this.props.showCompleted) return;
+		if(this.state.showCompleted) return;
 
-		// delay the update so the task doesn't just disappear
-		setTimeout(() => {
-			// update the state
-			this.setState({
-				children: this.task.children
-			});
-		}, HIDE_COMPLETED_TIMEOUT);
+		// update the state
+		this.setState({
+			children: this.task.visibleChildren
+		});
 	}
 
 	render() {
@@ -75,11 +59,6 @@ export class TasksWidget extends TaskComponent {
 		if(!this.task) return;
 
 		let {children} = this.state;
-
-		// filter out completed tasks
-		if(!this.props.showCompleted) {
-			children = children.filter(task => task.state.type != "done");
-		}
 
 		// get the number of layers of subitems we have left
 		const depth = this.props.depth !== undefined ?
@@ -89,34 +68,34 @@ export class TasksWidget extends TaskComponent {
 		// we can't add any more children
 		if(depth === 0) {
 			if(children.length > 0) {
-				return <TaskLink id={this.task.id} class="hidden">
+				return <TaskLink id={this.task.id} className="hidden">
 					{`${children.length} subtasks not shown`}
 				</TaskLink>;
 			}
 			else {
-				return "";
+				return null;
 			}
 		}
 
 		let hiddenMsg;
 
 		// limit the children for non-top level tasks
-		if(!this.props.toplevel && children.length > MAX_CHILDREN) {
+		if(this.task.children.length !== children.length) {
 			// tell the user we hid some tasks
-			hiddenMsg = <div class="hidden">
-				<TaskLink id={this.task.id} class="hidden">
-					{`${children.length - MAX_CHILDREN} subtasks not shown`}
+			hiddenMsg = <div className="hidden">
+				<TaskLink id={this.task.id} className="hidden">
+					{`${this.task.children.length - children.length} subtasks not shown`}
 				</TaskLink>
 			</div>;
-
-			// hide the tasks
-			children = children.slice(0, MAX_CHILDREN);
 		}
 
 		return <div>
 			{children.map(child => {
-				return <EditTask task={child} depth={depth - 1}
-					showCompleted={this.props.showCompleted}/>;
+				return <EditTask
+					key={child.id}
+					task={child}
+					depth={depth - 1}
+					showCompleted={this.state.showCompleted}/>;
 			})}
 			{hiddenMsg}
 		</div>;

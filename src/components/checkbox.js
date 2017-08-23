@@ -1,4 +1,5 @@
 import {TaskComponent} from "./task-component";
+import React from "react";
 
 const TAU = Math.PI * 2;
 
@@ -19,9 +20,6 @@ export class Checkbox extends TaskComponent {
 	constructor() {
 		super();
 
-		// bind event listeners
-		this.toggle = this.toggle.bind(this);
-
 		// set the preloaded state
 		this.state.state = {
 			type: "none",
@@ -37,17 +35,12 @@ export class Checkbox extends TaskComponent {
 	}
 
 	// toggle the state
-	toggle() {
+	toggle = () => {
 		this.task.state = this.state.state.type == "done" ? "none" : "done";
 	}
 
 	render() {
 		let {percentDone, type} = this.state.state;
-
-		// the checked state of a checkbox
-		let ariaState = (percentDone === 0 || percentDone === 1) ?
-			"" + !!percentDone :
-			"mixed";
 
 		// the circle/semicircle for the percent done
 		let doneCircle;
@@ -71,12 +64,10 @@ export class Checkbox extends TaskComponent {
 				d={`M ${RIGHT_X} ${RIGHT_Y} A ${RADIUS} ${RADIUS} ${+!largeArc} ${+largeArc} 1 ${x} ${y}`}/>
 		}
 
-		return <svg width={SIZE} height={SIZE} class={`checkbox flex-noshrink ${type}`}
-				onClick={this.toggle}
-				aria-role="checkbox" aria-checked={ariaState}
-				area-labelledby={`task-${this.props.task.id}`}>
-			<circle cx={ORIGIN} cy={ORIGIN} r={RADIUS - CURVE_WIDTH * 1.5} class="inner"/>
-			<circle cx={ORIGIN} cy={ORIGIN} r={RADIUS} class="backdrop"/>
+		return <svg width={SIZE} height={SIZE} className={`checkbox flex-noshrink ${type}`}
+				onClick={this.toggle}>
+			<circle cx={ORIGIN} cy={ORIGIN} r={RADIUS - CURVE_WIDTH * 1.5} className="inner"/>
+			<circle cx={ORIGIN} cy={ORIGIN} r={RADIUS} className="backdrop"/>
 			{doneCircle}
 		</svg>;
 	}

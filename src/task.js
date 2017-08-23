@@ -1,4 +1,6 @@
 import {Events} from "./util";
+import {Disposable} from "./util";
+import {lists} from "./lists";
 
 const db = firebase.database();
 
@@ -34,6 +36,19 @@ export class Task extends Events {
 
 		// set up the list of children
 		this.children = [];
+
+		// create the disposable for this task
+		this._disposable = new Disposable();
+
+		this._disposable.add(
+			// reset the filtered children
+			this._tasks.filter.on("refresh", () => {
+				this._refreshVisibleChildren();
+			})
+		);
+
+		// start with a depth of 0
+		this.depth = 0;
 	}
 
 	// recieve updates from firebase
@@ -54,14 +69,17 @@ export class Task extends Events {
 
 	// remove this task
 	_remove() {
+		// remove any for this task subscriptions
+		this.dispose();
+
 		this._updateParent();
 	}
 
 	// create a child task
-	create() {
+	create(name = "") {
 		// create the new task
 		const task = this._tasks.create({
-			name: "",
+			name,
 			state: "none",
 			parent: this.id
 		});
@@ -81,6 +99,8 @@ export class Task extends Events {
 
 		this._updateParent(undefined, opts);
 
+		this.dispose();
+
 		// delete the task from tasks
 		this._tasks.delete(this.id);
 
@@ -89,6 +109,11 @@ export class Task extends Events {
 		for(let i = this.children.length - 1; i >= 0; --i) {
 			this.children[i].delete({ isLastChild: true });
 		}
+	}
+
+	// remove any subscriptions
+	dispose() {
+		this._disposable.dispose();
 	}
 
 	// add this task to a parent
@@ -141,12 +166,18 @@ export class Task extends Events {
 
 			// notify the parent's listeners that we have been removed
 			this.parent.emit("children", this.parent.children);
+
+			// update the parent's visible children
+			this.parent._refreshVisibleChildren();
 		}
 
 		// update the internal parent reference
 		this.parent = newParent;
 
 		if(this.parent) {
+			// update our depth
+			this.depth = this.parent.depth + 1;
+
 			// add this to the parents children after the child after
 			if(after) {
 				const index = this.parent.children.indexOf(after);
@@ -168,7 +199,42 @@ export class Task extends Events {
 
 			// notify the parent's listeners that we have been added
 			this.parent.emit("children", this.parent.children);
+
+			// update the parent's visible children
+			this.parent._refreshVisibleChildren();
 		}
+	}
+
+	// force the visible children to be refreshed
+	_refreshVisibleChildren() {
+		// clear the visible children cache
+		this._visibleChildren = undefined;
+
+		// emit the change event
+		this.emit("visibleChildren", this.visibleChildren);
+	}
+
+	// get the children that are visible
+	get visibleChildren() {
+		// filter out the invisible children
+		if(!this._visibleChildren) {
+			this._visibleChildren = [];
+
+			// pick the tasks to keep
+			for(let task of this.children) {
+				// check if we should keep this task
+				if(this._tasks.filter.isVisible(task)) {
+					this._visibleChildren.push(task);
+				}
+
+				// check if we should continue filtering tasks
+				if(!this._tasks.filter.shouldContinue(this._visibleChildren, this)) {
+					break;
+				}
+			}
+		}
+
+		return this._visibleChildren;
 	}
 
 	// update the value of a property
@@ -221,14 +287,21 @@ export class Task extends Events {
 			);
 		}
 
+		// clear any old state value when we get children
+		if(this._state) {
+			delete this._state;
+
+			// update firebase
+			this._tasks._ref.child(`${this.id}/state`).remove();
+		}
+
 		// set the default state
 		this._cachedState = {
 			type: "done",
-			percentDone: 0
+			percentDone: 0,
+			completed: 0,
+			total: 0
 		};
-
-		// the percent of the overall percentDone each child gets
-		const taskPercent = 1 / this.children.length;
 
 		// combine the state of our children
 		for(const child of this.children) {
@@ -241,16 +314,33 @@ export class Task extends Events {
 			}
 
 			// add the child's percentDone
-			this._cachedState.percentDone += taskPercent * child.state.percentDone;
+			if(child.children.length > 0) {
+				this._cachedState.completed += child.state.completed;
+				this._cachedState.total += child.state.total;
+			}
+			else {
+				this._cachedState.completed += child.state.type == "done";
+				++this._cachedState.total;
+			}
 		}
 
+		// calculate the percent done
+		this._cachedState.percentDone =
+			this._cachedState.completed / this._cachedState.total;
+
 		// round to the 5th decimal place to avild floating point errors
-		this._cachedState.percentDone = Math.round(this._cachedState.percentDone * 100000) / 100000;
+		this._cachedState.percentDone =
+			Math.round(this._cachedState.percentDone * 100000) / 100000;
 	}
 
 	// emit a state change event
 	_stateChange() {
 		this.emit("state", this.state);
+
+		// update the parent's visible children
+		if(this.parent) {
+			this.parent._refreshVisibleChildren();
+		}
 	}
 
 	// update the state
@@ -268,26 +358,6 @@ export class Task extends Events {
 		this.parent._invalidateState();
 
 		return true;
-	}
-
-	// check if this task is showing more than the maximum number of children
-	childCountExcedes({maxChildren, showCompleted}) {
-		// the number of children that we can have before we exceed the allotment
-		let childrenRemaining = maxChildren;
-
-		for(let child of this.children) {
-			// this child is hidden ignore it
-			if(!showCompleted && child.state.type == "done") continue;
-
-			--childrenRemaining;
-
-			// we have exceded the maximum number of children allowed
-			if(childrenRemaining < 0) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	// delete all the children that have been completed
@@ -360,7 +430,7 @@ for(let prop of TASK_PROPS) {
 
 				// if this is the root task
 				if(prop == "name" && !this.parent) {
-					db.ref(`/users/${this._tasks.lists.userId}/${this._tasks.listId}`).set(value);
+					db.ref(`/users/${lists.userId}/${this._tasks.listId}`).set(value);
 				}
 			}
 		}

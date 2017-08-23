@@ -1,93 +1,56 @@
 import {Component} from "./component";
-import {TaskLink} from "./task-link";
-import {router} from "../router";
+import React from "react";
+import Drawer from "material-ui/Drawer";
+import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../constants";
+import AppBar from "material-ui/AppBar";
+import {CurrentUser} from "./current-user";
+import {Tabs, Tab} from "material-ui/Tabs";
+import {Lists} from "./lists";
+import {dockedStore, drawerOpen} from "../stores/states";
 
 export class ListsDrawer extends Component {
 	constructor() {
 		super();
 
-		this.addList = this.addList.bind(this);
-		this.newListUpdate = this.newListUpdate.bind(this);
+		this.state.title = "Lists";
 
-		this.state.lists = [];
+		dockedStore.bind(this);
+		drawerOpen.bind(this);
 	}
 
-	componentDidMount() {
-		let {lists} = this.props;
-
-		// get the initial lists
-		this.setState({
-			lists: lists.lists
-		});
-
-		// listen for changes
-		this.addSub(
-			lists.on("change", () => {
-				this.setState({
-					lists: lists.lists
-				});
-			})
-		);
+	// update the title
+	openTab(title) {
+		return () => this.setState({ title });
 	}
 
-	removeList(id) {
-		// delete the list
-		return () => this.props.lists.delete(id);
-	}
-
-	// update the state with changes to the new list name
-	newListUpdate(e) {
-		this.setState({
-			newList: e.target.value
-		});
-	}
-
-	// add a new list
-	addList(e) {
-		e.preventDefault();
-
-		// no list name
-		if(!this.state.newList) {
-			return;
+	// close the side bar if we are not docked
+	onClose = () => {
+		if(!this.state.docked) {
+			drawerOpen.set(false);
 		}
-
-		// create the list
-		const id = this.props.lists.create(this.state.newList);
-
-		// clear the input
-		this.setState({
-			newList: ""
-		});
-
-		// navigate to the list
-		router.openList(id);
-
-		// close the sidebar
-		this.props.onClose();
 	}
 
 	render() {
-		return <div class={`drawer ${this.props.open ? "open" : ""}`}>
-			{this.state.lists.map(list => {
-				return <div class="list-entry flex flex-vcenter">
-					<TaskLink id={list.id} isList onClick={this.props.onClose}
-						class="flex-fill no-underline">
-							{list.name}
-					</TaskLink>
-					<button class="btn" onClick={this.removeList(list.id)}>
-						<i class="material-icons">clear</i>
-					</button>
-				</div>
-			})}
-			<div class="list-entry no-hover">
-				<form class="flex flex-vcenter" onSubmit={this.addList}>
-					<input class="editor flex-fill" placeholder="New list"
-						value={this.state.newList} onInput={this.newListUpdate}/>
-					<button class="btn">
-						<i class="material-icons">add</i>
-					</button>
-				</form>
+		return <Drawer
+				docked={this.state.docked}
+				width={SIDEBAR_WIDTH}
+				open={this.state.drawerOpen}
+				onRequestChange={() => drawerOpen.set(false)}>
+			<AppBar
+				title={this.state.title}
+				iconElementLeft={<span></span>}
+				iconElementRight={<CurrentUser/>}/>
+			<div style={{ minHeight: "calc(100% - 106px)" }}>
+				{/*<Tabs>
+					<Tab label="Lists" onActive={this.openTab("Lists")}>*/}
+						<Lists onClose={this.onClose}/>
+					{/*</Tab>
+					<Tab label="Other" onActive={this.openTab("Other")}>
+						Filler content
+					</Tab>
+				</Tabs>*/}
 			</div>
-		</div>;
+			<div className="version">Life line v{VERSION}</div>
+		</Drawer>;
 	}
 }

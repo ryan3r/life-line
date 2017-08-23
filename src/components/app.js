@@ -2,19 +2,24 @@ import {Component} from "./component";
 import {Header} from "./header";
 import {TasksWidget} from "./tasks";
 import {router} from "../router";
-import {Tasks} from "../tasks";
 import {ListsDrawer} from "./lists-drawer";
 import {BreadCrumbs} from "./bread-crumbs";
 import {ProgressBar} from "./progress-bar";
-import {Filter} from "./filter";
+import React from "react";
+import AppBar from "material-ui/AppBar";
+import CircularProgress from "material-ui/CircularProgress";
+import IconButton from "material-ui/IconButton";
+import AddIcon from "material-ui/svg-icons/content/add";
+import {SIDEBAR_WIDTH} from "../constants";
+import {focusController} from "../focus-controller";
+import {lists} from "../lists";
+import {dockedStore} from "../stores/states";
 
 export class App extends Component {
 	constructor() {
 		super();
 
-		// bind event listeners to this class
-		this.closeDrawer = this.closeDrawer.bind(this);
-		this.createChild = this.createChild.bind(this);
+		dockedStore.bind(this);
 	}
 
 	componentDidMount() {
@@ -34,122 +39,60 @@ export class App extends Component {
 	}
 
 	componentWillMount() {
-		// we have a known task
-		this.setupList();
+		// get the current task
+		this.addSub(
+			router.onCurrentRootTask(task => {
+				this.setState({
+					task,
+					loaded: true
+				});
+			})
+		);
 
 		// listen for navigations
 		this.addSub(
-			router.on("navigate", () => this.setupList())
+			router.on("navigate", () => {
+				// clear current task and show the loader
+				this.setState({
+					task: undefined,
+					loaded: false,
+					errorType: undefined
+				});
+			})
+		);
+
+		// handle the error
+		this.addSub(
+			router.on("tasks-error", e => {
+				this.setState(e);
+			})
 		);
 	}
 
-	// setup the current list
-	setupList() {
-		// clear old errors
-		if(this.state.errorType !== undefined) {
-			this.setState({
-				errorType: undefined
-			});
-		}
-
-		// if we have a new list load it
-		if(router.listId && (!this._tasks || this._tasks.listId != router.listId)) {
-			// dispose of the old tasks object
-			if(this._tasks) {
-				this._tasks.dispose();
-			}
-
-			this._tasks = new Tasks(this.props.lists, router.listId);
-
-			// an error occured
-			this._tasks.ready.catch(err => {
-				// not allowed to access or it does not exist
-				if(err.code == "PERMISSION_DENIED") {
-					this.setState({
-						errorType: "access"
-					});
-				}
-				// unexpected error
-				else {
-					this.setState({
-						errorType: "unknown",
-						errorMessage: err.message
-					});
-				}
-			});
-		}
-
-		// load the current task
-		if(this._tasks) {
-			this.loadRoot();
-		}
-	}
-
-	// load the root task
-	loadRoot() {
-		let task;
-
-		// clear current task
-		this.setState({
-			task: undefined,
-			loaded: false
-		});
-
-		// load the requested task
-		if(!router.taskId) {
-			task = this._tasks.getRootAsync();
-		}
-		else {
-			task = this._tasks.getAsync(router.taskId);
-		}
-
-		// update the component
-		task.then(root => {
-			this.setState({
-				task: root,
-				loaded: true
-			});
-		});
-	}
-
-	// toggle the state of a boolean
-	toggleState(prop) {
-		return () => {
-			this.setState({
-				[prop]: !this.state[prop]
-			});
-		};
-	}
-
-	// close the drawer
-	closeDrawer() {
-		this.setState({
-			drawerOpen: false
-		});
-	}
-
 	// create a new child task for the root task
-	createChild() {
-		return this.state.task.create();
+	createChild = () => {
+		const task = this.state.task.create();
+
+		// focus that child
+		focusController.focusTask(task.id, 0);
 	}
 
 	// display a minimal app frame with a message
 	message(header, content) {
-		return <div class="container flex-column">
-			<div class="header flex flex-vcenter">
-				<button class="btn nocolor drawer-btn"
-					onClick={this.toggleState("drawerOpen")}>
-						<i class="material-icons">menu</i>
-				</button>
-				<h2 class="header-title">{header}</h2>
+		return <div className="container flex-column"
+				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
+			<AppBar title={header}
+				onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
+				iconElementLeft={this.state.docked ? <span></span> : null}
+				style={{flexShrink: 0}}/>
+			<div className="flex-fill flex container">
+				<ListsDrawer/>
+				<div className="scrollable flex-fill flex-column">
+					<div className="content flex flex-fill flex-vcenter flex-hcenter">
+						{content}
+					</div>
+				</div>
 			</div>
-			<div class="flex-fill flex container">
-				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}
-					lists={this.props.lists}/>
-				<div class="content flex-fill">{content}</div>
-			</div>
-			<div class={`shade ${this.state.drawerOpen ? "open" : ""}`}
-				onClick={this.toggleState("drawerOpen")}></div>
 		</div>;
 	}
 
@@ -165,7 +108,8 @@ export class App extends Component {
 		if(this.state.errorType == "unknown") {
 			return this.message(
 				"Unexpected error",
-				"An unexpected error occured while loading your list: " + this.state.errorMessage
+				"An unexpected error occured while loading your list: "
+					+ this.state.errorMessage
 			);
 		}
 
@@ -175,40 +119,46 @@ export class App extends Component {
 		}
 
 		if(this.state.loaded && !this.state.task) {
-			return this.message("No such tasks", "The url does not match any task in this list.");
+			return this.message(
+				"No such tasks",
+				"The url does not match any task in this list."
+			);
 		}
 
 		// show the loading page
 		if(!this.state.task) {
-			return this.message("Loading...", "");
+			return this.message("Loading...", <CircularProgress/>);
 		}
 
 		const ctrlPressed = this.state.ctrlPressed ? "ctrl-pressed" : "";
 
+		// the styles for the add button
+		const addBtnStyle = {
+			padding: 0,
+			width: 24,
+			height: 24
+		};
+
 		// show the app
-		return <div class={`container flex-column ${ctrlPressed}`}>
-			<Header task={this.state.task}
-				onHeaderToggle={this.toggleState("drawerOpen")}/>
+		return <div className={`container flex-column ${ctrlPressed}`}
+				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
+			<Header task={this.state.task}/>
 			<ProgressBar task={this.state.task}/>
-			<div class="flex-fill flex container">
-				<ListsDrawer open={this.state.drawerOpen} onClose={this.closeDrawer}
-					lists={this.props.lists}/>
-				<div class="scrollable flex-fill">
+			<div className="flex-fill flex container">
+				<ListsDrawer/>
+				<div className="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
-					<Filter showCompleted={this.state.showCompleted}
-						onToggleShowCompleted={this.toggleState("showCompleted")}
-						task={this.state.task}/>
-					<div class="content">
-						<TasksWidget task={this.state.task} toplevel
-							showCompleted={this.state.showCompleted}/>
-						<button class="btn nopad" onClick={this.createChild}>
-							<i class="material-icons">add</i>
-						</button>
+					<div className="content">
+						<TasksWidget task={this.state.task} toplevel/>
+						<IconButton
+							onClick={this.createChild}
+							style={addBtnStyle}
+							iconStyle={addBtnStyle}>
+								<AddIcon/>
+						</IconButton>
 					</div>
 				</div>
 			</div>
-			<div class={`shade ${this.state.drawerOpen ? "open" : ""}`}
-				onClick={this.toggleState("drawerOpen")}></div>
 		</div>;
 	}
 }
