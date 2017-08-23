@@ -87,7 +87,7 @@ export class App extends Component {
 				style={{flexShrink: 0}}/>
 			<div className="flex-fill flex container">
 				<ListsDrawer/>
-				<div className="scrollable flex-fill flex">
+				<div className="scrollable flex-fill flex-column">
 					<div className="content flex flex-fill flex-vcenter flex-hcenter">
 						{content}
 					</div>
@@ -157,6 +157,7 @@ export class App extends Component {
 								<AddIcon/>
 						</IconButton>
 					</div>
+					<div className="version">Life line v{VERSION}</div>
 				</div>
 			</div>
 		</div>;
