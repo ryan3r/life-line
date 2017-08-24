@@ -78,12 +78,6 @@ html, body {
 	font-family: inherit;
 }
 
-/* Make the tasks act as links when ctrl is held down */
-.ctrl-pressed .task .editor:hover {
-	text-decoration: underline;
-	cursor: pointer;
-}
-
 /* The page content */
 .content {
 	padding: 15px;

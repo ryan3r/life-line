@@ -22,22 +22,6 @@ export class App extends Component {
 		dockedStore.bind(this);
 	}
 
-	componentDidMount() {
-		this.listen(window, "keydown", e => {
-			// listen for the ctrl key to be pressed
-			if(e.keyCode == 17) {
-				this.setState({ ctrlPressed: true });
-			}
-		});
-
-		this.listen(window, "keyup", e => {
-			// listen for the ctrl key to be released
-			if(e.keyCode == 17) {
-				this.setState({ ctrlPressed: false });
-			}
-		});
-	}
-
 	componentWillMount() {
 		// get the current task
 		this.addSub(
@@ -130,8 +114,6 @@ export class App extends Component {
 			return this.message("Loading...", <CircularProgress/>);
 		}
 
-		const ctrlPressed = this.state.ctrlPressed ? "ctrl-pressed" : "";
-
 		// the styles for the add button
 		const addBtnStyle = {
 			padding: 0,
@@ -140,7 +122,7 @@ export class App extends Component {
 		};
 
 		// show the app
-		return <div className={`container flex-column ${ctrlPressed}`}
+		return <div className="container flex-column"
 				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
 			<Header task={this.state.task}/>
 			<ProgressBar task={this.state.task}/>

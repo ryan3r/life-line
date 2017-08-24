@@ -168,16 +168,7 @@ export class EditTask extends TaskComponent {
 		this.task.delete();
 	}
 
-	open = e => {
-		// we were ctrl clicked open this task
-		if(e.ctrlKey) {
-			e.preventDefault();
-
-			this.actualOpen();
-		}
-	}
-
-	actualOpen = () => {
+	open = () => {
 		router.openTask(this.task.id);
 	}
 
@@ -345,10 +336,10 @@ export class EditTask extends TaskComponent {
 			<div className={`task flex flex-vcenter ${this.task.state.type}`}>
 				<Checkbox task={this.task}/>
 				<EditTaskProp className="flex-fill" task={this.task} prop="name"
-					onKeyDown={this.handleKey} onMouseDown={this.open}/>
+					onKeyDown={this.handleKey}/>
 				<IconMenu
 					iconButtonElement={menuIcon}>
-						<MenuItem primaryText="Open" onClick={this.actualOpen}/>
+						<MenuItem primaryText="Open" onClick={this.open}/>
 						<MenuItem primaryText="Add subtask" onClick={this.create}/>
 						<MenuItem primaryText="Delete" onClick={this.remove}/>
 				</IconMenu>
