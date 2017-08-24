@@ -1,6 +1,6 @@
 import {Component} from "./component";
 import React from "react";
-import {Disposable} from "../util";
+import Disposable from "../util/disposable";
 
 export class TaskComponent extends Component {
 	constructor() {

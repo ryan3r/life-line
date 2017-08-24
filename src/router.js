@@ -1,4 +1,4 @@
-import {Events} from "./util";
+import Events from "./util/events";
 import {Tasks} from "./tasks";
 
 class Router extends Events {

@@ -1,5 +1,5 @@
-import {Events} from "./util";
-import {Disposable} from "./util";
+import Events from "./util/events";
+import Disposable from "./util/disposable";
 import {lists} from "./lists";
 
 const db = firebase.database();

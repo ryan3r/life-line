@@ -1,8 +1,8 @@
 import {showCompleted} from "./stores/states";
-import {Events} from "./util";
+import Events from "./util/events";
 import {MAX_CHILDREN} from "./constants";
 import {router} from "./router";
-import {Disposable} from "./util";
+import Disposable from "./util/disposable";
 
 export class Filter extends Events {
 	constructor() {

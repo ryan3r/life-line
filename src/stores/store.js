@@ -1,6 +1,6 @@
-import {Events} from "../util";
+import Events from "../util/events";
 
-export class Store extends Events {
+export default class Store extends Events {
 	constructor(name, state) {
 		super();
 

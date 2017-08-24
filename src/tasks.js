@@ -1,4 +1,5 @@
-import {defer, genId} from "./util";
+import defer from "./util/deferred";
+import genId from "./util/gen-id";
 import {Task} from "./task";
 import {Filter} from "./filter";
 

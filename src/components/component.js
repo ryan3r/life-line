@@ -1,6 +1,5 @@
-import {Subscription} from "../util";
 import React from "react";
-import {Disposable} from "../util";
+import Disposable from "../util/disposable";
 
 export class Component extends React.Component {
 	constructor() {
@@ -24,8 +23,8 @@ export class Component extends React.Component {
 		target.addEventListener(type, fn, opts);
 
 		// add a subsciption for the listeners
-		this.addSub(new Subscription(() => {
+		this.addSub(() => {
 			target.removeEventListener(type, fn, opts);
-		}));
+		});
 	}
 }
