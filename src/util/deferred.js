@@ -2,18 +2,7 @@
 export default function defer() {
 	let status = "pending", value;
 
-	// in case the user calls resolve/reject before the promise method is ready
-	let deferred = {
-		resolve: val => {
-			status = "resolved";
-			value = val;
-		},
-
-		reject: err => {
-			status = "rejected";
-			value = err;
-		}
-	};
+	let deferred = {};
 
 	deferred.promise = new Promise((resolve, reject) => {
 		// not handled yet
