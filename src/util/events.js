@@ -16,7 +16,14 @@ export default class Events {
 		this[`on${name}`] = fn => {
 			// emit a value to the listeners
 			const emitValue = value => {
-				value = initializeWith ? this[initializeWith] : value;
+				// initialize from a property
+				if(typeof initializeWith == "string") {
+					value = this[initializeWith];
+				}
+				// run an initialization function
+				else {
+					value = initializeWith(this);
+				}
 
 				// resolve the promise them send the value
 				if(value instanceof Promise) {
