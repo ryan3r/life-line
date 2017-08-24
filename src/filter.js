@@ -8,6 +8,8 @@ export class Filter extends Events {
 	constructor() {
 		super();
 
+		this.defineEvent("Refresh");
+
 		this.disposable = new Disposable();
 
 		// listen to state changes
@@ -17,7 +19,7 @@ export class Filter extends Events {
 				this._showCompleted = state;
 
 				// refresh the tasks
-				this.emit("refresh");
+				this.emit("Refresh");
 			})
 		);
 	}

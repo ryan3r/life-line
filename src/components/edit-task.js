@@ -281,7 +281,10 @@ export class EditTask extends TaskComponent {
 	}
 
 	// focus this task
-	onFocus() {
+	onFocus(id) {
+		// not a focus for this task
+		if(this.task.id !== id) return;
+
 		let {startAt, endAt} = focusController.getRangeInfo(this.task.name);
 		// get the text node for the editor
 		const editor = this.base.querySelector(".editor");

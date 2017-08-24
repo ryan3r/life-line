@@ -1,6 +1,12 @@
 import Events from "./util/events";
 
 export class FocusController extends Events {
+	constructor() {
+		super();
+
+		this.defineEvent("Focus", "_id");
+	}
+
 	// focus a task
 	focusTask(id, start, end) {
 		this._id = id;
@@ -16,7 +22,7 @@ export class FocusController extends Events {
 		this._end = end;
 
 		// notify any listeners that we focused a task
-		this.emit(`focus-${id}`);
+		this.emit("Focus");
 	}
 
 	// select a task and keep the currenly selected range
@@ -31,17 +37,6 @@ export class FocusController extends Events {
 		}
 
 		this.focusTask(id, position);
-	}
-
-	// check if a task has focus and listen for focus changes
-	onFocus(id, fn) {
-		// check if the task is already focused
-		if(this._id == id) {
-			fn();
-		}
-
-		// add a focus listener
-		return this.on(`focus-${id}`, fn);
 	}
 
 	// get the info for the range
