@@ -21,7 +21,7 @@ export default class Events {
 					value = this[initializeWith];
 				}
 				// run an initialization function
-				else {
+				else if(typeof initializeWith == "function") {
 					value = initializeWith(this);
 				}
 
