@@ -12,7 +12,9 @@
   "repository": "ryan3r/life-line",
   "author": "Ryan Ray <ryan314r@gmail.com>",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "sinon": "^3.2.1"
+  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.1",
