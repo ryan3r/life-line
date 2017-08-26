@@ -1,7 +1,7 @@
 import Events from "../util/events";
 
 export default class Store extends Events {
-	constructor(name, state) {
+	constructor(name, value) {
 		super();
 
 		this.defineEvent("StateChange", "value");
@@ -11,8 +11,8 @@ export default class Store extends Events {
 	}
 
 	// change the state
-	set(state) {
-		this.state = state;
+	set(value) {
+		this.value = value;
 
 		this.emit("StateChange");
 	}
@@ -21,10 +21,10 @@ export default class Store extends Events {
 	bind(component, name = this.name) {
 		// listen for state changes
 		component.addSub(
-			this.on("state-change", state => {
+			this.on("state-change", value => {
 				// update the component's state
 				component.setState({
-					[name]: state
+					[name]: value
 				});
 			})
 		);
