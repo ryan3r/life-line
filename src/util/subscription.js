@@ -1,7 +1,12 @@
 export default class Subscription {
-	constructor(fn) {
-		this._fn = fn;
+	constructor(cleanup) {
+		this._cleanup = cleanup;
 		this.active = true;
+	}
+
+	// a subscription that has not cleanup method (no-op)
+	static noop() {
+		return new Subscription(() => {});
 	}
 
 	// remove the subscription
@@ -10,7 +15,7 @@ export default class Subscription {
 		if(!this.active) return;
 
 		// call the unsubscribe function
-		this._fn();
+		this._cleanup();
 
 		// mark the subscription as inactive
 		this.active = false;
