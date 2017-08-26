@@ -24,7 +24,7 @@ export default class Store extends Events {
 
 		// listen for state changes
 		component.addSub(
-			this._on("StateChange", () => {
+			this.on("StateChange", () => {
 				// update the component's state
 				component.setState({
 					[name]: this.value

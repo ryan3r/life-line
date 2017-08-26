@@ -41,7 +41,7 @@ export default class Events {
 			};
 
 			// add the actual listener
-			let subscription = this._on(name, emitValue);
+			let subscription = this.on(name, emitValue);
 
 			// send the initial value
 			if(initializeWith) {
@@ -53,7 +53,7 @@ export default class Events {
 	}
 
 	// listen to an event of type {type}
-	_on(type, fn) {
+	on(type, fn) {
 		// add the listener
 		this._listeners[type].push(fn);
 
