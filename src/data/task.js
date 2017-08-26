@@ -6,6 +6,9 @@ const db = firebase.database();
 
 const TASK_PROPS = ["name"];
 
+// capitalize the first letter
+const capitalizeFirst = word => word.charAt(0).toUpperCase() + word.substr(1);
+
 export class Task extends Events {
 	constructor({id, raw, tasks}) {
 		super();
@@ -29,6 +32,9 @@ export class Task extends Events {
 		// set the props
 		for(const prop of TASK_PROPS) {
 			this["_" + prop] = raw[prop];
+
+			// define the change event
+			this.defineEvent(capitalizeFirst(prop), prop);
 		}
 
 		// update the state
@@ -36,6 +42,11 @@ export class Task extends Events {
 
 		// set up the list of children
 		this.children = [];
+
+		// add the evnts for state and children
+		this.defineEvent("State", "state");
+		this.defineEvent("Children", "children");
+		this.defineEvent("VisibleChildren", "visibleChildren");
 
 		// create the disposable for this task
 		this._disposable = new Disposable();
@@ -165,7 +176,7 @@ export class Task extends Events {
 			}
 
 			// notify the parent's listeners that we have been removed
-			this.parent.emit("children", this.parent.children);
+			this.parent.emit("Children", this.parent.children);
 
 			// update the parent's visible children
 			this.parent._refreshVisibleChildren();
@@ -198,7 +209,7 @@ export class Task extends Events {
 			this.parent._invalidateState();
 
 			// notify the parent's listeners that we have been added
-			this.parent.emit("children", this.parent.children);
+			this.parent.emit("Children", this.parent.children);
 
 			// update the parent's visible children
 			this.parent._refreshVisibleChildren();
@@ -211,7 +222,7 @@ export class Task extends Events {
 		this._visibleChildren = undefined;
 
 		// emit the change event
-		this.emit("visibleChildren", this.visibleChildren);
+		this.emit("VisibleChildren", this.visibleChildren);
 	}
 
 	// get the children that are visible
@@ -246,7 +257,7 @@ export class Task extends Events {
 		this["_" + prop] = value;
 
 		// emit the change
-		this.emit(prop, value);
+		this.emit(capitalizeFirst(prop), value);
 
 		return true;
 	}
@@ -335,7 +346,7 @@ export class Task extends Events {
 
 	// emit a state change event
 	_stateChange() {
-		this.emit("state", this.state);
+		this.emit("State", this.state);
 
 		// update the parent's visible children
 		if(this.parent) {
