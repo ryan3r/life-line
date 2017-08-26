@@ -4,7 +4,7 @@ export default class Store extends Events {
 	constructor(name, state) {
 		super();
 
-		this.defineEvent("StateChange", "state");
+		this.defineEvent("StateChange", "value");
 
 		this.name = name;
 		this.value = value;
