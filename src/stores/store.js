@@ -19,12 +19,15 @@ export default class Store extends Events {
 
 	// bind a store to the react state
 	bind(component, name = this.name) {
+		// set the initial state
+		component.state[name] = this.value;
+
 		// listen for state changes
 		component.addSub(
-			this.on("state-change", value => {
+			this._on("StateChange", () => {
 				// update the component's state
 				component.setState({
-					[name]: value
+					[name]: this.value
 				});
 			})
 		);
