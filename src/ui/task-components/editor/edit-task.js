@@ -116,30 +116,6 @@ const previousVisibleChild = fromTask => {
 };
 
 export default class EditTask extends TaskComponent {
-	// check if a task's children are hiden and open it if they are
-	openIfFull = parent => {
-		// check if with this next child we will hide the subtasks
-		const parentIsFull = parent.visibleChildren.length >= MAX_CHILDREN;
-
-		// open the parent since the children are hidden
-		if(parentIsFull) {
-			router.openTask(parent.id);
-		}
-	};
-
-	addListeners() {
-		super.addListeners();
-
-		// listen to focus changes
-		this.addSub(
-			focusController.onFocus(this.task.id, () => {
-				if(!this.base) return;
-
-				this.onFocus();
-			})
-		)
-	}
-
 	onTaskChildren() {
 		// save the current task
 		this.setState({
@@ -193,9 +169,6 @@ export default class EditTask extends TaskComponent {
 
 			// focus the new task
 			focusController.focusTask(newTask.id, 0);
-
-			// make sure the new task is visible
-			this.openIfFull(parent);
 		}
 		// handle backspace when the cursor is at the beginning
 		else if(e.keyCode == 8 &&
@@ -273,51 +246,45 @@ export default class EditTask extends TaskComponent {
 	}
 
 	componentDidMount() {
-		// check if we should have focus
-		if(focusController.hasFocus(this.task.id)) {
-			this.onFocus();
-		}
-	}
+		focusController.onFocus(id => {
+			// not a focus for this task
+			if(this.task.id !== id) return;
 
-	// focus this task
-	onFocus(id) {
-		// not a focus for this task
-		if(this.task.id !== id) return;
+			let {startAt, endAt} = focusController.getRangeInfo(this.task.name);
+			// get the text node for the editor
+			const editor = this.base.querySelector(".editor");
+			let textNode = editor.childNodes[0];
 
-		let {startAt, endAt} = focusController.getRangeInfo(this.task.name);
-		// get the text node for the editor
-		const editor = this.base.querySelector(".editor");
-		let textNode = editor.childNodes[0];
+			// if there is no text node create one
+			if(!textNode) {
+				textNode = document.createTextNode("");
 
-		// if there is no text node create one
-		if(!textNode) {
-			textNode = document.createTextNode("");
+				// add it to the editor
+				editor.appendChild(textNode);
+			}
 
-			// add it to the editor
-			editor.appendChild(textNode);
-		}
+			let range = document.createRange();
 
-		let range = document.createRange();
+			if(startAt > textNode.textContent.length) {
+				startAt = textNode.textContent.length;
+			}
 
-		if(startAt > textNode.textContent.length) {
-			startAt = textNode.textContent.length;
-		}
+			if(endAt > textNode.textContent.length) {
+				endAt = textNode.textContent.length;
+			}
 
-		if(endAt > textNode.textContent.length) {
-			endAt = textNode.textContent.length;
-		}
+			// select the text
+			range.setStart(textNode, startAt);
+			range.setEnd(textNode, endAt);
 
-		// select the text
-		range.setStart(textNode, startAt);
-		range.setEnd(textNode, endAt);
+			let selection = getSelection();
 
-		let selection = getSelection();
+			// clear the current selection (if any)
+			selection.removeAllRanges();
 
-		// clear the current selection (if any)
-		selection.removeAllRanges();
-
-		// add the new selection
-		selection.addRange(range);
+			// add the new selection
+			selection.addRange(range);
+		});
 	}
 
 	render() {
@@ -347,8 +314,7 @@ export default class EditTask extends TaskComponent {
 				</IconMenu>
 			</div>
 			<div className="subtasks">
-				<TasksWidget editMode task={this.task} depth={this.props.depth}
-					showCompleted={this.props.showCompleted}/>
+				<TasksWidget editMode task={this.task} depth={this.props.depth}/>
 			</div>
 		</div>;
 	}

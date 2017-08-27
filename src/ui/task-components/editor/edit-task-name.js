@@ -52,7 +52,6 @@ export default class EditTaskName extends TaskComponent {
 		// add the event listeners
 		this.listen(this.el, "input", this.update);
 		this.listen(this.el, "keydown", this.props.onKeyDown);
-		this.listen(this.el, "mousedown", this.props.onMouseDown);
 
 		// set the content
 		this.el.innerText = this.task[this.props.prop];
