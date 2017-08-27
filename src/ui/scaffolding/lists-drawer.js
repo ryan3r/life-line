@@ -1,14 +1,14 @@
-import {Component} from "./component";
+import Component from "../component";
 import React from "react";
 import Drawer from "material-ui/Drawer";
-import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../constants";
+import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../../constants";
 import AppBar from "material-ui/AppBar";
-import {CurrentUser} from "./current-user";
+import CurrentUser from "../user/current-user";
 import {Tabs, Tab} from "material-ui/Tabs";
-import {Lists} from "./lists";
-import {dockedStore, drawerOpen} from "../stores/states";
+import Lists from "./lists";
+import {dockedStore, drawerOpen} from "../../stores/states";
 
-export class ListsDrawer extends Component {
+export default class ListsDrawer extends Component {
 	constructor() {
 		super();
 

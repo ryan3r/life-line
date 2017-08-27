@@ -1,10 +1,10 @@
-import {Component} from "./component";
+import Component from "../component";
 import React from "react";
 import IconButton from "material-ui/IconButton";
 
 const auth = firebase.auth();
 
-export class CurrentUser extends Component {
+export default class CurrentUser extends Component {
 	componentWillMount() {
 		// show the current user
 		this.addSub(

@@ -1,4 +1,4 @@
-import {TaskComponent} from "../task-component";
+import TaskComponent from "../task-component";
 import React from "react";
 
 const TAU = Math.PI * 2;

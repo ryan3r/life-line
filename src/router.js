@@ -59,7 +59,7 @@ class Router extends Events {
 		history.pushState(null, null, url);
 
 		// notify listeners that we navigated
-		this.emit("Navigate");
+		this.emit("Location");
 	}
 }
 

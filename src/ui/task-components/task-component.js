@@ -1,8 +1,8 @@
-import {Component} from "./component";
+import Component from "../component";
 import React from "react";
-import Disposable from "../util/disposable";
+import Disposable from "../../util/disposable";
 
-export class TaskComponent extends Component {
+export default class TaskComponent extends Component {
 	constructor() {
 		super();
 
@@ -43,7 +43,7 @@ export class TaskComponent extends Component {
 
 				// add the listener
 				this.addSub(
-					this.task["on" + prop](this[key].bind(this));
+					this.task["on" + prop](this[key].bind(this))
 				);
 			}
 		}

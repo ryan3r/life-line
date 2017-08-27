@@ -1,9 +1,9 @@
-import {TaskComponent} from "./task-component";
+import TaskComponent from "../task-component";
 import React from "react";
 import LinearProgress from "material-ui/LinearProgress";
 import {blue500, green700} from "material-ui/styles/colors";
 
-export class ProgressBar extends TaskComponent {
+export default class ProgressBar extends TaskComponent {
 	onTaskState(state) {
 		this.setState(state);
 	}

@@ -1,11 +1,11 @@
-import {TaskComponent} from "./task-component";
-import {EditTask} from "./edit-task";
-import {TaskLink} from "./task-link";
+import TaskComponent from "../task-component";
+import EditTask from "./edit-task";
+import TaskLink from "../task-link";
 import React from "react";
-import {showCompleted} from "../stores/states";
-import {maxNestingDepth} from "../constants";
+import {showCompleted} from "../../../stores/states";
+import {maxNestingDepth} from "../../../constants";
 
-export class TasksWidget extends TaskComponent {
+export default class TasksWidget extends TaskComponent {
 	constructor() {
 		super();
 

@@ -1,9 +1,9 @@
-import {TaskProp} from "./task-prop";
-import {TaskLink} from "./task-link";
+import TaskProp from "../task-prop";
+import TaskLink from "../task-link";
 import React from "react";
 import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
 
-export let BreadCrumbs = function({task}) {
+let BreadCrumbs = function({task}) {
 	// don't display anything on the root
 	if(!task.parent) return null;
 
@@ -41,3 +41,5 @@ export let BreadCrumbs = function({task}) {
 		})}
 	</div>;
 };
+
+export default BreadCrumbs;

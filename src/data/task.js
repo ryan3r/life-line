@@ -1,5 +1,5 @@
-import Events from "./util/events";
-import Disposable from "./util/disposable";
+import Events from "../util/events";
+import Disposable from "../util/disposable";
 import {lists} from "./lists";
 
 const db = firebase.database();
@@ -9,7 +9,7 @@ const TASK_PROPS = ["name"];
 // capitalize the first letter
 const capitalizeFirst = word => word.charAt(0).toUpperCase() + word.substr(1);
 
-export class Task extends Events {
+export default class Task extends Events {
 	constructor({id, raw, tasks}) {
 		super();
 
@@ -217,7 +217,7 @@ export class Task extends Events {
 		delete this._cachedState;
 
 		// check for state listeners
-		if(this.hasListeners("state")) {
+		if(this.hasListeners("State")) {
 			this._calculateState();
 
 			// notify the listeners
@@ -287,7 +287,7 @@ export class Task extends Events {
 
 	// emit a state change event
 	_stateChange() {
-		this.emit("State", this.state);
+		this.emit("State");
 	}
 
 	// update the state

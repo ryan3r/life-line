@@ -1,5 +1,4 @@
 import TaskComponent from "../task-component";
-import TasksWidget from "./tasks";
 import Checkbox from "./checkbox";
 import EditTaskName from "./edit-task-name";
 import {router} from "../../../router";
@@ -10,6 +9,7 @@ import IconMenu from "material-ui/IconMenu";
 import MenuItem from "material-ui/MenuItem";
 import IconButton from "material-ui/IconButton";
 import {focusController} from "./focus-controller";
+import TasksWidget from "./tasks";
 
 // split the currently selected text field (removing the selected parts)
 const splitSelectedText = () => {
@@ -304,7 +304,7 @@ export default class EditTask extends TaskComponent {
 		return <div ref={base => this.base = base}>
 			<div className={`task flex flex-vcenter ${this.task.state.type}`}>
 				<Checkbox task={this.task}/>
-				<EditTaskProp className="flex-fill" task={this.task} prop="name"
+				<EditTaskName className="flex-fill" task={this.task} prop="name"
 					onKeyDown={this.handleKey}/>
 				<IconMenu
 					iconButtonElement={menuIcon}>
@@ -314,7 +314,8 @@ export default class EditTask extends TaskComponent {
 				</IconMenu>
 			</div>
 			<div className="subtasks">
-				<TasksWidget editMode task={this.task} depth={this.props.depth}/>
+				{/* TODO: Fix TasksWidget.default */}
+				<TasksWidget.default editMode task={this.task} depth={this.props.depth}/>
 			</div>
 		</div>;
 	}

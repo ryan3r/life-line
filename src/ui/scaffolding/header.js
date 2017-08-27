@@ -1,25 +1,37 @@
-import {EditTaskProp} from "./edit-task-prop";
+import EditTaskName from "../task-components/editor/edit-task-name";
 import AppBar from "material-ui/AppBar";
+import currentTask from "../../data/current-task";
 import React from "react";
-import {SIDEBAR_OPEN} from "../constants";
-import {Component} from "./component";
-import {Filter} from "./filter";
-import {dockedStore, drawerOpen} from "../stores/states";
+import {SIDEBAR_OPEN} from "../../constants";
+import Component from "../component";
+import Filter from "./filter";
+import {dockedStore, drawerOpen} from "../../stores/states";
 
-export class Header extends Component {
+export default class Header extends Component {
 	constructor() {
 		super();
 
 		dockedStore.bind(this);
 	}
 
+	componentWillMount() {
+		// store the current task in the state
+		this.addSub(
+			currentTask.onTask(task => {
+				this.setState({
+					task
+				});
+			})
+		);
+	}
+
 	render() {
-		const filterMenu = <Filter task={this.props.task}/>;
+		const filterMenu = <Filter task={this.state.task}/>;
 
 		return <AppBar
-			title={<EditTaskProp
+			title={<EditTaskName
 				className="invisible"
-				task={this.props.task}
+				task={this.state.task}
 				prop="name"/>}
 			onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
 			style={{flexShrink: 0}}

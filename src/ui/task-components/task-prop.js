@@ -1,7 +1,10 @@
-import {TaskComponent} from "./task-component";
+import TaskComponent from "./task-component";
 import React from "react";
 
-export class TaskProp extends TaskComponent {
+// capitalize the first letter
+const capitalizeFirst = word => word.charAt(0).toUpperCase() + word.substr(1);
+
+export default class TaskProp extends TaskComponent {
 	addListeners() {
 		// get the initial state
 		this.setState({
@@ -10,7 +13,7 @@ export class TaskProp extends TaskComponent {
 
 		// listen for changes to the property
 		this.addSub(
-			this.task.on(this.props.prop, value => {
+			this.task.on(capitalizeFirst(this.props.prop), value => {
 				this.setState({
 					value
 				});

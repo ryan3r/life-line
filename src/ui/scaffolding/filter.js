@@ -1,13 +1,13 @@
-import {Component} from "./component";
+import Component from "../component";
 import React from "react";
 import RaisedButton from "material-ui/RaisedButton";
 import MenuItem from "material-ui/MenuItem";
 import IconMenu from "material-ui/IconMenu";
 import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
 import IconButton from "material-ui/IconButton";
-import {showCompleted} from "../stores/states";
+import {showCompleted} from "../../stores/states";
 
-export class Filter extends Component {
+export default class Filter extends Component {
 	constructor() {
 		super();
 

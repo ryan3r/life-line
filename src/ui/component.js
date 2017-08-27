@@ -1,7 +1,7 @@
 import React from "react";
 import Disposable from "../util/disposable";
 
-export class Component extends React.Component {
+export default class Component extends React.Component {
 	constructor() {
 		super();
 

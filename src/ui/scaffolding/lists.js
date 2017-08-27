@@ -1,15 +1,15 @@
-import {Component} from "./component";
-import {router} from "../router";
+import Component from "../component";
+import {router} from "../../router";
 import React from "react";
 import {List, ListItem} from "material-ui/List";
 import IconButton from "material-ui/IconButton";
 import ClearIcon from "material-ui/svg-icons/content/clear";
 import AddIcon from "material-ui/svg-icons/content/add";
 import TextField from "material-ui/TextField";
-import {lists} from "../lists";
+import {lists} from "../../data/lists";
 import LinearProgress from "material-ui/LinearProgress";
 
-export class Lists extends Component {
+export default class Lists extends Component {
 	constructor() {
 		super();
 
@@ -19,16 +19,11 @@ export class Lists extends Component {
 	}
 
 	componentWillMount() {
-		// get the initial lists
-		this.setState({
-			lists: lists.lists
-		});
-
 		// listen for changes
 		this.addSub(
-			lists.on("change", () => {
+			lists.onLists(lists => {
 				this.setState({
-					lists: lists.lists
+					lists
 				});
 			})
 		);

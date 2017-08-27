@@ -1,19 +1,16 @@
-import defer from "./util/deferred";
-import genId from "./util/gen-id";
-import {Task} from "./task";
+import defer from "../util/deferred";
+import genId from "../util/gen-id";
+import Task from "./task";
 
 const db = firebase.database();
 
-export class Tasks {
+export default class Tasks {
 	constructor(listId) {
 		this._tasks = new Map();
 		this._pending = new Map();
 
 		// save the id for this list
 		this.listId = listId;
-
-		// create the filter
-		this.filter = new Filter();
 
 		// get the firebase ref
 		this._ref = db.ref(`/lists/${listId}/tasks`);
@@ -154,13 +151,5 @@ export class Tasks {
 	// disconnect the listeners
 	dispose() {
 		this._ref.off();
-
-		// dispose of the tasks
-		for(let [_, task] of this._tasks) {
-			task.dispose();
-		}
-
-		// dispose of the filter
-		this.filter.dispose();
 	}
 };

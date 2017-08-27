@@ -1,4 +1,4 @@
-import {TaskComponent} from "../task-component";
+import TaskComponent from "../task-component";
 import React from "react";
 
 const DEBOUNCE_TIMER = 500;
@@ -10,20 +10,15 @@ export default class EditTaskName extends TaskComponent {
 
 		// save the old task
 		if(this.oldTask) {
-			this.oldTask[this.props.prop] = this.el.innerText;
+			this.oldTask.name = this.el.innerText;
 		}
 
 		// make this the old task
 		this.oldTask = this.task;
 
-		// get the initial state
-		if(this.el) {
-			this.el.innerText = this.task[this.props.prop];
-		}
-
 		// listen for changes to the property
 		this.addSub(
-			this.task.on(this.props.prop, value => {
+			this.task.onName(value => {
 				// if we are not in focus
 				if(this.el &&
 					value != this.el.innerText &&
@@ -40,7 +35,7 @@ export default class EditTaskName extends TaskComponent {
 		clearTimeout(this._debounce);
 		// don't save while the user is typing
 		this._debounce = setTimeout(() => {
-			this.props.task[this.props.prop] = this.el.innerText;
+			this.props.task.name = this.el.innerText;
 		}, DEBOUNCE_TIMER);
 	}
 
@@ -54,7 +49,9 @@ export default class EditTaskName extends TaskComponent {
 		this.listen(this.el, "keydown", this.props.onKeyDown);
 
 		// set the content
-		this.el.innerText = this.task[this.props.prop];
+		if(this.task) {
+			this.el.innerText = this.task.name;
+		}
 	}
 
 	componentWillUnmount() {
@@ -62,7 +59,7 @@ export default class EditTaskName extends TaskComponent {
 		clearTimeout(this._debounce);
 
 		// save current value
-		this.task[this.props.prop] = this.el.innerText;
+		this.task.name = this.el.innerText;
 	}
 
 	render() {

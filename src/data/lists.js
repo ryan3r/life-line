@@ -1,7 +1,7 @@
-import Events from "./util/events";
-import genId from "./util/gen-id";
-import defer from "./util/deferred";
-import {router} from "./router";
+import Events from "../util/events";
+import genId from "../util/gen-id";
+import defer from "../util/deferred";
+import {router} from "../router";
 
 const db = firebase.database();
 

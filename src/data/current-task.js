@@ -1,17 +1,20 @@
 import Tasks from "./tasks";
 import Events from "../util/events";
 import Lists from "./lists";
+import {router} from "../router";
 
-export default let currentTask = new Events();
+let currentTask = new Events();
 
-currentTask.defineEvent("CurrentTask", "task");
+export default currentTask;
+
+currentTask.defineEvent("Task", "task");
 currentTask.defineEvent("TasksError");
 
 // save the Tasks instance
 let _tasks;
 
 // get/create the current tasks instance and listen for changes
-router.onNavigate(() => {
+router.onLocation(() => {
 	// if we have a new list load it
 	if(router.listId && (!_tasks || _tasks.listId != router.listId)) {
 		// dispose of the old tasks object
@@ -26,7 +29,7 @@ router.onNavigate(() => {
 			// clear the old task
 			currentTask.currentTask = undefined;
 
-			currentTask.emit("CurrentTask");
+			currentTask.emit("Task");
 
 			// not allowed to access or it does not exist
 			if(err.code == "PERMISSION_DENIED") {
@@ -44,28 +47,27 @@ router.onNavigate(() => {
 		});
 	}
 
-	// wait for tasks to be ready
-	_tasks.ready.then(() => {
-		// clear the previous errors
-		currentTask.emit("TasksError");
+	if(_tasks) {
+		// wait for tasks to be ready
+		_tasks.ready.then(() => {
+			// go from the url bar
+			if(router.taskId) {
+				return _tasks.getAsync(router.taskId)
+			}
+			// get the actual root
+			else {
+				return _tasks.getRootAsync();
+			}
+		})
 
-		// go from the url bar
-		if(router.taskId) {
-			return tasks.getAsync(router.taskId)
-		}
-		// get the actual root
-		else {
-			return tasks.getRootAsync();
-		}
-	})
+		.then(task => {
+			// make sure this is still the current task
+			if(task.id == router.taskId || (!task.parent && !router.taskId)) {
+				// save the current task
+				currentTask.task = task;
 
-	.then(task => {
-		// make sure this is still the current task
-		if(task.id == router.taskId || (!task.parent && !router.taskId)) {
-			// save the current task
-			currentTask.task = task;
-
-			currentTask.emit("CurrentTask");
-		}
-	});
+				currentTask.emit("Task");
+			}
+		});
+	}
 });

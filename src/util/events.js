@@ -54,6 +54,9 @@ export default class Events {
 
 	// listen to an event of type {type}
 	on(type, fn) {
+		// check if this event has been defined
+		this._verifyEventType(type);
+
 		// add the listener
 		this._listeners[type].push(fn);
 
@@ -70,6 +73,9 @@ export default class Events {
 
 	// emit an event of type {type} with the arguments {args}
 	emit(type, arg) {
+		// check if this event has been defined
+		this._verifyEventType(type);
+
 		for(const fn of this._listeners[type]) {
 			fn(arg);
 		}
@@ -77,6 +83,16 @@ export default class Events {
 
 	// check if an event has any listeners attached
 	hasListeners(type) {
-		return this._listeners[type] && this._listeners[type].length > 0;
+		// check if this event has been defined
+		this._verifyEventType(type);
+
+		return this._listeners[type].length > 0;
+	}
+
+	// check if the requested event type has been defined
+	_verifyEventType(type) {
+		if(!this._listeners[type]) {
+			throw new Error(`The event '${type}' is not defined for ${this}`);
+		}
 	}
 }
