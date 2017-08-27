@@ -1,4 +1,4 @@
-import {TaskComponent} from "./task-component";
+import {TaskComponent} from "../task-component";
 import React from "react";
 
 const TAU = Math.PI * 2;
@@ -16,7 +16,7 @@ const RADIUS = ORIGIN - CURVE_WIDTH;
 const RIGHT_X = ORIGIN;
 const RIGHT_Y = ORIGIN - RADIUS;
 
-export class Checkbox extends TaskComponent {
+export default class Checkbox extends TaskComponent {
 	constructor() {
 		super();
 

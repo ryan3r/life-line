@@ -1,4 +1,4 @@
-import Events from "./util/events";
+import Events from "../../../util/events";
 
 export class FocusController extends Events {
 	constructor() {

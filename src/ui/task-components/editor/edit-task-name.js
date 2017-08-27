@@ -1,9 +1,9 @@
-import {TaskComponent} from "./task-component";
+import {TaskComponent} from "../task-component";
 import React from "react";
 
 const DEBOUNCE_TIMER = 500;
 
-export class EditTaskProp extends TaskComponent {
+export default class EditTaskName extends TaskComponent {
 	addListeners() {
 		// clear any old save timers
 		clearTimeout(this._debounce);

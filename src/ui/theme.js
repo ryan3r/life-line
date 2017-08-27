@@ -1,4 +1,4 @@
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import getMuiTheme from "material-ui/styles/getMuiTheme";
 import {green500} from "material-ui/styles/colors";
 
 export const theme = getMuiTheme({

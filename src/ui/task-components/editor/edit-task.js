@@ -1,16 +1,15 @@
-import {TaskComponent} from "./task-component";
-import {TasksWidget} from "./tasks";
-import {Checkbox} from "./checkbox";
-import {EditTaskProp} from "./edit-task-prop";
-import {router} from "../router";
-import {MAX_CHILDREN} from "../constants";
+import TaskComponent from "../task-component";
+import TasksWidget from "./tasks";
+import Checkbox from "./checkbox";
+import EditTaskName from "./edit-task-name";
+import {router} from "../../../router";
+import {MAX_CHILDREN, maxNestingDepth} from "../../../constants";
 import React from "react";
 import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
 import IconMenu from "material-ui/IconMenu";
 import MenuItem from "material-ui/MenuItem";
 import IconButton from "material-ui/IconButton";
-import {focusController} from "../focus-controller";
-import {maxNestingDepth} from "../constants";
+import {focusController} from "./focus-controller";
 
 // split the currently selected text field (removing the selected parts)
 const splitSelectedText = () => {
@@ -116,7 +115,7 @@ const previousVisibleChild = fromTask => {
 	});
 };
 
-export class EditTask extends TaskComponent {
+export default class EditTask extends TaskComponent {
 	// check if a task's children are hiden and open it if they are
 	openIfFull = parent => {
 		// check if with this next child we will hide the subtasks
