@@ -37,7 +37,7 @@ export class TasksWidget extends TaskComponent {
 		});
 	}
 
-	onTaskVisibleChildren(children) {
+	onTaskChildren(children) {
 		// update the state
 		this.setState({
 			children
@@ -80,14 +80,14 @@ export class TasksWidget extends TaskComponent {
 		let hiddenMsg;
 
 		// limit the children for non-top level tasks
-		if(this.task.children.length !== children.length) {
+		/*if(this.task.children.length !== children.length) {
 			// tell the user we hid some tasks
 			hiddenMsg = <div className="hidden">
 				<TaskLink id={this.task.id} className="hidden">
 					{`${this.task.children.length - children.length} subtasks not shown`}
 				</TaskLink>
 			</div>;
-		}
+		}*/
 
 		return <div>
 			{children.map(child => {
