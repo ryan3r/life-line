@@ -46,17 +46,6 @@ export class Task extends Events {
 		// add the evnts for state and children
 		this.defineEvent("State", "state");
 		this.defineEvent("Children", "children");
-		this.defineEvent("VisibleChildren", "visibleChildren");
-
-		// create the disposable for this task
-		this._disposable = new Disposable();
-
-		this._disposable.add(
-			// reset the filtered children
-			this._tasks.filter.on("refresh", () => {
-				this._refreshVisibleChildren();
-			})
-		);
 
 		// start with a depth of 0
 		this.depth = 0;
@@ -80,9 +69,6 @@ export class Task extends Events {
 
 	// remove this task
 	_remove() {
-		// remove any for this task subscriptions
-		this.dispose();
-
 		this._updateParent();
 	}
 
@@ -110,8 +96,6 @@ export class Task extends Events {
 
 		this._updateParent(undefined, opts);
 
-		this.dispose();
-
 		// delete the task from tasks
 		this._tasks.delete(this.id);
 
@@ -120,11 +104,6 @@ export class Task extends Events {
 		for(let i = this.children.length - 1; i >= 0; --i) {
 			this.children[i].delete({ isLastChild: true });
 		}
-	}
-
-	// remove any subscriptions
-	dispose() {
-		this._disposable.dispose();
 	}
 
 	// add this task to a parent
@@ -177,9 +156,6 @@ export class Task extends Events {
 
 			// notify the parent's listeners that we have been removed
 			this.parent.emit("Children", this.parent.children);
-
-			// update the parent's visible children
-			this.parent._refreshVisibleChildren();
 		}
 
 		// update the internal parent reference
@@ -210,42 +186,7 @@ export class Task extends Events {
 
 			// notify the parent's listeners that we have been added
 			this.parent.emit("Children", this.parent.children);
-
-			// update the parent's visible children
-			this.parent._refreshVisibleChildren();
 		}
-	}
-
-	// force the visible children to be refreshed
-	_refreshVisibleChildren() {
-		// clear the visible children cache
-		this._visibleChildren = undefined;
-
-		// emit the change event
-		this.emit("VisibleChildren", this.visibleChildren);
-	}
-
-	// get the children that are visible
-	get visibleChildren() {
-		// filter out the invisible children
-		if(!this._visibleChildren) {
-			this._visibleChildren = [];
-
-			// pick the tasks to keep
-			for(let task of this.children) {
-				// check if we should keep this task
-				if(this._tasks.filter.isVisible(task)) {
-					this._visibleChildren.push(task);
-				}
-
-				// check if we should continue filtering tasks
-				if(!this._tasks.filter.shouldContinue(this._visibleChildren, this)) {
-					break;
-				}
-			}
-		}
-
-		return this._visibleChildren;
 	}
 
 	// update the value of a property
@@ -347,11 +288,6 @@ export class Task extends Events {
 	// emit a state change event
 	_stateChange() {
 		this.emit("State", this.state);
-
-		// update the parent's visible children
-		if(this.parent) {
-			this.parent._refreshVisibleChildren();
-		}
 	}
 
 	// update the state
