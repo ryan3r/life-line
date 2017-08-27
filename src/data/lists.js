@@ -9,21 +9,10 @@ export class Lists extends Events {
 	constructor() {
 		super();
 
-		// start the loaders
-		this.emit("loading");
+		this.defineEvent("Loaded", "_loaded");
+		this.defineEvent("Lists", "lists");
 
 		this._loaded = false;
-	}
-
-	// listen for the uid to be set
-	onLoaded(fn) {
-		// already loaded
-		if(this._loaded) {
-			fn();
-		}
-
-		// listen for changes
-		return this.on("loaded", fn);
 	}
 
 	// set the uid and login
@@ -40,7 +29,7 @@ export class Lists extends Events {
 		this._loaded = true;
 
 		// hide the loaders
-		this.emit("loaded");
+		this.emit("Loaded");
 
 		// get the firebase ref
 		this._ref = db.ref(`/users/${userId}`);
@@ -59,7 +48,7 @@ export class Lists extends Events {
 		});
 
 		// tell any listeners to refresh
-		this.emit("change");
+		this.emit("Lists");
 
 		// open this list if there is not already a list open
 		if(this._isFirstList && !router.listId) {
@@ -77,7 +66,7 @@ export class Lists extends Events {
 		});
 
 		// tell any listeners to refresh
-		this.emit("change");
+		this.emit("Lists");
 	}
 
 	_removed(snap) {
@@ -85,7 +74,7 @@ export class Lists extends Events {
 		this._lists.delete(snap.key);
 
 		// tell any listeners to refresh
-		this.emit("change");
+		this.emit("Lists");
 
 		if(snap.key == router.listId) {
 			// get the first list
