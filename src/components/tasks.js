@@ -50,7 +50,7 @@ export class TasksWidget extends TaskComponent {
 
 		// update the state
 		this.setState({
-			children: this.task.visibleChildren
+			children: this.task.children
 		});
 	}
 
