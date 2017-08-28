@@ -10,6 +10,8 @@ import MenuItem from "material-ui/MenuItem";
 import IconButton from "material-ui/IconButton";
 import {focusController} from "./focus-controller";
 import TasksWidget from "./tasks";
+import currentTask from "../../../data/current-task";
+import {showCompleted} from "../../../stores/states";
 
 // split the currently selected text field (removing the selected parts)
 const splitSelectedText = () => {
@@ -24,31 +26,37 @@ const splitSelectedText = () => {
 
 // focus the next visible task
 const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
-	// find our position in the current parent
-	const index = fromTask.parent.visibleChildren.indexOf(fromTask);
+	let to = fromTask;
+
 	// the deepest we can go
-	const maxDepth = router._tasks.get(router.taskId).depth + maxNestingDepth();
+	const maxDepth = currentTask.task.depth + maxNestingDepth();
 
-	let to;
+	for(;;) {
+		// find our position in the current parent
+		const index = to.parent.children.indexOf(to);
 
-	if(index === 0) {
-		// the parent is not visible
-		if(fromTask.id == router.taskId) {
-			return;
+		if(index === 0) {
+			// the parent is not visible
+			if(to.id == router.taskId) {
+				return;
+			}
+			// move to the parent
+			else {
+				to = fromTask.parent;
+			}
 		}
-		// move to the parent
 		else {
-			to = fromTask.parent;
-		}
-	}
-	else {
-		// go to the previous child
-		to = fromTask.parent.visibleChildren[index - 1];
+			// go to the previous child
+			to = to.parent.children[index - 1];
 
-		while(to.visibleChildren.length > 0 && to.depth <= maxDepth) {
-			// go to the last child
-			to = to.visibleChildren[to.visibleChildren.length - 1];
+			while(to.children.length > 0 && to.depth <= maxDepth) {
+				// go to the last child
+				to = to.children[to.children.length - 1];
+			}
 		}
+
+		// keep searching
+		if(to.state.type !== "done" || showCompleted.value) break;
 	}
 
 	// return the task
@@ -69,45 +77,51 @@ const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
 
 // find the task that is visually below the current task
 const previousVisibleChild = fromTask => {
+	// the deepest we can go
+	const maxDepth = currentTask.task.depth + maxNestingDepth();
+
 	// save the length of the current task
 	const currentLength = fromTask.name.length;
-	// the deepest we can go
-	const maxDepth = router._tasks.get(router.taskId).depth + maxNestingDepth();
 
-	// find our position in the current parent
-	const index = fromTask.parent.visibleChildren.indexOf(fromTask);
+	for(;;) {
+		// find our position in the current parent
+		const index = fromTask.parent.children.indexOf(fromTask);
 
-	// move to our first child if it is visible
-	if(fromTask.visibleChildren.length > 0 && fromTask.depth + 1 < maxDepth) {
-		fromTask = fromTask.visibleChildren[0];
-	}
-	// go to the previous child
-	else if(fromTask.parent.visibleChildren.length - 1 > index) {
-		fromTask = fromTask.parent.visibleChildren[index + 1];
-	}
-	// go to the parent and try again
-	else {
-		for(;;) {
-			// no more tasks
-			if(!fromTask.parent || !fromTask.parent.parent) return;
-
-			// find the parent
-			const index = fromTask.parent.parent.visibleChildren.indexOf(
-				fromTask.parent
-			);
-
-			// this parent has no siblings after it repeat this setp
-			if(fromTask.parent.parent.visibleChildren.length - 1 === index) {
-				fromTask = fromTask.parent;
-
-				continue;
-			}
-
-			// go to the sibling after our parent
-			fromTask = fromTask.parent.parent.visibleChildren[index + 1];
-
-			break;
+		// move to our first child if it is visible
+		if(fromTask.children.length > 0 && fromTask.depth + 1 < maxDepth) {
+			fromTask = fromTask.children[0];
 		}
+		// go to the previous child
+		else if(fromTask.parent.children.length - 1 > index) {
+			fromTask = fromTask.parent.children[index + 1];
+		}
+		// go to the parent and try again
+		else {
+			for(;;) {
+				// no more tasks
+				if(!fromTask.parent || !fromTask.parent.parent) return;
+
+				// find the parent
+				const index = fromTask.parent.parent.children.indexOf(
+					fromTask.parent
+				);
+
+				// this parent has no siblings after it repeat this setp
+				if(fromTask.parent.parent.children.length - 1 === index) {
+					fromTask = fromTask.parent;
+
+					continue;
+				}
+
+				// go to the sibling after our parent
+				fromTask = fromTask.parent.parent.children[index + 1];
+
+				break;
+			}
+		}
+
+		// keep searching
+		if(fromTask.state.type !== "done" || showCompleted.value) break;
 	}
 
 	focusController.focusTaskWithCurrentRange(fromTask.id, {
