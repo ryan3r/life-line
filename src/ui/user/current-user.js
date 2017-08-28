@@ -2,10 +2,17 @@ import Component from "../component";
 import React from "react";
 import IconButton from "material-ui/IconButton";
 import FlatButton from "material-ui/FlatButton";
+import Dialog from "material-ui/Dialog";
 
 const auth = firebase.auth();
 
 export default class CurrentUser extends Component {
+	constructor() {
+		super();
+
+		this.state.logoutOpen = false;
+	}
+
 	componentWillMount() {
 		// show the current user
 		this.addSub(
@@ -32,14 +39,23 @@ export default class CurrentUser extends Component {
 	}
 
 	logout = () => {
-		// log the current user out
-		if(confirm("You are about to be logged out")) {
-			auth.signOut();
-		}
+		// close the dialog
+		this.logoutDialog(false)();
+
+		// sign out
+		auth.signOut();
 	}
 
 	login = () => {
 		location.href = "/login.html";
+	}
+
+	logoutDialog = state => {
+		return () => {
+			this.setState({
+				logoutOpen: state
+			});
+		};
 	}
 
 	render() {
@@ -53,12 +69,27 @@ export default class CurrentUser extends Component {
 		// the user info has not loaded yet
 		if(!this.state.photoUrl) return null;
 
-		return <IconButton>
-			<img
-				src={this.state.photoUrl}
-				width="30"
-				height="30"
-				onClick={this.logout}/>
-		</IconButton>;
+		const actions = <div>
+			<FlatButton label="Cancel" onClick={this.logoutDialog(false)}/>
+			<FlatButton label="Logout" onClick={this.logout} primary={true}/>
+		</div>
+
+		return <div>
+			<Dialog
+				title="Logout"
+				actions={actions}
+				modal={false}
+				open={this.state.logoutOpen}
+				onRequestClose={this.logoutDialog(false)}>
+				Are you sure you would like to logout.
+			</Dialog>
+			<IconButton>
+				<img
+					src={this.state.photoUrl}
+					width="30"
+					height="30"
+					onClick={this.logoutDialog(true)}/>
+			</IconButton>
+		</div>;
 	}
 }
