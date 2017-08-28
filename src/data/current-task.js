@@ -10,22 +10,19 @@ export default currentTask;
 currentTask.defineEvent("Task", "task");
 currentTask.defineEvent("TasksError");
 
-// save the Tasks instance
-let _tasks;
-
 // get/create the current tasks instance and listen for changes
 router.onLocation(() => {
 	// if we have a new list load it
-	if(router.listId && (!_tasks || _tasks.listId != router.listId)) {
+	if(router.listId && (!currentTask.tasks || currentTask.tasks.listId != router.listId)) {
 		// dispose of the old tasks object
-		if(_tasks) {
-			_tasks.dispose();
+		if(currentTask.tasks) {
+			currentTask.tasks.dispose();
 		}
 
 		// create the tasks instance
-		_tasks = new Tasks(router.listId);
+		currentTask.tasks = new Tasks(router.listId);
 
-		_tasks.ready.catch(err => {
+		currentTask.tasks.ready.catch(err => {
 			// clear the old task
 			currentTask.currentTask = undefined;
 
@@ -47,16 +44,16 @@ router.onLocation(() => {
 		});
 	}
 
-	if(_tasks) {
+	if(currentTask.tasks) {
 		// wait for tasks to be ready
-		_tasks.ready.then(() => {
+		currentTask.tasks.ready.then(() => {
 			// go from the url bar
 			if(router.taskId) {
-				return _tasks.getAsync(router.taskId)
+				return currentTask.tasks.getAsync(router.taskId)
 			}
 			// get the actual root
 			else {
-				return _tasks.getRootAsync();
+				return currentTask.tasks.getRootAsync();
 			}
 		})
 
