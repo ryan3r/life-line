@@ -4,7 +4,7 @@ import currentTask from "../../data/current-task";
 import React from "react";
 import {SIDEBAR_OPEN} from "../../constants";
 import Component from "../component";
-import Filter from "./filter";
+import HeaderMenu from "./header-menu";
 import {dockedStore, drawerOpen} from "../../stores/states";
 
 export default class Header extends Component {
@@ -26,8 +26,6 @@ export default class Header extends Component {
 	}
 
 	render() {
-		const filterMenu = <Filter task={this.state.task}/>;
-
 		return <AppBar
 			title={<EditTaskName
 				className="invisible"
@@ -36,6 +34,6 @@ export default class Header extends Component {
 			onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
 			style={{flexShrink: 0}}
 			iconElementLeft={this.state.docked ? <span></span> : null}
-			iconElementRight={filterMenu}/>
+			iconElementRight={<HeaderMenu task={this.state.task}/>}/>
 	}
 }

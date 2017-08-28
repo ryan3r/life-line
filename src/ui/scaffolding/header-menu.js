@@ -7,7 +7,7 @@ import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
 import IconButton from "material-ui/IconButton";
 import {showCompleted} from "../../stores/states";
 
-export default class Filter extends Component {
+export default class HeaderMenu extends Component {
 	constructor() {
 		super();
 
