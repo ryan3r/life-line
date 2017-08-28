@@ -60,6 +60,11 @@ export default class TasksWidget extends TaskComponent {
 
 		let {children} = this.state;
 
+		// hide completed tasks
+		if(!this.state.showCompleted) {
+			children = children.filter(task => task.state.type !== "done");
+		}
+
 		// get the number of layers of subitems we have left
 		const depth = this.props.depth !== undefined ?
 			this.props.depth :
@@ -77,18 +82,6 @@ export default class TasksWidget extends TaskComponent {
 			}
 		}
 
-		let hiddenMsg;
-
-		// limit the children for non-top level tasks
-		/*if(this.task.children.length !== children.length) {
-			// tell the user we hid some tasks
-			hiddenMsg = <div className="hidden">
-				<TaskLink id={this.task.id} className="hidden">
-					{`${this.task.children.length - children.length} subtasks not shown`}
-				</TaskLink>
-			</div>;
-		}*/
-
 		return <div>
 			{children.map(child => {
 				return <EditTask
@@ -97,7 +90,6 @@ export default class TasksWidget extends TaskComponent {
 					depth={depth - 1}
 					showCompleted={this.state.showCompleted}/>;
 			})}
-			{hiddenMsg}
 		</div>;
 	}
 }
