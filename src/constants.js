@@ -17,8 +17,15 @@ export const HIDE_COMPLETED_TIMEOUT = 500;
 // calculate the max nesting depth
 // NOTE: the + 1 is because the first row of tasks are not indented
 export const maxNestingDepth = () => {
-	const baseline = BASELINE + (innerWidth > SIDEBAR_OPEN ? SIDEBAR_WIDTH : 0);
+	// check if the sidebar is open
+	const SIDEBAR_WIDTH_IN_BASELINE = innerWidth > SIDEBAR_OPEN ? SIDEBAR_WIDTH : 0;
+
+	// calculate the baseline for the app
+	const baseline = BASELINE + SIDEBAR_WIDTH_IN_BASELINE;
+
+	// divy up the rest of the width to tasks
 	const depth = ((innerWidth - baseline) / INDENT_SIZE | 0) + 1;
 
+	// make sure we at least have a depth of 1
 	return depth < 1 ? 1 : depth;
 };
