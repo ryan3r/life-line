@@ -26,18 +26,22 @@ export class Lists extends Events {
 		this._lists = new Map();
 		this.userId = userId;
 		this._isFirstList = true;
-		this._loaded = true;
 
-		// hide the loaders
-		this.emit("Loaded");
+		// only try to load the lists if we have a user id
+		if(userId) {
+			this._loaded = true;
 
-		// get the firebase ref
-		this._ref = db.ref(`/users/${userId}`);
+			// hide the loaders
+			this.emit("Loaded");
 
-		// listen to the database
-		this._ref.on("child_added", this._added.bind(this));
-		this._ref.on("child_changed", this._changed.bind(this));
-		this._ref.on("child_removed", this._removed.bind(this));
+			// get the firebase ref
+			this._ref = db.ref(`/users/${userId}`);
+
+			// listen to the database
+			this._ref.on("child_added", this._added.bind(this));
+			this._ref.on("child_changed", this._changed.bind(this));
+			this._ref.on("child_removed", this._removed.bind(this));
+		}
 	}
 
 	_added(snap) {

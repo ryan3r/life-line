@@ -32,7 +32,8 @@ export default class Lists extends Component {
 		this.addSub(
 			lists.onLoaded(() => {
 				this.setState({
-					loading: false
+					loading: false,
+					loggedIn: !!lists.userId
 				});
 			})
 		);
@@ -89,6 +90,13 @@ export default class Lists extends Component {
 		// show the loader
 		if(this.state.loading) {
 			return null;
+		}
+
+		// not logged in
+		if(!this.state.loggedIn) {
+			return <div style={{padding: "15px"}}>
+				You need to login to see your lists.
+			</div>;
 		}
 
 		return <div>
