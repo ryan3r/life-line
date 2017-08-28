@@ -43,7 +43,9 @@ export default class CurrentUser extends Component {
 		this.logoutDialog(false)();
 
 		// sign out
-		auth.signOut();
+		auth.signOut()
+			// make sure we have nothing from the old session
+			.then(() => location.reload());
 	}
 
 	login = () => {

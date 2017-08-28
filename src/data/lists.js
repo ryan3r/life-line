@@ -42,6 +42,10 @@ export class Lists extends Events {
 			this._ref.on("child_changed", this._changed.bind(this));
 			this._ref.on("child_removed", this._removed.bind(this));
 		}
+		// clear lists values
+		else {
+			this.emit("Lists");
+		}
 	}
 
 	_added(snap) {
