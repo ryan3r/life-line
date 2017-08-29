@@ -154,3 +154,9 @@ div.hidden {
 	color: #aaa;
 	text-align: center;
 }
+
+.save-status {
+	color: #777;
+	padding: 15px;
+	padding-bottom: 0px;
+}

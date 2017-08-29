@@ -9,6 +9,7 @@ import {SIDEBAR_WIDTH} from "../../constants";
 import {lists} from "../../data/lists";
 import {dockedStore} from "../../stores/states";
 import Editor from "../task-components/editor";
+import UnsavedChanges from "./unsaved-changes";
 
 export default class App extends Component {
 	constructor() {
@@ -24,6 +25,7 @@ export default class App extends Component {
 			<Header task={this.state.task}/>
 			<ListsDrawer/>
 			<Editor/>
+			<UnsavedChanges/>
 		</div>;
 	}
 }

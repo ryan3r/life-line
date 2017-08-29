@@ -2,6 +2,7 @@ import Events from "../util/events";
 import Disposable from "../util/disposable";
 import {lists} from "./lists";
 import {TASK_PROPS} from "../constants";
+import saveTracker from "../util/save-tracker";
 
 const db = firebase.database();
 
@@ -82,7 +83,9 @@ export default class Task extends Events {
 
 		// remove the state property from firebase
 		if(this.children.length === 0) {
-			this._tasks._ref.child(`${this.id}/state`).remove();
+			saveTracker.addSaveJob(
+				this._tasks._ref.child(`${this.id}/state`).remove()
+			);
 		}
 
 		return task;
@@ -110,7 +113,9 @@ export default class Task extends Events {
 		this._updateParent(task, {after});
 
 		// save the change to firebase
-		this._tasks._ref.child(`${this.id}/parent`).set(this.parent.id);
+		saveTracker.addSaveJob(
+			this._tasks._ref.child(`${this.id}/parent`).set(this.parent.id)
+		);
 	}
 
 	// get the sibling before this one
@@ -243,7 +248,9 @@ export default class Task extends Events {
 			delete this._state;
 
 			// update firebase
-			this._tasks._ref.child(`${this.id}/state`).remove();
+			saveTracker.addSaveJob(
+				this._tasks._ref.child(`${this.id}/state`).remove()
+			);
 		}
 
 		// set the default state
@@ -347,7 +354,9 @@ export default class Task extends Events {
 			this._updateState(state);
 
 			// save the change to firebase
-			this._tasks._ref.child(`${this.id}/state`).set(this._state);
+			saveTracker.addSaveJob(
+				this._tasks._ref.child(`${this.id}/state`).set(this._state)
+			);
 		}
 		// pass this change on to our children
 		else {
@@ -372,11 +381,15 @@ for(let prop of TASK_PROPS) {
 
 			// save changes to firebase
 			if(changed && !this._deleted && prop.syncToFirebase) {
-				this._tasks._ref.child(`${this.id}/${prop.name}`).set(value);
+				saveTracker.addSaveJob(
+					this._tasks._ref.child(`${this.id}/${prop.name}`).set(value)
+				);
 
 				// if this is the root task
 				if(prop.name == "name" && !this.parent) {
-					db.ref(`/users/${lists.userId}/${this._tasks.listId}`).set(value);
+					saveTracker.addSaveJob(
+						db.ref(`/users/${lists.userId}/${this._tasks.listId}`).set(value)
+					);
 				}
 			}
 		}

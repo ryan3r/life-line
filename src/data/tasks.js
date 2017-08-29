@@ -1,6 +1,7 @@
 import defer from "../util/deferred";
 import genId from "../util/gen-id";
 import Task from "./task";
+import saveTracker from "../util/save-tracker";
 
 const db = firebase.database();
 
@@ -132,7 +133,9 @@ export default class Tasks {
 		this._tasks.set(id, task);
 
 		// save the task
-		this._ref.child(id).set(raw);
+		saveTracker.addSaveJob(
+			this._ref.child(id).set(raw)
+		);
 
 		return task;
 	}
@@ -144,7 +147,9 @@ export default class Tasks {
 			this._tasks.delete(id);
 
 			// remove the task from firebase
-			this._ref.child(id).remove();
+			saveTracker.addSaveJob(
+				this._ref.child(id).remove()
+			);
 		}
 	}
 

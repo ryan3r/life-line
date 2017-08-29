@@ -8,6 +8,7 @@ import BreadCrumbs from "./bread-crumbs";
 import ProgressBar from "./progress-bar";
 import React from "react";
 import CircularProgress from "material-ui/CircularProgress";
+import SaveStatus from "./save-status";
 
 export default class Editor extends Component {
 	constructor() {
@@ -80,7 +81,7 @@ export default class Editor extends Component {
 					+ this.state.errorMessage
 			);
 		}
-		
+
 		// show the loading page
 		if(this.state.loading) {
 			return this.message("Loading...", <CircularProgress/>);
@@ -98,6 +99,7 @@ export default class Editor extends Component {
 			<div style={{height: "100%"}} className="flex">
 				<div className="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
+					<SaveStatus/>
 					<div className="content">
 						<TasksWidget task={this.state.task} toplevel/>
 						<IconButton
