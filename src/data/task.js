@@ -30,10 +30,10 @@ export default class Task extends Events {
 
 		// set the props
 		for(const prop of TASK_PROPS) {
-			this["_" + prop] = raw[prop];
+			this["_" + prop.name] = raw[prop.name];
 
 			// define the change event
-			this.defineEvent(capitalizeFirst(prop), prop);
+			this.defineEvent(capitalizeFirst(prop.name), prop.name);
 		}
 
 		// update the state
@@ -54,7 +54,7 @@ export default class Task extends Events {
 	_update(raw) {
 		// update the properties
 		for(const prop of TASK_PROPS) {
-			this._updateProp(prop, raw[prop]);
+			this._updateProp(prop.name, raw[prop.name]);
 		}
 
 		// update the state
@@ -359,23 +359,23 @@ export default class Task extends Events {
 }
 
 for(let prop of TASK_PROPS) {
-	Object.defineProperty(Task.prototype, prop, {
+	Object.defineProperty(Task.prototype, prop.name, {
 		// get the name
 		get() {
-			return this["_" + prop];
+			return this["_" + prop.name];
 		},
 
 		// store the value of the property
 		set(value) {
 			// update our internal version of prop
-			const changed = this._updateProp(prop, value);
+			const changed = this._updateProp(prop.name, value);
 
 			// save changes to firebase
-			if(changed && !this._deleted) {
-				this._tasks._ref.child(`${this.id}/${prop}`).set(value);
+			if(changed && !this._deleted && prop.syncToFirebase) {
+				this._tasks._ref.child(`${this.id}/${prop.name}`).set(value);
 
 				// if this is the root task
-				if(prop == "name" && !this.parent) {
+				if(prop.name == "name" && !this.parent) {
 					db.ref(`/users/${lists.userId}/${this._tasks.listId}`).set(value);
 				}
 			}

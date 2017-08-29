@@ -54,9 +54,21 @@ export default class TasksWidget extends TaskComponent {
 		});
 	}
 
+	onTaskHideChildren() {
+		// update the state
+		this.setState({
+			children: this.task.children
+		});
+	}
+
 	render() {
 		// no task yet
 		if(!this.task) return;
+
+		// our children are hidden
+		if(this.task.hideChildren) {
+			return null;
+		}
 
 		let {children} = this.state;
 

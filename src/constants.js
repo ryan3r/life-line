@@ -12,7 +12,10 @@ export const SIDEBAR_OPEN = 750;
 export const SIDEBAR_WIDTH = 300;
 
 // the properties for a task
-export const TASK_PROPS = ["name"];
+export const TASK_PROPS = [
+	{ name: "name", syncToFirebase: true },
+	{ name: "hideChildren" }
+];
 
 // the number of milliseconds to wait before hiding a completed task
 export const HIDE_COMPLETED_TIMEOUT = 500;

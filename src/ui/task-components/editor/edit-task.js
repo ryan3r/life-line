@@ -12,6 +12,7 @@ import TasksWidget from "./tasks";
 import currentTask from "../../../data/current-task";
 import {showCompleted} from "../../../stores/states";
 import isTaskVisible from "../../../util/is-task-visible";
+import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
 
 // split the currently selected text field (removing the selected parts)
 const splitSelectedText = () => {
@@ -135,6 +136,12 @@ export default class EditTask extends TaskComponent {
 		// save the current task
 		this.setState({
 			task: this.task
+		});
+	}
+
+	onTaskHideChildren() {
+		this.setState({
+			showChildrenToggle: this.task.children.length > 0
 		});
 	}
 
@@ -297,6 +304,8 @@ export default class EditTask extends TaskComponent {
 		});
 	}
 
+	toggleHideChildren = () => this.task.hideChildren = !this.task.hideChildren;
+
 	render() {
 		// the styles to apply to the menu icon
 		const iconStyles = {
@@ -311,8 +320,31 @@ export default class EditTask extends TaskComponent {
 				<MoreVertIcon/>
 		</IconButton>;
 
+		// rotate the arrow when hidden
+		let iconArrow = Object.assign({
+			transform: `rotate(${this.task.hideChildren ? 0 : 90}deg)`
+		}, iconStyles);
+
+		// give the checkbox some space
+		const btnStyles = {
+		    width: 24,
+		    height: 24,
+		    padding: 0,
+			marginRight: 5
+		};
+
+		// show a open/close arrow for the children
+		const hideShowChildren = this.state.showChildrenToggle ? <IconButton
+			style={btnStyles}
+			iconStyle={iconArrow}
+			onClick={this.toggleHideChildren}>
+				<KeyboardArrowRightIcon/>
+		</IconButton> : null;
+
 		return <div ref={base => this.base = base}>
-			<div className={`task flex flex-vcenter ${this.task.state.type}`}>
+			<div className={`task flex flex-vcenter ${this.task.state.type}`}
+				style={{marginLeft: this.state.showChildrenToggle ? 0 : 29}}>
+				{hideShowChildren}
 				<Checkbox task={this.task}/>
 				<EditTaskName className="flex-fill" task={this.task} prop="name"
 					onKeyDown={this.handleKey}/>

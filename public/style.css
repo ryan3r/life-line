@@ -102,6 +102,7 @@ a:hover {
 a.hidden {
 	color: #777;
 	font-style: italic;
+	margin-left: 29px;
 }
 
 div.hidden {
@@ -121,9 +122,7 @@ div.hidden {
 
 /* Indent subtasks */
 .subtasks {
-	border-left: 2px solid #ddd;
-	margin-left: 11px;
-	padding-left: 17px;
+	padding-left: 20px;
 }
 
 /* The bread crumbs */
