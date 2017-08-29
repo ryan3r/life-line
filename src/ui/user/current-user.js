@@ -83,7 +83,7 @@ export default class CurrentUser extends Component {
 				modal={false}
 				open={this.state.logoutOpen}
 				onRequestClose={this.logoutDialog(false)}>
-				Are you sure you would like to logout.
+				Are you sure you want to logout.
 			</Dialog>
 			<IconButton>
 				<img
