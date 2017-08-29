@@ -10,6 +10,12 @@ import React from "react";
 import CircularProgress from "material-ui/CircularProgress";
 
 export default class Editor extends Component {
+	constructor() {
+		super();
+
+		this.state.loading = true;
+	}
+
 	componentWillMount() {
 		// store the current task in the state
 		this.addSub(
@@ -24,6 +30,13 @@ export default class Editor extends Component {
 		this.addSub(
 			currentTask.onTasksError(error => {
 				this.setState(error);
+			})
+		);
+
+		// get the loading state of the current task
+		this.addSub(
+			currentTask.onLoading(loading => {
+				this.setState({ loading });
 			})
 		);
 	}
@@ -67,9 +80,9 @@ export default class Editor extends Component {
 					+ this.state.errorMessage
 			);
 		}
-
+		
 		// show the loading page
-		if(!this.state.task) {
+		if(this.state.loading) {
 			return this.message("Loading...", <CircularProgress/>);
 		}
 

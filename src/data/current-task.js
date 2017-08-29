@@ -9,9 +9,14 @@ export default currentTask;
 
 currentTask.defineEvent("Task", "task");
 currentTask.defineEvent("TasksError");
+currentTask.defineEvent("Loading", "loading");
 
 // get/create the current tasks instance and listen for changes
 router.onLocation(() => {
+	// mark the task as loading
+	currentTask.loading = true;
+	currentTask.emit("Loading");
+
 	// if we have a new list load it
 	if(router.listId && (!currentTask.tasks || currentTask.tasks.listId != router.listId)) {
 		// dispose of the old tasks object
@@ -25,8 +30,11 @@ router.onLocation(() => {
 		currentTask.tasks.ready.catch(err => {
 			// clear the old task
 			currentTask.currentTask = undefined;
-
 			currentTask.emit("Task");
+
+			// mark the task as done loading
+			currentTask.loading = false;
+			currentTask.emit("Loading");
 
 			// not allowed to access or it does not exist
 			if(err.code == "PERMISSION_DENIED") {
@@ -65,6 +73,10 @@ router.onLocation(() => {
 
 				currentTask.emit("Task");
 			}
+
+			// mark the task as done loading
+			currentTask.loading = false;
+			currentTask.emit("Loading");
 		});
 	}
 });
