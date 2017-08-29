@@ -2,7 +2,6 @@ import TaskComponent from "../task-component";
 import Checkbox from "./checkbox";
 import EditTaskName from "./edit-task-name";
 import {router} from "../../../router";
-import {MAX_CHILDREN} from "../../../constants";
 import React from "react";
 import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
 import IconMenu from "material-ui/IconMenu";

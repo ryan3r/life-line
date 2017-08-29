@@ -1,10 +1,9 @@
 import Events from "../util/events";
 import Disposable from "../util/disposable";
 import {lists} from "./lists";
+import {TASK_PROPS} from "../constants";
 
 const db = firebase.database();
-
-const TASK_PROPS = ["name"];
 
 // capitalize the first letter
 const capitalizeFirst = word => word.charAt(0).toUpperCase() + word.substr(1);

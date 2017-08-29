@@ -1,7 +1,6 @@
 import TaskComponent from "../task-component";
 import React from "react";
-
-const DEBOUNCE_TIMER = 500;
+import {DEBOUNCE_TIMER} from "../../../constants";
 
 export default class EditTaskName extends TaskComponent {
 	addListeners() {
