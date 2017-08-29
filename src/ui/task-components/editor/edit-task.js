@@ -229,9 +229,6 @@ export default class EditTask extends TaskComponent {
 				// make sure we foucs this task when we rerender
 				focusController.focusTaskWithCurrentRange(this.task.id);
 
-				// make sure this task remains visible
-				this.openIfFull(attachTo);
-
 				this.task.attachTo(attachTo);
 			}
 		}
@@ -258,7 +255,7 @@ export default class EditTask extends TaskComponent {
 	componentDidMount() {
 		focusController.onFocus(id => {
 			// not a focus for this task
-			if(this.task.id !== id) return;
+			if(this.task.id !== id || !this.base) return;
 
 			let {startAt, endAt} = focusController.getRangeInfo(this.task.name);
 			// get the text node for the editor
