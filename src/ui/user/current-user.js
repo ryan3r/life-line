@@ -11,6 +11,7 @@ export default class CurrentUser extends Component {
 		super();
 
 		this.state.logoutOpen = false;
+		this.state.loading = true;
 	}
 
 	componentWillMount() {
@@ -23,6 +24,7 @@ export default class CurrentUser extends Component {
 				// display the current user
 				if(user) {
 					this.setState({
+						loading: false,
 						loggedIn: true,
 						name: user.displayName,
 						photoUrl: user.photoURL
@@ -31,6 +33,7 @@ export default class CurrentUser extends Component {
 				// show a login button
 				else {
 					this.setState({
+						loading: false,
 						loggedIn: false
 					});
 				}
@@ -61,6 +64,9 @@ export default class CurrentUser extends Component {
 	}
 
 	render() {
+		// still loading show nothing
+		if(this.state.loading) return null;
+
 		// show a logged in button
 		if(!this.state.loggedIn) {
 			return <FlatButton onClick={this.login} style={{color: "#fff"}}>
