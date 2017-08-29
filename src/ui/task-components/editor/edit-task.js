@@ -291,6 +291,9 @@ export default class EditTask extends TaskComponent {
 
 			// add the new selection
 			selection.addRange(range);
+
+			// make sure this task is in view
+			this.base.scrollIntoViewIfNeeded();
 		});
 	}
 
