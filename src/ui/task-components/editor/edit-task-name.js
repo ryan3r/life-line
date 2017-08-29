@@ -1,6 +1,7 @@
 import TaskComponent from "../task-component";
 import React from "react";
 import {DEBOUNCE_TIMER} from "../../../constants";
+import SelectionSnapshot from "../../../util/selection-snapshot";
 
 export default class EditTaskName extends TaskComponent {
 	addListeners() {
@@ -20,41 +21,19 @@ export default class EditTaskName extends TaskComponent {
 			this.task.onName(value => {
 				// if we are not in focus
 				if(this.el && value != this.el.innerText) {
-					let start, end, node;
-					const restoreSelection = document.activeElement == this.el;
+					let snapshot;
 
 					// save the current selection
-					if(restoreSelection) {
-						let range = getSelection().getRangeAt(0);
-
-						start = range.startOffset;
-						end = range.endOffset;
-						node = range.startContainer;
+					if(document.activeElement == this.el) {
+						snapshot = new SelectionSnapshot();
 					}
 
 					// set the new value
 					this.el.innerText = value;
 
 					// restore the previous selection
-					if(restoreSelection) {
-						let selection = getSelection();
-
-						// remove the old ranges
-						selection.removeAllRanges();
-
-						// recreate the selection
-						let range = document.createRange();
-
-						// make sure the end is still inside the node
-						if(node.textContent.length < end) {
-							end = node.textContent.length;
-						}
-
-						range.setStart(node, start);
-						range.setEnd(node, end);
-
-						// reselect content
-						selection.addRange(range);
+					if(snapshot) {
+						snapshot.restore();
 					}
 				}
 			})
@@ -78,6 +57,20 @@ export default class EditTaskName extends TaskComponent {
 		// add the event listeners
 		this.listen(this.el, "input", this.update);
 		this.listen(this.el, "keydown", this.props.onKeyDown);
+
+		// clear the formatting on paste
+		this.listen(this.el, "paste", () => {
+			// wait for the paste to execute
+			setTimeout(() => {
+				// save the current selection
+				let snapshot = new SelectionSnapshot();
+
+				// clear the formatting
+		        this.el.innerText = this.el.innerText;
+
+				snapshot.restore(this.el.childNodes[0]);
+		    }, 0);
+		});
 
 		// set the content
 		if(this.task) {
