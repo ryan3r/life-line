@@ -2,7 +2,7 @@ import TaskComponent from "../task-component";
 import Checkbox from "./checkbox";
 import EditTaskName from "./edit-task-name";
 import {router} from "../../../router";
-import {MAX_CHILDREN, maxNestingDepth} from "../../../constants";
+import {MAX_CHILDREN} from "../../../constants";
 import React from "react";
 import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
 import IconMenu from "material-ui/IconMenu";
@@ -12,6 +12,7 @@ import {focusController} from "./focus-controller";
 import TasksWidget from "./tasks";
 import currentTask from "../../../data/current-task";
 import {showCompleted} from "../../../stores/states";
+import isTaskVisible from "../../../util/is-task-visible";
 
 // split the currently selected text field (removing the selected parts)
 const splitSelectedText = () => {
@@ -27,9 +28,6 @@ const splitSelectedText = () => {
 // focus the next visible task
 const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
 	let to = fromTask;
-
-	// the deepest we can go
-	const maxDepth = currentTask.task.depth + maxNestingDepth();
 
 	for(;;) {
 		// find our position in the current parent
@@ -49,7 +47,7 @@ const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
 			// go to the previous child
 			to = to.parent.children[index - 1];
 
-			while(to.children.length > 0 && to.depth <= maxDepth) {
+			while(to.children.length > 0 && isTaskVisible(to)) {
 				// go to the last child
 				to = to.children[to.children.length - 1];
 			}
@@ -77,9 +75,6 @@ const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
 
 // find the task that is visually below the current task
 const previousVisibleChild = fromTask => {
-	// the deepest we can go
-	const maxDepth = currentTask.task.depth + maxNestingDepth();
-
 	// save the length of the current task
 	const currentLength = fromTask.name.length;
 
@@ -88,7 +83,7 @@ const previousVisibleChild = fromTask => {
 		const index = fromTask.parent.children.indexOf(fromTask);
 
 		// move to our first child if it is visible
-		if(fromTask.children.length > 0 && fromTask.depth + 1 < maxDepth) {
+		if(fromTask.children.length > 0 && isTaskVisible(fromTask.children[0])) {
 			fromTask = fromTask.children[0];
 		}
 		// go to the previous child
@@ -230,6 +225,11 @@ export default class EditTask extends TaskComponent {
 				focusController.focusTaskWithCurrentRange(this.task.id);
 
 				this.task.attachTo(attachTo);
+
+				// check if the current task is visible
+				if(!isTaskVisible(this.task)) {
+					router.openTask(this.task.parent.id);
+				}
 			}
 		}
 		// up arrow move to the next task
