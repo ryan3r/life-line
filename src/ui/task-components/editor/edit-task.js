@@ -178,7 +178,8 @@ export default class EditTask extends TaskComponent {
 		// handle backspace when the cursor is at the beginning
 		else if(e.keyCode == 8 &&
 			getSelection().rangeCount > 0 &&
-			getSelection().getRangeAt(0).startOffset === 0) {
+			getSelection().getRangeAt(0).startOffset === 0 &&
+			getSelection().type == "Caret") {
 			// get the next visible task
 			let toTask = nextVisibleTask(this.task, { getTask: true });
 
