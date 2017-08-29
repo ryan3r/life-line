@@ -1,6 +1,6 @@
 {
   "name": "life-line",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "main": "./src/server",
   "bin": "./bin/life-line.js",
@@ -12,7 +12,9 @@
   "repository": "ryan3r/life-line",
   "author": "Ryan Ray <ryan314r@gmail.com>",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "sinon": "^3.2.1"
+  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.1",

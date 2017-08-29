@@ -1,4 +1,4 @@
-import {Store} from "./store";
+import Store from "./store";
 import {SIDEBAR_OPEN} from "../constants";
 
 // the docked state of the sidebar

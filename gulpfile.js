@@ -12,16 +12,22 @@ gulp.task("default", function() {
 
 // build for production
 gulp.task("prod", function() {
-	return build(false, true);
+	return build({ production: true });
 });
 
 // build the source and watch for changes
 gulp.task("watch", function() {
-	return build(true);
+	build({ watch: true });
+	build({ watch: true, tests: true });
 });
 
-function build(watch, production) {
-	let buildPipe = gulp.src("src/index.js")
+// build the tests
+gulp.task("tests", function() {
+	build({ tests: true });
+});
+
+function build({watch, production, tests}) {
+	let buildPipe = gulp.src(tests ? "src/tests/index.js" : "src/index.js")
 
 	// use plumber to catch any errors
 	.pipe(plumber(err => console.log(err.stack)))
@@ -46,7 +52,7 @@ function build(watch, production) {
 			]
 		},
 		output: {
-			filename: "bundle.js"
+			filename: tests ? "test-bundle.js" : "bundle.js"
 		},
 		devtool: !production && "eval",
 		target: "web",
