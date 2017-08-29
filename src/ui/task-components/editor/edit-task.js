@@ -171,9 +171,6 @@ export default class EditTask extends TaskComponent {
 			// update the name for this task
 			this.task.name = selfName;
 
-			// force the editor to refresh
-			this.base.querySelector(".editor").innerText = selfName;
-
 			// the parent for the new task
 			// ctrlKey to create a child for this task
 			const parent = e.ctrlKey ? this.task : this.task.parent;
@@ -194,9 +191,8 @@ export default class EditTask extends TaskComponent {
 			if(toTask) {
 				let index = toTask.name.length;
 
-				// move our name to the to task
-				// we go to the DOM to make sure we have the latest name
-				toTask.name += this.base.querySelector(".editor").innerText;
+				// add the content of this task to the new task
+				toTask.name += this.task.name;
 
 				// go to the current end of the to task
 				focusController.focusTask(toTask.id, index);

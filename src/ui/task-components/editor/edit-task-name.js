@@ -20,11 +20,43 @@ export default class EditTaskName extends TaskComponent {
 		this.addSub(
 			this.task.onName(value => {
 				// if we are not in focus
-				if(this.el &&
-					value != this.el.innerText &&
-					document.activeElement != this.el) {
+				if(this.el && value != this.el.innerText) {
+					let start, end, node;
+					const restoreSelection = document.activeElement == this.el;
+
+					// save the current selection
+					if(restoreSelection) {
+						let range = getSelection().getRangeAt(0);
+
+						start = range.startOffset;
+						end = range.endOffset;
+						node = range.startContainer;
+					}
+
 					// set the new value
 					this.el.innerText = value;
+
+					// restore the previous selection
+					if(restoreSelection) {
+						let selection = getSelection();
+
+						// remove the old ranges
+						selection.removeAllRanges();
+
+						// recreate the selection
+						let range = document.createRange();
+
+						// make sure the end is still inside the node
+						if(node.textContent.length < end) {
+							end = node.textContent.length;
+						}
+
+						range.setStart(node, start);
+						range.setEnd(node, end);
+
+						// reselect content
+						selection.addRange(range);
+					}
 				}
 			})
 		);
