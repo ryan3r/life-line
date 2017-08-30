@@ -88,6 +88,9 @@ export default class Task extends Events {
 			);
 		}
 
+		// make sure the children are visible we a new one is created
+		this.hideChildren = false;
+
 		return task;
 	}
 
