@@ -128,7 +128,8 @@ export default class EditTask extends TaskComponent {
 	onTaskChildren() {
 		// save the current task
 		this.setState({
-			task: this.task
+			task: this.task,
+			showChildrenToggle: this.task.children.length > 0
 		});
 	}
 
