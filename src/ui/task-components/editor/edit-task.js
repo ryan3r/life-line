@@ -14,6 +14,13 @@ import {showCompleted} from "../../../stores/states";
 import isTaskVisible from "../../../util/is-task-visible";
 import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
 
+// if the keyboard is opened make sure it doesn't cover the current editor
+window.addEventListener("resize", () => {
+	if(document.activeElement) {
+		document.activeElement.scrollIntoViewIfNeeded();
+	}
+});
+
 // split the currently selected text field (removing the selected parts)
 const splitSelectedText = () => {
 	const range = getSelection().getRangeAt(0);
