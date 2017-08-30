@@ -3,6 +3,8 @@ import Disposable from "../util/disposable";
 import {lists} from "./lists";
 import {TASK_PROPS} from "../constants";
 import saveTracker from "../util/save-tracker";
+import {DEBOUNCE_TIMER} from "../constants";
+import Debouncer from "../util/debouncer";
 
 const db = firebase.database();
 
@@ -35,6 +37,14 @@ export default class Task extends Events {
 
 			// define the change event
 			this.defineEvent(capitalizeFirst(prop.name), prop.name);
+
+			// set up the save to firebase deferred
+			if(prop.syncToFirebase) {
+				this["_save" + prop.name] = new Debouncer(
+					this._makePropSave(prop.name),
+					DEBOUNCE_TIMER
+				);
+			}
 		}
 
 		// update the state
@@ -368,6 +378,27 @@ export default class Task extends Events {
 			}
 		}
 	}
+
+	// make the save to firebase method for props
+	_makePropSave(name) {
+		return () => {
+			let promises = [];
+			const value = this[name];
+
+			promises.push(
+				this._tasks._ref.child(`${this.id}/${name}`).set(value)
+			);
+
+			// if this is the root task
+			if(name == "name" && !this.parent) {
+				promises.push(
+					db.ref(`/users/${lists.userId}/${this._tasks.listId}`).set(value)
+				);
+			}
+
+			return Promise.all(promises);
+		};
+	}
 }
 
 for(let prop of TASK_PROPS) {
@@ -385,15 +416,8 @@ for(let prop of TASK_PROPS) {
 			// save changes to firebase
 			if(changed && !this._deleted && prop.syncToFirebase) {
 				saveTracker.addSaveJob(
-					this._tasks._ref.child(`${this.id}/${prop.name}`).set(value)
+					this["_save" + prop.name].trigger()
 				);
-
-				// if this is the root task
-				if(prop.name == "name" && !this.parent) {
-					saveTracker.addSaveJob(
-						db.ref(`/users/${lists.userId}/${this._tasks.listId}`).set(value)
-					);
-				}
 			}
 		}
 	});

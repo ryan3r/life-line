@@ -5,17 +5,6 @@ import SelectionSnapshot from "../../../util/selection-snapshot";
 
 export default class EditTaskName extends TaskComponent {
 	addListeners() {
-		// clear any old save timers
-		clearTimeout(this._debounce);
-
-		// save the old task
-		if(this.oldTask) {
-			this.oldTask.name = this.el.innerText;
-		}
-
-		// make this the old task
-		this.oldTask = this.task;
-
 		// listen for changes to the property
 		this.addSub(
 			this.task.onName(value => {
@@ -41,12 +30,7 @@ export default class EditTaskName extends TaskComponent {
 	}
 
 	update = (e) => {
-		// clear the old timer
-		clearTimeout(this._debounce);
-		// don't save while the user is typing
-		this._debounce = setTimeout(() => {
-			this.props.task.name = this.el.innerText;
-		}, DEBOUNCE_TIMER);
+		this.props.task.name = this.el.innerText;
 	}
 
 	componentDidMount() {
@@ -76,14 +60,6 @@ export default class EditTaskName extends TaskComponent {
 		if(this.task) {
 			this.el.innerText = this.task.name;
 		}
-	}
-
-	componentWillUnmount() {
-		// clear any old save timers
-		clearTimeout(this._debounce);
-
-		// save current value
-		this.task.name = this.el.innerText;
 	}
 
 	render() {
