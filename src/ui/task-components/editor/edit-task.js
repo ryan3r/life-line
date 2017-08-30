@@ -354,8 +354,10 @@ export default class EditTask extends TaskComponent {
 			marginRight: 5
 		};
 
+		const showChildrenToggle = this.props.depth > 0 && this.state.showChildrenToggle;
+
 		// show a open/close arrow for the children
-		const hideShowChildren = this.state.showChildrenToggle ? <IconButton
+		const hideShowChildren = showChildrenToggle ?<IconButton
 			style={btnStyles}
 			iconStyle={iconArrow}
 			onClick={this.toggleHideChildren}>
@@ -364,7 +366,7 @@ export default class EditTask extends TaskComponent {
 
 		return <div ref={base => this.base = base}>
 			<div className={`task flex flex-vcenter ${this.task.state.type}`}
-				style={{marginLeft: this.state.showChildrenToggle ? 0 : 29}}>
+				style={{marginLeft: showChildrenToggle ? 0 : 29}}>
 				{hideShowChildren}
 				<Checkbox task={this.task}/>
 				<EditTaskName className="flex-fill" task={this.task} prop="name"
