@@ -13,7 +13,6 @@
   "author": "Ryan Ray <ryan314r@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "react-transition-group": "^1.2.0",
     "sinon": "^3.2.1"
   },
   "devDependencies": {

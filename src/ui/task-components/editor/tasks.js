@@ -4,7 +4,6 @@ import TaskLink from "../task-link";
 import React from "react";
 import {showCompleted} from "../../../stores/states";
 import {maxNestingDepth} from "../../../constants";
-import {CSSTransitionGroup} from "react-transition-group";
 
 export default class TasksWidget extends TaskComponent {
 	constructor() {
@@ -95,11 +94,7 @@ export default class TasksWidget extends TaskComponent {
 			}
 		}
 
-		return <CSSTransitionGroup
-			transitionName="task"
-			transitionLeaveTimeout={450}
-      		transitionLeave={true}
-			transitionEnter={false}>
+		return <div>
 			{children.map(child => {
 				return <EditTask
 					key={child.id}
@@ -107,6 +102,6 @@ export default class TasksWidget extends TaskComponent {
 					depth={depth - 1}
 					showCompleted={this.state.showCompleted}/>;
 			})}
-		</CSSTransitionGroup>;
+		</div>;
 	}
 }
