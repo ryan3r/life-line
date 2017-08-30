@@ -229,7 +229,7 @@ export default class EditTask extends TaskComponent {
 		// indent tasks on tab
 		else if(e.keyCode == 9) {
 			// get the sibling that will become the parent
-			let attachTo = this.task.getLastSibling();
+			let attachTo = nextVisibleTask(this.task, { getTask: true });
 
 			if(attachTo) {
 				// make sure we foucs this task when we rerender

@@ -131,20 +131,6 @@ export default class Task extends Events {
 		);
 	}
 
-	// get the sibling before this one
-	getLastSibling() {
-		// no parent
-		if(!this.parent) return;
-
-		// find this task in the parent
-		const index = this.parent.children.indexOf(this);
-
-		// no sibling before this one
-		if(index === 0) return;
-
-		return this.parent.children[index - 1];
-	}
-
 	// change our parent
 	_updateParent(newParent, {isLastChild, after} = {}) {
 		// remove the old parent
