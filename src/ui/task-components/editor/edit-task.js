@@ -151,7 +151,10 @@ export default class EditTask extends TaskComponent {
 			router.openTask(this.task.id);
 		}
 
-		this.task.create();
+		let newTask = this.task.create();
+
+		// focus the new task
+		focusController.focusTask(newTask.id, 0);
 	}
 
 	remove = () => {
@@ -260,6 +263,16 @@ export default class EditTask extends TaskComponent {
 	}
 
 	componentDidMount() {
+		// make sure the focus is not taken from us by material-ui
+		this.listen(this.base.querySelector(".editor"), "blur", () => {
+			setTimeout(() => {
+				if(document.activeElement.getAttribute("role") == "menuitem" &&
+					this.base) {
+					this.base.querySelector(".editor").focus();
+				}
+			}, 0);
+		});
+
 		focusController.onFocus(id => {
 			// not a focus for this task
 			if(this.task.id !== id || !this.base) return;
