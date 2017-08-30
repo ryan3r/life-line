@@ -17,9 +17,6 @@ export const TASK_PROPS = [
 	{ name: "hideChildren" }
 ];
 
-// the number of milliseconds to wait before hiding a completed task
-export const HIDE_COMPLETED_TIMEOUT = 500;
-
 // calculate the max nesting depth
 // NOTE: the + 1 is because the first row of tasks are not indented
 export const maxNestingDepth = () => {
