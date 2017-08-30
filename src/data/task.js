@@ -390,7 +390,7 @@ export default class Task extends Events {
 			);
 
 			// if this is the root task
-			if(name == "name" && !this.parent) {
+			if(name == "name" && !this._deleted && !this.parent) {
 				promises.push(
 					db.ref(`/users/${lists.userId}/${this._tasks.listId}`).set(value)
 				);
@@ -414,7 +414,7 @@ for(let prop of TASK_PROPS) {
 			const changed = this._updateProp(prop.name, value);
 
 			// save changes to firebase
-			if(changed && !this._deleted && prop.syncToFirebase) {
+			if(changed && prop.syncToFirebase) {
 				saveTracker.addSaveJob(
 					this["_save" + prop.name].trigger()
 				);
