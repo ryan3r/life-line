@@ -37,12 +37,21 @@ export default class Tasks {
 				pending.resolve();
 			}
 
+			let promises = [];
+
 			// refresh all tasks state now that everything has loaded
 			for(let [_, task] of this._tasks) {
 				if(task.children.length > 0) {
 					task._invalidateState();
 				}
+
+				// run any final initialization
+				promises.push(
+					task.init()
+				);
 			}
+
+			return Promise.all(promises);
 		});
 	}
 

@@ -1,4 +1,5 @@
 import Events from "./util/events";
+import localforage from "localforage";
 
 class Router extends Events {
 	constructor() {
@@ -10,7 +11,16 @@ class Router extends Events {
 
 		// no list in the url
 		if(!this.listId) {
-			this.listId = localStorage.getItem("last-list");
+			localforage.getItem("last-list")
+
+			.then(listId => {
+				// make sure we haven't navigated yet
+				if(!this.listId) {
+					this.listId = listId;
+
+					this.emit("Location");
+				}
+			})
 		}
 	}
 
@@ -27,7 +37,7 @@ class Router extends Events {
 
 		// save the new list when we navigate to it
 		if(this.listId) {
-			localStorage.setItem("last-list", this.listId);
+			localforage.setItem("last-list", this.listId);
 		}
 	}
 
@@ -49,7 +59,7 @@ class Router extends Events {
 		this._updateUrl();
 
 		// save the new list
-		localStorage.setItem("last-list", this.listId);
+		localforage.setItem("last-list", this.listId);
 	}
 
 	_updateUrl() {

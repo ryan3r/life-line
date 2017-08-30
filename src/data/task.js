@@ -5,6 +5,7 @@ import {TASK_PROPS} from "../constants";
 import saveTracker from "../util/save-tracker";
 import {DEBOUNCE_TIMER} from "../constants";
 import Debouncer from "../util/debouncer";
+import localforage from "localforage";
 
 const db = firebase.database();
 
@@ -59,6 +60,20 @@ export default class Task extends Events {
 
 		// start with a depth of 0
 		this.depth = 0;
+	}
+
+	// all tasks have been loaded
+	init() {
+		if(this.children.length > 0) {
+			// get the value of hideChildren
+			return localforage.getItem(`hideChildren-${this.id}`)
+
+			.then(hideChildren => {
+				this._updateProp("hideChildren", hideChildren);
+			});
+		}
+
+		return Promise.resolve();
 	}
 
 	// recieve updates from firebase
@@ -399,11 +414,24 @@ for(let prop of TASK_PROPS) {
 			// update our internal version of prop
 			const changed = this._updateProp(prop.name, value);
 
-			// save changes to firebase
-			if(changed && prop.syncToFirebase) {
-				saveTracker.addSaveJob(
-					this["_save" + prop.name].trigger()
-				);
+			if(changed) {
+				// save changes to firebase
+				if(prop.syncToFirebase) {
+					saveTracker.addSaveJob(
+						this["_save" + prop.name].trigger()
+					);
+				}
+
+				// save to localforage
+				if(prop.name == "hideChildren") {
+					if(value) {
+						localforage.setItem(`hideChildren-${this.id}`, true);
+					}
+					// only save the value if it's true to save space
+					else {
+						localforage.removeItem(`hideChildren-${this.id}`);
+					}
+				}
 			}
 		}
 	});
