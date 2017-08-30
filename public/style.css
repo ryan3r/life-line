@@ -161,14 +161,3 @@ div.hidden {
 	padding: 15px;
 	padding-bottom: 0px;
 }
-
-/* Don't animate deletions */
-.task-leave > .subtasks, .task-leave > .task:not(.done) {
-	display: none;
-}
-
-/* Gracefuly transition out a task */
-.task-leave > .done {
-	transition: opacity 450ms;
-	opacity: 0;
-}
