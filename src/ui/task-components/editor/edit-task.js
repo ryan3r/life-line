@@ -188,7 +188,10 @@ export default class EditTask extends TaskComponent {
 			const parent = e.ctrlKey ? this.task : this.task.parent;
 
 			// create a new sibling task
-			const newTask = parent.create(newName);
+			const newTask = parent.create({
+				name: newName,
+				after: e.ctrlKey ? "none" : this.task.id
+			});
 
 			// focus the new task
 			focusController.focusTask(newTask.id, 0);

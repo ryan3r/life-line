@@ -121,7 +121,6 @@ export default class Tasks {
 			// find the root task
 			for(let [_, task] of this._tasks) {
 				if(!task.parent) {
-					window.root = task;
 					return task;
 				}
 			}

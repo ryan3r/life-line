@@ -68,7 +68,7 @@ export default class Task extends Events {
 
 	// all tasks have been loaded
 	init() {
-		return this.ready.then(() => {
+		this.ready = this.ready.then(() => {
 			// make sure we have an after
 			if(!this.after && this.parent) {
 				const index = this.parent.children.indexOf(this);
@@ -90,6 +90,8 @@ export default class Task extends Events {
 				});
 			}
 		});
+
+		return this.ready;
 	}
 
 	// recieve updates from firebase
@@ -114,12 +116,13 @@ export default class Task extends Events {
 	}
 
 	// create a child task
-	create(name = "") {
+	create({name = "", after} = {}) {
 		// create the new task
 		const task = this._tasks.create({
 			name,
 			state: "none",
-			parent: this.id
+			parent: this.id,
+			after
 		});
 
 		// remove the state property from firebase
@@ -290,7 +293,7 @@ export default class Task extends Events {
 		}
 		else {
 			// find the task we are after
-			toIndex = this.parent.children.findIndex(child => this.after == child.id) - 1;
+			toIndex = this.parent.children.findIndex(child => this.after == child.id) + 1;
 		}
 
 		// the task has been moved
