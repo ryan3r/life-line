@@ -121,6 +121,7 @@ export default class Tasks {
 			// find the root task
 			for(let [_, task] of this._tasks) {
 				if(!task.parent) {
+					window.root = task;
 					return task;
 				}
 			}
@@ -140,6 +141,9 @@ export default class Tasks {
 
 		// add the task to the task list
 		this._tasks.set(id, task);
+
+		// run any final initialization
+		task.init();
 
 		// save the task
 		saveTracker.addSaveJob(

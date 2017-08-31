@@ -16,6 +16,8 @@ export default class Task extends Events {
 	constructor({id, raw, tasks}) {
 		super();
 
+		this.ready = Promise.resolve();
+
 		// save a reference to the tasks object
 		this._tasks = tasks;
 
@@ -25,7 +27,7 @@ export default class Task extends Events {
 		// get our parent
 		if(raw.parent) {
 			// wait for the parent to be loaded
-			tasks.getAsync(raw.parent)
+			this.ready = tasks.getAsync(raw.parent)
 
 			.then(parent => {
 				this._updateParent(parent);
@@ -64,16 +66,39 @@ export default class Task extends Events {
 
 	// all tasks have been loaded
 	init() {
-		if(this.children.length > 0) {
-			// get the value of hideChildren
-			return localforage.getItem(`hideChildren-${this.id}`)
+		return this.ready.then(() => {
+			// make sure we have an after
+			if(!this.after && this.parent) {
+				const index = this.parent.children.indexOf(this);
 
-			.then(hideChildren => {
-				this._updateProp("hideChildren", hideChildren);
+				if(index !== 0) {
+					this.after = this.parent.children[index - 1].id;
+				}
+				else {
+					this.after = "none";
+				}
+			}
+
+			// order the children
+			this.children.sort((a, b) => {
+				if(a.after == "none") return -1;
+				if(b.after == "none") return 1;
+
+				if(a.after == b.id) return 1;
+				if(b.after == a.id) return -1;
+
+				return 0;
 			});
-		}
 
-		return Promise.resolve();
+			if(this.children.length > 0) {
+				// get the value of hideChildren
+				return localforage.getItem(`hideChildren-${this.id}`)
+
+				.then(hideChildren => {
+					this._updateProp("hideChildren", hideChildren);
+				});
+			}
+		});
 	}
 
 	// recieve updates from firebase
@@ -119,10 +144,36 @@ export default class Task extends Events {
 		return task;
 	}
 
+	_updateAfterRemoved(opts = {}) {
+		// update the task that comes after this one
+		if(!opts.isLastChild && this.parent) {
+			const index = this.parent.children.indexOf(this);
+
+			// not the last child
+			if(index < this.parent.children.length - 1) {
+				// get the child that comes after us
+				let sibling = this.parent.children[index + 1];
+
+				// nothing before us
+				if(index === 0) {
+					sibling.after = "none";
+				}
+				// set it to the task before us
+				else {
+					let before = this.parent.children[index - 1];
+
+					sibling.after = before.id;
+				}
+			}
+		}
+	}
+
 	// delete this task
-	delete(opts) {
+	delete(opts = {}) {
 		// mark this task as deleted
 		this._deleted = true;
+
+		this._updateAfterRemoved(opts);
 
 		this._updateParent(undefined, opts);
 
@@ -130,7 +181,7 @@ export default class Task extends Events {
 		this._tasks.delete(this.id);
 
 		// Delete all the children as well
-		// I iterate backwards because children will be deleting themselvs from this array
+		// I iterate backwards because children will be deleting themselves from this array
 		for(let i = this.children.length - 1; i >= 0; --i) {
 			this.children[i].delete({ isLastChild: true });
 		}
@@ -138,12 +189,20 @@ export default class Task extends Events {
 
 	// add this task to a parent
 	attachTo(task, after) {
+		// update the after on task after us
+		this._updateAfterRemoved();
+
 		this._updateParent(task, {after});
 
 		// save the change to firebase
 		saveTracker.addSaveJob(
 			this._tasks._ref.child(`${this.id}/parent`).set(this.parent.id)
 		);
+
+		// update our after
+		if(after) {
+			this.after = after.id;
+		}
 	}
 
 	// change our parent
@@ -173,7 +232,7 @@ export default class Task extends Events {
 			}
 
 			// notify the parent's listeners that we have been removed
-			this.parent.emit("Children", this.parent.children);
+			this.parent.emit("Children");
 		}
 
 		// update the internal parent reference
@@ -215,10 +274,52 @@ export default class Task extends Events {
 		// update the value
 		this["_" + prop] = value;
 
+		// update the ordering
+		if(prop == "after") {
+			this._updateAfter();
+		}
+
 		// emit the change
 		this.emit(capitalizeFirst(prop), value);
 
 		return true;
+	}
+
+	// update the ordering now that after has changed
+	_updateAfter() {
+		// no parent
+		if(!this.parent) return;
+
+		let toIndex;
+		let index = this.parent.children.indexOf(this);
+
+		// the first task
+		if(this.after == "none") {
+			toIndex = 0;
+		}
+		else {
+			// find the task we are after
+			toIndex = this.parent.children.findIndex(child => this.after == child.id) - 1;
+		}
+
+		// the task has been moved
+		if(index !== toIndex) {
+			// remove it from the old location
+			if(index !== -1) {
+				this.parent.children.splice(index, 1);
+			}
+
+			// put it in the new location
+			this.parent.children.splice(toIndex, 0, this);
+
+			// find the child that is now after us and update that
+			if(toIndex >= 0 && toIndex < this.parent.children.length - 1) {
+				this.parent.children[toIndex + 1].after = this.id;
+			}
+
+			// refresh any listeners
+			this.parent.emit("Children");
+		}
 	}
 
 	// mark the calculated state for this task as invalid and recaclulate it if
@@ -386,8 +487,13 @@ export default class Task extends Events {
 			let promises = [];
 			const value = this[name];
 
+			// save the value
+			const ref = this._tasks._ref.child(`${this.id}/${name}`);
+
 			promises.push(
-				this._tasks._ref.child(`${this.id}/${name}`).set(value)
+				value === undefined ?
+					ref.remove() : // firebase does not support undefined
+					ref.set(value)
 			);
 
 			// if this is the root task

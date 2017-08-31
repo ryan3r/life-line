@@ -14,7 +14,8 @@ export const SIDEBAR_WIDTH = 300;
 // the properties for a task
 export const TASK_PROPS = [
 	{ name: "name", syncToFirebase: true },
-	{ name: "hideChildren" }
+	{ name: "hideChildren" },
+	{ name: "after", syncToFirebase: true }
 ];
 
 // calculate the max nesting depth
