@@ -31,6 +31,8 @@ export default class Task extends Events {
 
 			.then(parent => {
 				this._updateParent(parent);
+
+				this._updateAfter();
 			});
 		}
 
@@ -78,17 +80,6 @@ export default class Task extends Events {
 					this.after = "none";
 				}
 			}
-
-			// order the children
-			this.children.sort((a, b) => {
-				if(a.after == "none") return -1;
-				if(b.after == "none") return 1;
-
-				if(a.after == b.id) return 1;
-				if(b.after == a.id) return -1;
-
-				return 0;
-			});
 
 			if(this.children.length > 0) {
 				// get the value of hideChildren
