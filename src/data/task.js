@@ -113,6 +113,11 @@ export default class Task extends Events {
 	// remove this task
 	_remove() {
 		this._updateParent();
+
+		// clear the hideChildren state
+		if(this.hideChildren) {
+			localforage.removeItem(`hideChildren-${this.id}`);
+		}
 	}
 
 	// create a child task
@@ -170,6 +175,11 @@ export default class Task extends Events {
 		this._updateAfterRemoved(opts);
 
 		this._updateParent(undefined, opts);
+
+		// clear the hideChildren state
+		if(this.hideChildren) {
+			localforage.removeItem(`hideChildren-${this.id}`);
+		}
 
 		// delete the task from tasks
 		this._tasks.delete(this.id);
