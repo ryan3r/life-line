@@ -28,14 +28,6 @@ router.onLocation(() => {
 		currentTask.tasks = new Tasks(router.listId);
 
 		currentTask.tasks.ready.catch(err => {
-			// clear the old task
-			currentTask.currentTask = undefined;
-			currentTask.emit("Task");
-
-			// mark the task as done loading
-			currentTask.loading = false;
-			currentTask.emit("Loading");
-
 			// not allowed to access or it does not exist
 			if(err.code == "PERMISSION_DENIED") {
 				currentTask.emit("TasksError", {
@@ -49,6 +41,14 @@ router.onLocation(() => {
 					errorMessage: err.message
 				});
 			}
+
+			// clear the old task
+			currentTask.currentTask = undefined;
+			currentTask.emit("Task");
+
+			// mark the task as done loading
+			currentTask.loading = false;
+			currentTask.emit("Loading");
 		});
 	}
 
