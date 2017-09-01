@@ -37,5 +37,4 @@ jspm_packages
 .node_repl_history
 
 # Ignore the builds
-public/bundle.js
-public/test-bundle.js
+public/*

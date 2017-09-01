@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login</title>
+	<meta name="viewport" content="width=device-width"/>
+	<!-- Load the styles -->
+	<link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.3.0/firebaseui.css"/>
+	<!-- Load firebase -->
+	<script src="/__/firebase/4.1.3/firebase-app.js"></script>
+    <script src="/__/firebase/4.1.3/firebase-auth.js"></script>
+    <script src="/__/firebase/init.js"></script>
+	<!-- Load the firebase ui -->
+	<script defer src="https://cdn.firebase.com/libs/firebaseui/2.3.0/firebaseui.js"></script>
+</head>
+<body>
+	<div class="firebase-login">Loading...</div>
+
+	<script>
+		window.addEventListener("load", function() {
+			// remove the loading message
+			document.querySelector(".firebase-login").innerHTML = "";
+
+			// initialize firebase auth
+			var ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+			// show the ui
+			ui.start(".firebase-login", {
+				signInSuccessUrl: "/",
+				signInOptions: [
+					  firebase.auth.GoogleAuthProvider.PROVIDER_ID
+				]
+			});
+		});
+	</script>
+</body>
+</html>

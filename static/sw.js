@@ -1,7 +1,7 @@
 const ASSETS = [
 	"/offline.html",
-	"/style.css",
-	"/favicon.png"
+	"/{{style.css}}",
+	"/{{favicon.png}}"
 ];
 
 // download the assets
