@@ -4,6 +4,8 @@ import TaskLink from "../task-link";
 import React from "react";
 import {showCompleted} from "../../../stores/states";
 import {maxNestingDepth} from "../../../constants";
+import RaisedButton from "material-ui/RaisedButton";
+import {focusController} from "./focus-controller";
 
 export default class TasksWidget extends TaskComponent {
 	constructor() {
@@ -61,9 +63,27 @@ export default class TasksWidget extends TaskComponent {
 		});
 	}
 
+	// create a new child task for the root task
+	createChild = () => {
+		const task = this.task.create();
+
+		// focus that child
+		focusController.focusTask(task.id, 0);
+	}
+
 	render() {
 		// no task yet
 		if(!this.task) return;
+
+		if(this.props.toplevel && this.task.children.length === 0) {
+			return <div style={{ textAlign: "center" }}>
+				<h2 style={{ marginBottom: "50px" }}>No tasks yet</h2>
+				<RaisedButton
+					label="Create one"
+					onClick={this.createChild}
+					primary={true}/>
+			</div>;
+		}
 
 		// our children are hidden
 		if(this.task.hideChildren) {

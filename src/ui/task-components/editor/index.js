@@ -1,8 +1,6 @@
 import Component from "../../component";
 import currentTask from "../../../data/current-task";
 import {focusController} from "./focus-controller";
-import AddIcon from "material-ui/svg-icons/content/add";
-import IconButton from "material-ui/IconButton";
 import TasksWidget from "./tasks";
 import BreadCrumbs from "./bread-crumbs";
 import ProgressBar from "./progress-bar";
@@ -44,14 +42,6 @@ export default class Editor extends Component {
 
 	componentDidMount() {
 		this._mounted = true;
-	}
-
-	// create a new child task for the root task
-	createChild = () => {
-		const task = this.state.task.create();
-
-		// focus that child
-		focusController.focusTask(task.id, 0);
 	}
 
 	// display a message to the user
@@ -102,12 +92,6 @@ export default class Editor extends Component {
 					<SaveStatus/>
 					<div className="content">
 						<TasksWidget task={this.state.task} toplevel/>
-						<IconButton
-							onClick={this.createChild}
-							style={addBtnStyle}
-							iconStyle={addBtnStyle}>
-								<AddIcon/>
-						</IconButton>
 					</div>
 				</div>
 			</div>
