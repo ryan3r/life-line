@@ -24,7 +24,7 @@ module.exports = function(dev) {
 
 		// fill in the template
 		const content = rawFile.replace(/\{\{\s*(.+?)\s*\}\}/g, (txt, name) => {
-			return files[name] || "";
+			return files[name] || name;
 		});
 
 		// hash this file
