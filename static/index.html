@@ -25,7 +25,7 @@
 	<!-- Install the service worker -->
 	<script>
 		// install the service worker
-		if("serviceWorker" in navigator) {
+		if("serviceWorker" in navigator && location.origin.indexOf("localhost") === -1) {
 			navigator.serviceWorker.register("/sw.js");
 		}
 	</script>
