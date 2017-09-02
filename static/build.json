@@ -6,7 +6,7 @@
 	{ "name": "style.css", "hash": true },
 	{ "name": "sw.js" },
 	{ "name": "manifest.json", "hash": true },
-	{ "name": "offline.html" },
+	{ "name": "offline.html", "hash": true },
 	{ "name": "tests.html", "devOnly": true  },
 	{ "name": "index.html" }
 ]

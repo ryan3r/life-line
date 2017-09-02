@@ -1,9 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Not available</title>
+	<title>Offline</title>
 	<meta name="viewport" content="width=device-width"/>
 	<link rel="icon" href="/{{favicon.png}}"/>
+	<style>
+		body {
+			margin: 0px;
+		}
+
+		.header {
+			background-color: #4caf50;
+			color: #fff;
+		}
+
+		.header-title {
+			margin: 0px;
+		}
+
+		.header, .content {
+			padding: 15px;
+		}
+	</style>
 </head>
 <body>
 	<!-- The ui -->
@@ -11,5 +29,11 @@
 		<h2 class="header-title">Offline</h2>
 	</div>
 	<div class="content">Life line is not available offline.</div>
+	<!-- Reload when we com back on line -->
+	<script>
+		window.addEventListener("online", function() {
+			location.reload();
+		});
+	</script>
 </body>
 </html>
