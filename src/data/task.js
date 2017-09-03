@@ -82,7 +82,9 @@ export default class Task extends Events {
 	_update(raw) {
 		// update the properties
 		for(const prop of TASK_PROPS) {
-			this._updateProp(prop.name, raw[prop.name]);
+			if(prop.syncToFirebase) {
+				this._updateProp(prop.name, raw[prop.name]);
+			}
 		}
 
 		// update the state
