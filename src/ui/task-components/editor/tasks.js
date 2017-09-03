@@ -86,7 +86,7 @@ export default class TasksWidget extends TaskComponent {
 		}
 
 		// our children are hidden
-		if(this.task.hideChildren) {
+		if(this.task.hideChildren && !this.props.toplevel) {
 			return null;
 		}
 
