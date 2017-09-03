@@ -52,7 +52,7 @@ export default class Editor extends Component {
 
 		return <div className="flex-fill flex container">
 			<div className="scrollable flex-fill flex-column">
-				<div className="content flex flex-fill flex-vcenter flex-hcenter">
+				<div className="flex flex-fill flex-vcenter flex-hcenter">
 					{content}
 				</div>
 			</div>
@@ -65,6 +65,13 @@ export default class Editor extends Component {
 			return this.message(
 				"Access denied",
 				"Either the list you requested does not exist or you do not have access."
+			);
+		}
+
+		if(this.state.errorType == "exists") {
+			return this.message(
+				"Not found",
+				"The list and/or task you requested does not exist."
 			);
 		}
 

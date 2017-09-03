@@ -66,6 +66,23 @@ router.onLocation(() => {
 		})
 
 		.then(task => {
+			// throw a no such task error
+			if(!task) {
+				currentTask.emit("TasksError", {
+					errorType: "exists"
+				});
+
+				// clear the old task
+				currentTask.currentTask = undefined;
+				currentTask.emit("Task");
+
+				// mark the task as done loading
+				currentTask.loading = false;
+				currentTask.emit("Loading");
+
+				return;
+			}
+
 			// make sure this is still the current task
 			if(task.id == router.taskId || (!task.parent && !router.taskId)) {
 				// save the current task
