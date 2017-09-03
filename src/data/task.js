@@ -109,10 +109,7 @@ export default class Task extends Events {
 
 			// notify the listeners
 			this.parent.emit("Children");
-
-			if(this.parent.parent) {
-				this.parent.parent._updateGrandchildren();
-			}
+			this.parent._updateGrandchildren();
 		}
 	}
 
@@ -238,10 +235,6 @@ export default class Task extends Events {
 		// refresh the ui
 		this.parent.emit("Children");
 
-		if(this.parent.parent) {
-			this.parent.parent._updateGrandchildren();
-		}
-
 		// save our index to firebase
 		saveTracker.addSaveJob(
 			this._tasks._ref.child(`${this.id}/index`).set(this.index)
@@ -273,9 +266,7 @@ export default class Task extends Events {
 			if(!noEmitChildren) {
 				this.parent.emit("Children");
 
-				if(this.parent.parent) {
-					this.parent.parent._updateGrandchildren();
-				}
+				this.parent._updateGrandchildren();
 			}
 		}
 
@@ -302,9 +293,7 @@ export default class Task extends Events {
 			if(!noEmitChildren) {
 				this.parent.emit("Children");
 
-				if(this.parent.parent) {
-					this.parent.parent._updateGrandchildren();
-				}
+				this.parent._updateGrandchildren();
 			}
 		}
 	}
@@ -513,6 +502,11 @@ export default class Task extends Events {
 		this._hasGrandchildren = this.children.every(child => child.children.length === 0);
 
 		this.emit("HasGrandchildren");
+
+		// also update our parent
+		if(this.parent) {
+			this.parent._updateGrandchildren();
+		}
 	}
 
 	get hasGrandchildren() {
