@@ -81,7 +81,7 @@ const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
 };
 
 // find the task that is visually below the current task
-const previousVisibleChild = fromTask => {
+const previousVisibleChild = (fromTask, {getTask} = {}) => {
 	// save the length of the current task
 	const currentLength = fromTask.name.length;
 
@@ -126,9 +126,42 @@ const previousVisibleChild = fromTask => {
 		if(fromTask.state.type !== "done" || showCompleted.value) break;
 	}
 
-	focusController.focusTaskWithCurrentRange(fromTask.id, {
-		length: currentLength
-	});
+	// just return the task
+	if(getTask) {
+		return fromTask;
+	}
+	// jump to the task
+	else {
+		focusController.focusTaskWithCurrentRange(fromTask.id, {
+			length: currentLength
+		});
+	}
+};
+
+// get the next task in this parent
+const nextInParent = fromTask => {
+	const {children} = fromTask.parent;
+
+	for(let i = children.indexOf(fromTask) - 1; i >= 0; --i) {
+		// we found the task to jump to
+		if(showCompleted.value ||
+			children[i].state.type != "done") {
+			return children[i];
+		}
+	}
+};
+
+// go to the previous task in this parent
+const previousInParent = fromTask => {
+	const {children} = fromTask.parent;
+
+	for(let i = children.indexOf(fromTask) + 1; i < children.length; ++i) {
+		// we found the task to jump to
+		if(showCompleted.value ||
+			children[i].state.type != "done") {
+			return children[i];
+		}
+	}
 };
 
 export default class EditTask extends TaskComponent {
@@ -189,7 +222,8 @@ export default class EditTask extends TaskComponent {
 
 			// create a new sibling task
 			const newTask = parent.create({
-				name: newName
+				name: newName,
+				index: e.ctrlKey ? 0 : this.task.index + 1
 			});
 
 			// focus the new task
@@ -233,12 +267,12 @@ export default class EditTask extends TaskComponent {
 			}
 
 			// attach this task to its grandparent after the current parent
-			this.task.attachTo(parent.parent, parent);
+			this.task.attachTo(parent.parent, parent.index + 1);
 		}
 		// indent tasks on tab
 		else if(e.keyCode == 9) {
 			// get the sibling that will become the parent
-			let attachTo = nextVisibleTask(this.task, { getTask: true });
+			let attachTo = nextInParent(this.task);
 
 			if(attachTo) {
 				// make sure we foucs this task when we rerender
@@ -251,6 +285,26 @@ export default class EditTask extends TaskComponent {
 					router.openTask(this.task.parent.id);
 				}
 			}
+		}
+		// switch places with the next logical task
+		else if((e.keyCode == 38 || e.keyCode == 40) && e.ctrlKey) {
+			let toTask;
+
+			// find the next visible task
+			if(e.keyCode == 38) {
+				toTask = nextInParent(this.task);
+			}
+			else {
+				toTask = previousInParent(this.task);
+			}
+
+			// switch with in the same parent
+			if(toTask && toTask.parent == this.task.parent) {
+				toTask.switchWith(this.task);
+			}
+
+			// refocus this task
+			focusController.focusTaskWithCurrentRange(this.task.id);
 		}
 		// up arrow move to the next task
 		else if(e.keyCode == 38) {
