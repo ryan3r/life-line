@@ -106,8 +106,6 @@ export default class Task extends Events {
 			// update our index
 			this.index = raw.index;
 
-			this.parent.children.map(x => console.log(x.name));
-
 			// notify the listeners
 			this.parent.emit("Children");
 		}
@@ -125,6 +123,11 @@ export default class Task extends Events {
 
 	// create a child task
 	create({name = "", index} = {}) {
+		// assign an index
+		if(index === undefined) {
+			index = this.children.length;
+		}
+
 		// create the new task
 		const task = this._tasks.create({
 			name,
@@ -134,9 +137,7 @@ export default class Task extends Events {
 		});
 
 		// push back any children that are displased by this task
-		if(index !== undefined) {
-			this._updateChildIndexes("increment", index - 1);
-		}
+		this._updateChildIndexes("increment", index - 1);
 
 		// remove the state property from firebase
 		if(this.children.length === 0) {
