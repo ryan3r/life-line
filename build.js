@@ -20,16 +20,18 @@ module.exports = function(dev) {
 
 		const dir = entry.publicDir ? "public" : "static";
 		// load the file
-		const rawFile = fs.readFileSync(path.join(__dirname, dir, entry.name), "utf8");
+		let rawFile = fs.readFileSync(path.join(__dirname, dir, entry.name));
 
 		// fill in the template
-		const content = rawFile.replace(/\{\{\s*(.+?)\s*\}\}/g, (txt, name) => {
-			return files[name] || name;
-		});
+		if(!entry.binary) {
+			rawFile = rawFile.toString("utf8").replace(/\{\{\s*(.+?)\s*\}\}/g, (txt, name) => {
+				return files[name] || name;
+			});
+		}
 
 		// hash this file
 		let hash = crypto.createHash("md5");
-		hash.update(content);
+		hash.update(rawFile);
 		const hashStr = hash.digest("hex");
 
 		// get the file extension
@@ -44,7 +46,7 @@ module.exports = function(dev) {
 		files[entry.name] = outName;
 
 		// save the file
-		fs.writeFile(path.join(__dirname, "public", outName), content);
+		fs.writeFile(path.join(__dirname, "public", outName), rawFile);
 	}
 };
 
