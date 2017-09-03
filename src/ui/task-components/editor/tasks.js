@@ -117,6 +117,7 @@ export default class TasksWidget extends TaskComponent {
 		return <div>
 			{children.map(child => {
 				return <EditTask
+					toplevel={this.props.toplevel}
 					key={child.id}
 					task={child}
 					depth={depth - 1}

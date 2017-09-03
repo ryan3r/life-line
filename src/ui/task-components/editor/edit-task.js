@@ -165,6 +165,19 @@ const previousInParent = fromTask => {
 };
 
 export default class EditTask extends TaskComponent {
+	addListeners() {
+		super.addListeners();
+
+		// listen for grandchildren changes
+		this.taskDisposable.add(
+			this.task.parent.onHasGrandchildren(siblingsHaveChildren => {
+				this.setState({
+					siblingsHaveChildren
+				});
+			})
+		);
+	}
+
 	onTaskChildren() {
 		// save the current task
 		this.setState({
@@ -420,9 +433,22 @@ export default class EditTask extends TaskComponent {
 				<KeyboardArrowRightIcon/>
 		</IconButton> : null;
 
+		// check if any of our siblings have children
+		const noSiblingsChildren = this.task.parent.children.every(task => {
+			return task.children.length === 0;
+		});
+
+		// check if we should indent this task
+		const indentTask =
+			!showChildrenToggle &&
+			!(this.props.toplevel && this.state.siblingsHaveChildren);
+
+		// save the indented state
+		this._wasIndented = indentTask;
+
 		return <div ref={base => this.base = base}>
 			<div className={`task flex flex-vcenter ${this.task.state.type}`}
-				style={{marginLeft: showChildrenToggle ? 0 : 29}}>
+				style={{marginLeft: indentTask ? 29 : 0}}>
 				{hideShowChildren}
 				<Checkbox task={this.task}/>
 				<EditTaskName className="flex-fill" task={this.task} prop="name"

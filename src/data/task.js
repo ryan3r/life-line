@@ -57,6 +57,7 @@ export default class Task extends Events {
 		// add the evnts for state and children
 		this.defineEvent("State", "state");
 		this.defineEvent("Children", "children");
+		this.defineEvent("HasGrandchildren", "hasGrandchildren");
 
 		// start with a depth of 0
 		this.depth = 0;
@@ -108,6 +109,10 @@ export default class Task extends Events {
 
 			// notify the listeners
 			this.parent.emit("Children");
+
+			if(this.parent.parent) {
+				this.parent.parent._updateGrandchildren();
+			}
 		}
 	}
 
@@ -233,6 +238,10 @@ export default class Task extends Events {
 		// refresh the ui
 		this.parent.emit("Children");
 
+		if(this.parent.parent) {
+			this.parent.parent._updateGrandchildren();
+		}
+
 		// save our index to firebase
 		saveTracker.addSaveJob(
 			this._tasks._ref.child(`${this.id}/index`).set(this.index)
@@ -263,6 +272,10 @@ export default class Task extends Events {
 			// notify the parent's listeners that we have been removed
 			if(!noEmitChildren) {
 				this.parent.emit("Children");
+
+				if(this.parent.parent) {
+					this.parent.parent._updateGrandchildren();
+				}
 			}
 		}
 
@@ -288,6 +301,10 @@ export default class Task extends Events {
 			// notify the parent's listeners that we have been added
 			if(!noEmitChildren) {
 				this.parent.emit("Children");
+
+				if(this.parent.parent) {
+					this.parent.parent._updateGrandchildren();
+				}
 			}
 		}
 	}
@@ -489,6 +506,22 @@ export default class Task extends Events {
 
 			return Promise.all(promises);
 		};
+	}
+
+	// check if we have any grandchildren
+	_updateGrandchildren() {
+		this._hasGrandchildren = this.children.every(child => child.children.length === 0);
+
+		this.emit("HasGrandchildren");
+	}
+
+	get hasGrandchildren() {
+		// check if the value is cached
+		if(this._hasGrandchildren === undefined) {
+			this._updateGrandchildren();
+		}
+
+		return this._hasGrandchildren;
 	}
 }
 
