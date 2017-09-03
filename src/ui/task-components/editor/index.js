@@ -64,7 +64,7 @@ export default class Editor extends Component {
 		if(this.state.errorType == "access") {
 			return this.message(
 				"Access denied",
-				"Either the list you requested does not exist or you do not have access."
+				"You do not have access to this list."
 			);
 		}
 
