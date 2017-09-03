@@ -7,6 +7,7 @@ import ProgressBar from "./progress-bar";
 import React from "react";
 import CircularProgress from "material-ui/CircularProgress";
 import SaveStatus from "./save-status";
+import {pageTitle} from "../../../stores/states";
 
 export default class Editor extends Component {
 	constructor() {
@@ -46,6 +47,9 @@ export default class Editor extends Component {
 
 	// display a message to the user
 	message(title, content) {
+		// update the page title
+		setTimeout(() => pageTitle.set(title), 0);
+
 		return <div className="flex-fill flex container">
 			<div className="scrollable flex-fill flex-column">
 				<div className="content flex flex-fill flex-vcenter flex-hcenter">
@@ -76,6 +80,9 @@ export default class Editor extends Component {
 		if(this.state.loading) {
 			return this.message("Loading...", <CircularProgress/>);
 		}
+
+		// clear the page title
+		setTimeout(() => pageTitle.set(undefined), 0);
 
 		// the styles for the add button
 		const addBtnStyle = {

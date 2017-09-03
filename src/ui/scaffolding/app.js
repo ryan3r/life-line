@@ -22,7 +22,7 @@ export default class App extends Component {
 		// show the app
 		return <div className="container"
 				style={{ marginLeft: this.state.docked ? SIDEBAR_WIDTH : 0 }}>
-			<Header task={this.state.task}/>
+			<Header/>
 			<ListsDrawer/>
 			<Editor/>
 			<UnsavedChanges/>
