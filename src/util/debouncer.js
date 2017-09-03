@@ -27,4 +27,9 @@ export default class Debouncer {
 
 		return this._deferred.promise;
 	}
+
+	// cancel any pending calls
+	cancel() {
+		clearTimeout(this._timeout);
+	}
 }

@@ -119,9 +119,22 @@ export default class Task extends Events {
 	_remove() {
 		this._updateParent();
 
+		// cancel any pending changes
+		this._cancelSaves();
+
 		// clear the hideChildren state
 		if(this.hideChildren) {
 			localforage.removeItem(`hideChildren-${this.id}`);
+		}
+	}
+
+	// cancel any pending saves
+	_cancelSaves() {
+		for(const prop of TASK_PROPS) {
+			// only clear props that sync to firebase
+			if(prop.syncToFirebase) {
+				this["_save" + prop.name].cancel();
+			}
 		}
 	}
 
@@ -165,6 +178,9 @@ export default class Task extends Events {
 		this.parent._updateChildIndexes("decrement", this.index);
 
 		this._updateParent();
+
+		// cancel any pending changes
+		this._cancelSaves();
 
 		// clear the hideChildren state
 		if(this.hideChildren) {
