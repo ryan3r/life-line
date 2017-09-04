@@ -1,0 +1,12 @@
+[
+	{ "name": "test-bundle.js", "publicDir": true, "devOnly": true, "hash": true },
+	{ "name": "bundle.js", "publicDir": true, "hash": true },
+	{ "name": "favicon.png", "hash": true, "binary": true },
+	{ "name": "login.html" },
+	{ "name": "style.css", "hash": true },
+	{ "name": "sw.js" },
+	{ "name": "manifest.json", "hash": true },
+	{ "name": "offline.html", "hash": true },
+	{ "name": "tests.html", "devOnly": true  },
+	{ "name": "index.html" }
+]

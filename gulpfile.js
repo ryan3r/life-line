@@ -7,7 +7,8 @@ const uglify = require("gulp-uglify");
 
 // build the source
 gulp.task("default", function() {
-	return build(false);
+	build({});
+	build({ tests: true });
 });
 
 // build for production

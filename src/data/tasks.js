@@ -1,6 +1,7 @@
 import defer from "../util/deferred";
 import genId from "../util/gen-id";
 import Task from "./task";
+import saveTracker from "../util/save-tracker";
 
 const db = firebase.database();
 
@@ -36,12 +37,21 @@ export default class Tasks {
 				pending.resolve();
 			}
 
+			let promises = [];
+
 			// refresh all tasks state now that everything has loaded
 			for(let [_, task] of this._tasks) {
 				if(task.children.length > 0) {
 					task._invalidateState();
 				}
+
+				// run any final initialization
+				promises.push(
+					task.init()
+				);
 			}
+
+			return Promise.all(promises);
 		});
 	}
 
@@ -131,8 +141,13 @@ export default class Tasks {
 		// add the task to the task list
 		this._tasks.set(id, task);
 
+		// run any final initialization
+		task.init();
+
 		// save the task
-		this._ref.child(id).set(raw);
+		saveTracker.addSaveJob(
+			this._ref.child(id).set(raw)
+		);
 
 		return task;
 	}
@@ -144,7 +159,9 @@ export default class Tasks {
 			this._tasks.delete(id);
 
 			// remove the task from firebase
-			this._ref.child(id).remove();
+			saveTracker.addSaveJob(
+				this._ref.child(id).remove()
+			);
 		}
 	}
 

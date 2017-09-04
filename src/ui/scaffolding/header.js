@@ -5,13 +5,14 @@ import React from "react";
 import {SIDEBAR_OPEN} from "../../constants";
 import Component from "../component";
 import HeaderMenu from "./header-menu";
-import {dockedStore, drawerOpen} from "../../stores/states";
+import {dockedStore, drawerOpen, pageTitle} from "../../stores/states";
 
 export default class Header extends Component {
 	constructor() {
 		super();
 
 		dockedStore.bind(this);
+		pageTitle.bind(this);
 	}
 
 	componentWillMount() {
@@ -26,11 +27,22 @@ export default class Header extends Component {
 	}
 
 	render() {
-		return <AppBar
-			title={<EditTaskName
+		let title = null;
+
+		// use what ever title we are given
+		if(this.state.pageTitle) {
+			title = this.state.pageTitle;
+		}
+		// edit the current task
+		else if(this.state.task) {
+			title = <EditTaskName
 				className="invisible"
 				task={this.state.task}
-				prop="name"/>}
+				prop="name"/>;
+		}
+
+		return <AppBar
+			title={title}
 			onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
 			style={{flexShrink: 0}}
 			iconElementLeft={this.state.docked ? <span></span> : null}

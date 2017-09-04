@@ -2,6 +2,7 @@ import Events from "../util/events";
 import genId from "../util/gen-id";
 import defer from "../util/deferred";
 import {router} from "../router";
+import saveTracker from "../util/save-tracker";
 
 const db = firebase.database();
 
@@ -106,17 +107,21 @@ export class Lists extends Events {
 		const rootId = genId();
 
 		// add the list to the user's list of lists
-		this._ref.child(listId).set(name);
+		saveTracker.addSaveJob(
+			this._ref.child(listId).set(name)
+		);
 
 		// create the actual list
-		db.ref(`/lists/${listId}`).set({
-			owner: this.userId,
-			tasks: {
-				[rootId]: {
-					name
+		saveTracker.addSaveJob(
+			db.ref(`/lists/${listId}`).set({
+				owner: this.userId,
+				tasks: {
+					[rootId]: {
+						name
+					}
 				}
-			}
-		});
+			})
+		);
 
 		return listId;
 	}
@@ -124,10 +129,14 @@ export class Lists extends Events {
 	// delete a list
 	delete(id) {
 		// remove the list from the users lists
-		this._ref.child(id).remove();
+		saveTracker.addSaveJob(
+			this._ref.child(id).remove()
+		);
 
 		// remove the actual list
-		db.ref(`/lists/${id}`).remove();
+		saveTracker.addSaveJob(
+			db.ref(`/lists/${id}`).remove()
+		)
 	}
 
 	// get all the lists

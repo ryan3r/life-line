@@ -12,10 +12,10 @@ export const SIDEBAR_OPEN = 750;
 export const SIDEBAR_WIDTH = 300;
 
 // the properties for a task
-export const TASK_PROPS = ["name"];
-
-// the number of milliseconds to wait before hiding a completed task
-export const HIDE_COMPLETED_TIMEOUT = 500;
+export const TASK_PROPS = [
+	{ name: "name", syncToFirebase: true },
+	{ name: "hideChildren" }
+];
 
 // calculate the max nesting depth
 // NOTE: the + 1 is because the first row of tasks are not indented

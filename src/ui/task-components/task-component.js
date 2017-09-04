@@ -42,7 +42,7 @@ export default class TaskComponent extends Component {
 				let prop = key.substr(6);
 
 				// add the listener
-				this.addSub(
+				this.taskDisposable.add(
 					this.task["on" + prop](this[key].bind(this))
 				);
 			}

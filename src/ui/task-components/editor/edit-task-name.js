@@ -1,60 +1,28 @@
 import TaskComponent from "../task-component";
 import React from "react";
 import {DEBOUNCE_TIMER} from "../../../constants";
+import SelectionSnapshot from "../../../util/selection-snapshot";
 
 export default class EditTaskName extends TaskComponent {
 	addListeners() {
-		// clear any old save timers
-		clearTimeout(this._debounce);
-
-		// save the old task
-		if(this.oldTask) {
-			this.oldTask.name = this.el.innerText;
-		}
-
-		// make this the old task
-		this.oldTask = this.task;
-
 		// listen for changes to the property
 		this.addSub(
 			this.task.onName(value => {
 				// if we are not in focus
 				if(this.el && value != this.el.innerText) {
-					let start, end, node;
-					const restoreSelection = document.activeElement == this.el;
+					let snapshot;
 
 					// save the current selection
-					if(restoreSelection) {
-						let range = getSelection().getRangeAt(0);
-
-						start = range.startOffset;
-						end = range.endOffset;
-						node = range.startContainer;
+					if(document.activeElement == this.el) {
+						snapshot = new SelectionSnapshot();
 					}
 
 					// set the new value
 					this.el.innerText = value;
 
 					// restore the previous selection
-					if(restoreSelection) {
-						let selection = getSelection();
-
-						// remove the old ranges
-						selection.removeAllRanges();
-
-						// recreate the selection
-						let range = document.createRange();
-
-						// make sure the end is still inside the node
-						if(node.textContent.length < end) {
-							end = node.textContent.length;
-						}
-
-						range.setStart(node, start);
-						range.setEnd(node, end);
-
-						// reselect content
-						selection.addRange(range);
+					if(snapshot) {
+						snapshot.restore();
 					}
 				}
 			})
@@ -62,12 +30,7 @@ export default class EditTaskName extends TaskComponent {
 	}
 
 	update = (e) => {
-		// clear the old timer
-		clearTimeout(this._debounce);
-		// don't save while the user is typing
-		this._debounce = setTimeout(() => {
-			this.props.task.name = this.el.innerText;
-		}, DEBOUNCE_TIMER);
+		this.props.task.name = this.el.innerText;
 	}
 
 	componentDidMount() {
@@ -79,18 +42,24 @@ export default class EditTaskName extends TaskComponent {
 		this.listen(this.el, "input", this.update);
 		this.listen(this.el, "keydown", this.props.onKeyDown);
 
+		// clear the formatting on paste
+		this.listen(this.el, "paste", () => {
+			// wait for the paste to execute
+			setTimeout(() => {
+				// save the current selection
+				let snapshot = new SelectionSnapshot();
+
+				// clear the formatting
+		        this.el.innerText = this.el.innerText;
+
+				snapshot.restore(this.el.childNodes[0]);
+		    }, 0);
+		});
+
 		// set the content
 		if(this.task) {
 			this.el.innerText = this.task.name;
 		}
-	}
-
-	componentWillUnmount() {
-		// clear any old save timers
-		clearTimeout(this._debounce);
-
-		// save current value
-		this.task.name = this.el.innerText;
 	}
 
 	render() {

@@ -4,6 +4,7 @@ import ReactDom from "react-dom";
 import React from "react";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import theme from "./ui/theme";
+import "./util/save-tracker";
 
 firebase.auth().onAuthStateChanged(function(user) {
 	// load the lists for this list
