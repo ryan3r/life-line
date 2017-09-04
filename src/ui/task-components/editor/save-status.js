@@ -26,6 +26,8 @@ export default class SaveStatus extends Component {
 	}
 
 	componentWillUnmount() {
+		super.componentWillUnmount();
+
 		this._connectedRef.off();
 	}
 
