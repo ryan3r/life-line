@@ -6,6 +6,7 @@ import saveTracker from "../util/save-tracker";
 import {DEBOUNCE_TIMER} from "../constants";
 import Debouncer from "../util/debouncer";
 import localforage from "localforage";
+import {showCompleted} from "../stores/states";
 
 const db = firebase.database();
 
@@ -21,6 +22,9 @@ export default class Task extends Events {
 
 		// get our id
 		this.id = id;
+
+		// collect all task releated subscriptions
+		this.disposable = new Disposable();
 
 		// get our parent
 		if(raw.parent) {
@@ -61,6 +65,13 @@ export default class Task extends Events {
 
 		// start with a depth of 0
 		this.depth = 0;
+
+		// refresh when we change modes
+		this.disposable.add(
+			showCompleted.onStateChange(() => {
+				this._updateGrandchildren({ propagate: false });
+			})
+		);
 	}
 
 	// all tasks have been loaded
@@ -420,6 +431,11 @@ export default class Task extends Events {
 	// emit a state change event
 	_stateChange() {
 		this.emit("State");
+
+		// refresh grandchildren count for our parent
+		if(!showCompleted.value && this.parent) {
+			this.parent._updateGrandchildren({ propagate: false });
+		}
 	}
 
 	// update the state
@@ -522,13 +538,18 @@ export default class Task extends Events {
 	}
 
 	// check if we have any grandchildren
-	_updateGrandchildren() {
-		this._hasGrandchildren = this.children.every(child => child.children.length === 0);
+	_updateGrandchildren({propagate = true} = {}) {
+		this._hasGrandchildren = this.children.every(child => {
+			// check if this child is visible
+			const hidden = !showCompleted.value && child.state.type == "done";
+
+			return child.children.length === 0 || hidden;
+		});
 
 		this.emit("HasGrandchildren");
 
 		// also update our parent
-		if(this.parent) {
+		if(this.parent && propagate) {
 			this.parent._updateGrandchildren();
 		}
 	}
