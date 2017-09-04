@@ -61,8 +61,33 @@ export default class CurrentUser extends Component {
 		// close the dialog
 		this.hideDialog();
 
-		// delete the account
-		auth.currentUser.delete()
+		const db = firebase.database();
+
+		// get our user data
+		const userRef = db.ref(`/users/${auth.currentUser.uid}`);
+
+		// get this users lists
+		userRef.once("value").then(lists => {
+			// get the actual value (not the snapshot)
+			lists = lists.val();
+
+			let promises = [];
+
+			// delete all the lists
+			for(let listId of Object.keys(lists)) {
+				promises.push(db.ref(`/lists/${listId}`).remove())
+			}
+
+			// delete the user info
+			promises.push(userRef.remove());
+
+			return Promise.all(promises)
+		})
+
+		.then(() => {
+			// delete the account
+			auth.currentUser.delete();
+		})
 
 		.then(() => {
 			alert("Your account has been deleted");
