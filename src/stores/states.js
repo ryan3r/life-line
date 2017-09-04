@@ -15,3 +15,6 @@ export let drawerOpen = new Store("drawerOpen");
 
 // show or don't show completed tasks
 export let showCompleted = new Store("showCompleted");
+
+// the title for the current page
+export let pageTitle = new Store("pageTitle");

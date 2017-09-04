@@ -1,15 +1,21 @@
 import Component from "../../component";
 import currentTask from "../../../data/current-task";
 import {focusController} from "./focus-controller";
-import AddIcon from "material-ui/svg-icons/content/add";
-import IconButton from "material-ui/IconButton";
 import TasksWidget from "./tasks";
 import BreadCrumbs from "./bread-crumbs";
 import ProgressBar from "./progress-bar";
 import React from "react";
 import CircularProgress from "material-ui/CircularProgress";
+import SaveStatus from "./save-status";
+import {pageTitle} from "../../../stores/states";
 
 export default class Editor extends Component {
+	constructor() {
+		super();
+
+		this.state.loading = true;
+	}
+
 	componentWillMount() {
 		// store the current task in the state
 		this.addSub(
@@ -26,25 +32,27 @@ export default class Editor extends Component {
 				this.setState(error);
 			})
 		);
+
+		// get the loading state of the current task
+		this.addSub(
+			currentTask.onLoading(loading => {
+				this.setState({ loading });
+			})
+		);
 	}
 
 	componentDidMount() {
 		this._mounted = true;
 	}
 
-	// create a new child task for the root task
-	createChild = () => {
-		const task = this.state.task.create();
-
-		// focus that child
-		focusController.focusTask(task.id, 0);
-	}
-
 	// display a message to the user
 	message(title, content) {
+		// update the page title
+		setTimeout(() => pageTitle.set(title), 0);
+
 		return <div className="flex-fill flex container">
 			<div className="scrollable flex-fill flex-column">
-				<div className="content flex flex-fill flex-vcenter flex-hcenter">
+				<div className="flex flex-fill flex-vcenter flex-hcenter">
 					{content}
 				</div>
 			</div>
@@ -56,7 +64,14 @@ export default class Editor extends Component {
 		if(this.state.errorType == "access") {
 			return this.message(
 				"Access denied",
-				"Either the list you requested does not exist or you do not have access."
+				"You do not have access to this list."
+			);
+		}
+
+		if(this.state.errorType == "exists") {
+			return this.message(
+				"Not found",
+				"The list and/or task you requested does not exist."
 			);
 		}
 
@@ -69,9 +84,12 @@ export default class Editor extends Component {
 		}
 
 		// show the loading page
-		if(!this.state.task) {
+		if(this.state.loading) {
 			return this.message("Loading...", <CircularProgress/>);
 		}
+
+		// clear the page title
+		setTimeout(() => pageTitle.set(undefined), 0);
 
 		// the styles for the add button
 		const addBtnStyle = {
@@ -85,14 +103,9 @@ export default class Editor extends Component {
 			<div style={{height: "100%"}} className="flex">
 				<div className="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
+					<SaveStatus/>
 					<div className="content">
 						<TasksWidget task={this.state.task} toplevel/>
-						<IconButton
-							onClick={this.createChild}
-							style={addBtnStyle}
-							iconStyle={addBtnStyle}>
-								<AddIcon/>
-						</IconButton>
 					</div>
 				</div>
 			</div>
