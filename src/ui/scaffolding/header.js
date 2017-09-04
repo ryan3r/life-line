@@ -28,17 +28,21 @@ export default class Header extends Component {
 
 	render() {
 		let title = null;
+		let headerMenu = null;
 
 		// use what ever title we are given
 		if(this.state.pageTitle) {
 			title = this.state.pageTitle;
 		}
-		// edit the current task
 		else if(this.state.task) {
+			// edit the current task
 			title = <EditTaskName
 				className="invisible"
 				task={this.state.task}
 				prop="name"/>;
+
+			// Show editing view options
+			headerMenu = <HeaderMenu task={this.state.task}/>;
 		}
 
 		return <AppBar
@@ -46,6 +50,6 @@ export default class Header extends Component {
 			onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
 			style={{flexShrink: 0}}
 			iconElementLeft={this.state.docked ? <span></span> : null}
-			iconElementRight={<HeaderMenu task={this.state.task}/>}/>
+			iconElementRight={headerMenu}/>
 	}
 }

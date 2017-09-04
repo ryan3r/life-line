@@ -8,6 +8,7 @@ import React from "react";
 import CircularProgress from "material-ui/CircularProgress";
 import SaveStatus from "./save-status";
 import {pageTitle} from "../../../stores/states";
+import {router} from "../../../router";
 
 export default class Editor extends Component {
 	constructor() {
@@ -17,6 +18,13 @@ export default class Editor extends Component {
 	}
 
 	componentWillMount() {
+		// listen to the authenticated/not authenticated state
+		this.addSub(
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ loggedIn: !!user });
+			})
+		);
+
 		// store the current task in the state
 		this.addSub(
 			currentTask.onTask(task => {
@@ -80,6 +88,23 @@ export default class Editor extends Component {
 				"Unexpected error",
 				"An unexpected error occured while loading your list: "
 					+ this.state.errorMessage
+			);
+		}
+
+		// no url and no user account tell them to sign in or get a list url
+		if(!this.state.loggedIn && !router.listId) {
+			return this.message(
+				"Nothing here",
+				`Please either sign in/sign up or type the full url
+				 for the list you are looking for.`
+			);
+		}
+
+		// probably a new users
+		if(!router.listId) {
+			return this.message(
+				"Welcome",
+				"Either open an existing list or create a new one to get started."
 			);
 		}
 
