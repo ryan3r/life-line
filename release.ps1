@@ -8,6 +8,9 @@ If(!$bumpType) {
 	exit 1
 }
 
+# Push from Github
+git pull
+
 # Bump the version
 npm version $bumpType
 
