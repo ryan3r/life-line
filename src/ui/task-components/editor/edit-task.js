@@ -426,7 +426,7 @@ export default class EditTask extends TaskComponent {
 		const showChildrenToggle = this.props.depth > 0 && this.state.showChildrenToggle;
 
 		// show a open/close arrow for the children
-		const hideShowChildren = showChildrenToggle ?<IconButton
+		const hideShowChildren = showChildrenToggle ? <IconButton
 			style={btnStyles}
 			iconStyle={iconArrow}
 			onClick={this.toggleHideChildren}>
@@ -438,10 +438,13 @@ export default class EditTask extends TaskComponent {
 			return task.children.length === 0;
 		});
 
-		// check if we should indent this task
+		// Indent the task if we are not showing the collapse toggle.
+		// If we are at the top level and either we are low on space or
+		// none of our siblings have children don't indenet.
 		const indentTask =
 			!showChildrenToggle &&
-			!(this.props.toplevel && this.state.siblingsHaveChildren);
+			(!this.props.toplevel ||
+				(!this.state.siblingsHaveChildren && this.props.depth > 0));
 
 		// save the indented state
 		this._wasIndented = indentTask;
