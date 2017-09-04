@@ -449,8 +449,13 @@ export default class EditTask extends TaskComponent {
 		// save the indented state
 		this._wasIndented = indentTask;
 
+		// show the fade animation
+		const fadeClass = !showCompleted.value && this.task.state.type == "done" ?
+			"fadeout-task" :
+			"";
+
 		return <div ref={base => this.base = base}>
-			<div className={`task flex flex-vcenter ${this.task.state.type}`}
+			<div className={`task flex flex-vcenter ${this.task.state.type} ${fadeClass}`}
 				style={{marginLeft: indentTask ? 29 : 0}}>
 				{hideShowChildren}
 				<Checkbox task={this.task}/>

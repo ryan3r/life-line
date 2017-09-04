@@ -6,6 +6,7 @@ import {showCompleted} from "../../../stores/states";
 import {maxNestingDepth} from "../../../constants";
 import RaisedButton from "material-ui/RaisedButton";
 import {focusController} from "./focus-controller";
+import Debouncer from "../../../util/debouncer";
 
 export default class TasksWidget extends TaskComponent {
 	constructor() {
@@ -14,6 +15,18 @@ export default class TasksWidget extends TaskComponent {
 		this.state.children = [];
 
 		showCompleted.bind(this);
+
+		this._refreshTimer = new Debouncer(() => {
+			this.setState({
+				children: this.task.children
+			});
+		}, 700);
+	}
+
+	componentWillUnmount() {
+		super.componentWillUnmount();
+
+		this._refreshTimer.cancel();
 	}
 
 	componentWillMount() {
@@ -94,7 +107,25 @@ export default class TasksWidget extends TaskComponent {
 
 		// hide completed tasks
 		if(!this.state.showCompleted) {
-			children = children.filter(task => task.state.type !== "done");
+			let hasAnimatingChildren = false;
+
+			children = children.filter(task => {
+				// calculate the time since the state change
+				const doneTime = Date.now() - task._stateModified;
+
+				if(task.state.type == "done" && doneTime < 500) {
+					hasAnimatingChildren = true;
+
+					return true;
+				}
+
+				return task.state.type !== "done";;
+			});
+
+			// refresh after the animations are done
+			if(hasAnimatingChildren) {
+				this._refreshTimer.trigger();
+			}
 		}
 
 		// get the number of layers of subitems we have left

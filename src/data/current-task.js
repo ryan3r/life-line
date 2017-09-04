@@ -89,6 +89,11 @@ router.onLocation(() => {
 				currentTask.task = task;
 
 				currentTask.emit("Task");
+
+				// expose the root tasks for debugging
+				if(location.origin == "http://localhost:5000") {
+					window.root = task;
+				}
 			}
 
 			// mark the task as done loading

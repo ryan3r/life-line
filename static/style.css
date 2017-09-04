@@ -161,3 +161,9 @@ div.hidden {
 	padding: 15px;
 	padding-bottom: 0px;
 }
+
+/* Fade tasks when they are completed */
+.fadeout-task {
+	transition: opacity 700ms;
+	opacity: 0;
+}

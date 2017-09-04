@@ -345,6 +345,9 @@ export default class Task extends Events {
 
 		// check for state listeners
 		if(this.hasListeners("State")) {
+			// save the time that we modified the state
+			this._stateModified = Date.now();
+
 			this._calculateState();
 
 			// notify the listeners
@@ -473,6 +476,9 @@ export default class Task extends Events {
 	set state(state) {
 		// get the state of a childless task
 		if(this.children.length === 0) {
+			// save the time that we modified the state
+			this._stateModified = Date.now();
+
 			// update the state
 			this._updateState(state);
 
