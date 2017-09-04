@@ -100,6 +100,14 @@ export default class Editor extends Component {
 			);
 		}
 
+		// probably a new users
+		if(!router.listId) {
+			return this.message(
+				"Welcome",
+				"Either open an existing list or create a new one to get started."
+			);
+		}
+
 		// show the loading page
 		if(this.state.loading) {
 			return this.message("Loading...", <CircularProgress/>);

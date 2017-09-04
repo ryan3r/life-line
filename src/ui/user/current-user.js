@@ -5,6 +5,7 @@ import Dialog from "material-ui/Dialog";
 import IconMenu from "material-ui/IconMenu";
 import IconButton from "material-ui/IconButton";
 import MenuItem from "material-ui/MenuItem";
+import localforage from "localforage";
 
 const auth = firebase.auth();
 
@@ -50,10 +51,17 @@ export default class CurrentUser extends Component {
 		// close the dialog
 		this.hideDialog();
 
-		// sign out
-		auth.signOut()
-			// make sure we have nothing from the old session
-			.then(() => location.reload());
+		Promise.all([
+			// sign out
+			auth.signOut(),
+			// remove all local data
+			localforage.clear()
+		])
+
+		// make sure we have nothing from the old session
+		.then(() => {
+			location.href = "/";
+		});
 	}
 
 	// delete their account
@@ -74,19 +82,24 @@ export default class CurrentUser extends Component {
 			let promises = [];
 
 			// delete all the lists
-			for(let listId of Object.keys(lists)) {
-				promises.push(db.ref(`/lists/${listId}`).remove())
+			if(lists) {
+				for(let listId of Object.keys(lists)) {
+					promises.push(db.ref(`/lists/${listId}`).remove())
+				}
 			}
 
 			// delete the user info
 			promises.push(userRef.remove());
+
+			// remove all local data
+			promises.push(localforage.clear());
 
 			return Promise.all(promises)
 		})
 
 		.then(() => {
 			// delete the account
-			auth.currentUser.delete();
+			return auth.currentUser.delete();
 		})
 
 		.then(() => {
