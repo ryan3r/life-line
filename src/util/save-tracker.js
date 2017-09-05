@@ -2,7 +2,6 @@ import Events from "./events";
 
 const saveTracker = new Events();
 
-window.saveTracker = saveTracker;
 export default saveTracker;
 
 saveTracker.defineEvent("IsDirty", "isDirty");
