@@ -54,7 +54,7 @@ const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
 			// go to the previous child
 			to = to.parent.children[index - 1];
 
-			while(to.children.length > 0 && isTaskVisible(to)) {
+			while(to.children.length > 0 && !to.hideChildren && isTaskVisible(to)) {
 				// go to the last child
 				to = to.children[to.children.length - 1];
 			}
@@ -90,8 +90,10 @@ const previousVisibleChild = (fromTask, {getTask} = {}) => {
 		const index = fromTask.parent.children.indexOf(fromTask);
 
 		// move to our first child if it is visible
-		if(fromTask.children.length > 0 && isTaskVisible(fromTask.children[0])) {
-			fromTask = fromTask.children[0];
+		if(fromTask.children.length > 0 &&
+			!fromTask.hideChildren &&
+			isTaskVisible(fromTask.children[0])) {
+				fromTask = fromTask.children[0];
 		}
 		// go to the previous child
 		else if(fromTask.parent.children.length - 1 > index) {
