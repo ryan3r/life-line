@@ -30,6 +30,11 @@ export default class Debouncer {
 
 	// cancel any pending calls
 	cancel() {
+		// resolve the old deferred
+		if(this._deferred) {
+			this._deferred.resolve();
+		}
+		
 		clearTimeout(this._timeout);
 	}
 }
