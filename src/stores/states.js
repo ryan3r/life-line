@@ -13,6 +13,9 @@ window.addEventListener("resize", () => {
 // the state of the side bar
 export let drawerOpen = new Store("drawerOpen");
 
+// the state of the props side bar
+export let propDrawerTask = new Store("propDrawerTask");
+
 // show or don't show completed tasks
 export let showCompleted = new Store("showCompleted");
 

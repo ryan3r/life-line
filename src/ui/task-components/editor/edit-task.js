@@ -13,6 +13,7 @@ import currentTask from "../../../data/current-task";
 import {showCompleted} from "../../../stores/states";
 import isTaskVisible from "../../../util/is-task-visible";
 import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
+import {propDrawerTask} from "../../../stores/states";
 
 // if the keyboard is opened make sure it doesn't cover the current editor
 window.addEventListener("resize", () => {
@@ -394,6 +395,11 @@ export default class EditTask extends TaskComponent {
 		});
 	}
 
+	// show this in the props sidebar
+	showSidebar = () => {
+		propDrawerTask.set(this.task);
+	}
+
 	toggleHideChildren = () => this.task.hideChildren = !this.task.hideChildren;
 
 	render() {
@@ -464,6 +470,7 @@ export default class EditTask extends TaskComponent {
 				<IconMenu
 					iconButtonElement={menuIcon}>
 						<MenuItem primaryText="Open" onClick={this.open}/>
+						<MenuItem primaryText="Edit props" onClick={this.showSidebar}/>
 						<MenuItem primaryText="Add subtask" onClick={this.create}/>
 						<MenuItem primaryText="Delete" onClick={this.remove}/>
 				</IconMenu>

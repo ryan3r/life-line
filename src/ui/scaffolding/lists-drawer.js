@@ -1,7 +1,7 @@
 import Component from "../component";
 import React from "react";
 import Drawer from "material-ui/Drawer";
-import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../../constants";
+import {SIDEBAR_WIDTH} from "../../constants";
 import AppBar from "material-ui/AppBar";
 import CurrentUser from "../user/current-user";
 import {Tabs, Tab} from "material-ui/Tabs";

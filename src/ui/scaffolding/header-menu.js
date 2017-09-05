@@ -5,7 +5,7 @@ import MenuItem from "material-ui/MenuItem";
 import IconMenu from "material-ui/IconMenu";
 import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
 import IconButton from "material-ui/IconButton";
-import {showCompleted} from "../../stores/states";
+import {showCompleted, propDrawerTask} from "../../stores/states";
 
 export default class HeaderMenu extends Component {
 	constructor() {
@@ -16,6 +16,11 @@ export default class HeaderMenu extends Component {
 
 	onToggleShowCompleted = () => {
 		showCompleted.set(!this.state.showCompleted);
+	}
+
+	// open the props sidebar for the current task
+	showSidebar = () => {
+		propDrawerTask.set(this.props.task);
 	}
 
 	render() {
@@ -34,6 +39,9 @@ export default class HeaderMenu extends Component {
 			<MenuItem
 				onClick={this.onToggleShowCompleted}
 				primaryText={`${btnMsg} completed`}/>
+			<MenuItem
+				onClick={this.showSidebar}
+				primaryText="Edit props"/>
 			<MenuItem
 				onClick={deleteCompleted}
 				primaryText="Delete completed"/>

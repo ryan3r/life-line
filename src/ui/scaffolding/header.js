@@ -1,4 +1,4 @@
-import EditTaskName from "../task-components/editor/edit-task-name";
+import TaskProp from "../task-components/task-prop";
 import AppBar from "material-ui/AppBar";
 import currentTask from "../../data/current-task";
 import React from "react";
@@ -36,8 +36,7 @@ export default class Header extends Component {
 		}
 		else if(this.state.task) {
 			// edit the current task
-			title = <EditTaskName
-				className="invisible"
+			title = <TaskProp
 				task={this.state.task}
 				prop="name"/>;
 

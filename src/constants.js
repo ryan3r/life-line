@@ -10,10 +10,11 @@ export const DEBOUNCE_TIMER = 500;
 // the sidebar sizing
 export const SIDEBAR_OPEN = 750;
 export const SIDEBAR_WIDTH = 300;
+export const PROP_SIDEBAR_WIDTH = 300;
 
 // the properties for a task
 export const TASK_PROPS = [
-	{ name: "name", syncToFirebase: true },
+	{ name: "name", syncToFirebase: true, editor: "textarea" },
 	{ name: "hideChildren" }
 ];
 
