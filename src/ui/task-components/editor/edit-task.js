@@ -48,7 +48,7 @@ const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
 			}
 			// move to the parent
 			else {
-				to = fromTask.parent;
+				to = to.parent;
 			}
 		}
 		else {
