@@ -13,6 +13,7 @@ import currentTask from "../../../data/current-task";
 import {showCompleted} from "../../../stores/states";
 import isTaskVisible from "../../../util/is-task-visible";
 import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
+import ArrowForwardIcon from "material-ui/svg-icons/navigation/arrow-forward";
 
 // if the keyboard is opened make sure it doesn't cover the current editor
 window.addEventListener("resize", () => {
@@ -342,58 +343,77 @@ export default class EditTask extends TaskComponent {
 	}
 
 	componentDidMount() {
-		// make sure the focus is not taken from us by material-ui
 		this.listen(this.base.querySelector(".editor"), "blur", () => {
 			setTimeout(() => {
+				// make sure the focus is not taken from us by material-ui
 				if(document.activeElement.getAttribute("role") == "menuitem" &&
 					this.base) {
 					this.base.querySelector(".editor").focus();
 				}
+				// notify the focus controller of the change
+				else {
+					focusController.lostFocus(this.task.id);
+				}
 			}, 0);
 		});
 
-		focusController.onFocus(id => {
-			// not a focus for this task
-			if(this.task.id !== id || !this.base) return;
-
-			let {startAt, endAt} = focusController.getRangeInfo(this.task.name);
-			// get the text node for the editor
-			const editor = this.base.querySelector(".editor");
-			let textNode = editor.childNodes[0];
-
-			// if there is no text node create one
-			if(!textNode) {
-				textNode = document.createTextNode("");
-
-				// add it to the editor
-				editor.appendChild(textNode);
-			}
-
-			let range = document.createRange();
-
-			if(startAt > textNode.textContent.length) {
-				startAt = textNode.textContent.length;
-			}
-
-			if(endAt > textNode.textContent.length) {
-				endAt = textNode.textContent.length;
-			}
-
-			// select the text
-			range.setStart(textNode, startAt);
-			range.setEnd(textNode, endAt);
-
-			let selection = getSelection();
-
-			// clear the current selection (if any)
-			selection.removeAllRanges();
-
-			// add the new selection
-			selection.addRange(range);
-
-			// make sure this task is in view
-			this.base.scrollIntoViewIfNeeded();
+		// this task just got focus tell everyone
+		this.listen(this.base.querySelector(".editor"), "focus", () => {
+			focusController.gotFocus(this.task.id);
 		});
+
+		this.addSub(
+			focusController.onFocus(id => {
+				// update the task in focus state
+				this.setState({
+					taskFocused: id !== undefined
+				});
+
+				// not a focus for this task
+				if(this.task.id !== id || !this.base) return;
+
+				// we don't need to worry about this event
+				if(!focusController.trueFocus) return;
+
+				let {startAt, endAt} = focusController.getRangeInfo(this.task.name);
+				// get the text node for the editor
+				const editor = this.base.querySelector(".editor");
+				let textNode = editor.childNodes[0];
+
+				// if there is no text node create one
+				if(!textNode) {
+					textNode = document.createTextNode("");
+
+					// add it to the editor
+					editor.appendChild(textNode);
+				}
+
+				let range = document.createRange();
+
+				if(startAt > textNode.textContent.length) {
+					startAt = textNode.textContent.length;
+				}
+
+				if(endAt > textNode.textContent.length) {
+					endAt = textNode.textContent.length;
+				}
+
+				// select the text
+				range.setStart(textNode, startAt);
+				range.setEnd(textNode, endAt);
+
+				let selection = getSelection();
+
+				// clear the current selection (if any)
+				selection.removeAllRanges();
+
+				// add the new selection
+				selection.addRange(range);
+
+				// make sure this task is in view
+				this.base.scrollIntoViewIfNeeded();
+			})
+		);
 	}
 
 	toggleHideChildren = () => this.task.hideChildren = !this.task.hideChildren;
@@ -456,6 +476,33 @@ export default class EditTask extends TaskComponent {
 			"fadeout-task" :
 			"";
 
+		// the styles for the arrow icon
+		const arrowStyles = {
+		    width: 25,
+		    height: 25,
+		    padding: 0,
+			marginRight: 5
+		};
+
+		// show the open arrow for tasks with children
+		const openArrow = this.task.children.length > 0 && !this.state.taskFocused ?
+			<IconButton
+				onClick={this.open}
+				style={arrowStyles}
+				iconStyle={arrowStyles}>
+					<ArrowForwardIcon/>
+			</IconButton>
+			: null;
+
+		// show the editing menu when we are focused
+		const editMenu = this.state.taskFocused ?
+			<IconMenu
+				iconButtonElement={menuIcon}>
+					<MenuItem primaryText="Add subtask" onClick={this.create}/>
+					<MenuItem primaryText="Delete" onClick={this.remove}/>
+			</IconMenu>
+			: null;
+
 		return <div ref={base => this.base = base}>
 			<div className={`task flex flex-vcenter ${this.task.state.type} ${fadeClass}`}
 				style={{marginLeft: indentTask ? 29 : 0}}>
@@ -463,12 +510,8 @@ export default class EditTask extends TaskComponent {
 				<Checkbox task={this.task}/>
 				<EditTaskName className="flex-fill" task={this.task} prop="name"
 					onKeyDown={this.handleKey}/>
-				<IconMenu
-					iconButtonElement={menuIcon}>
-						<MenuItem primaryText="Open" onClick={this.open}/>
-						<MenuItem primaryText="Add subtask" onClick={this.create}/>
-						<MenuItem primaryText="Delete" onClick={this.remove}/>
-				</IconMenu>
+				{editMenu}
+				{openArrow}
 			</div>
 			<div className="subtasks">
 				{/* TODO: Fix TasksWidget.default */}
