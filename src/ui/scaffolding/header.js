@@ -6,6 +6,12 @@ import {SIDEBAR_OPEN} from "../../constants";
 import Component from "../component";
 import HeaderMenu from "./header-menu";
 import {dockedStore, drawerOpen, pageTitle} from "../../stores/states";
+import {focusController} from "../task-components/editor/focus-controller";
+import EditToolbar from "../task-components/editor/edit-toolbar";
+import {green500} from "material-ui/styles/colors";
+
+// get the theme color meta
+const themeColor = document.querySelector("meta[name=theme-color]");
 
 export default class Header extends Component {
 	constructor() {
@@ -13,6 +19,22 @@ export default class Header extends Component {
 
 		dockedStore.bind(this);
 		pageTitle.bind(this);
+
+		// show the editing menu when we are editing
+		this.addSub(
+			focusController.onFocus(id => {
+				// set the initial state
+				if(!this.updater.isMounted(this)) {
+					this.state.focused = id;
+				}
+				// update the state
+				else {
+					this.setState({
+						focused: id
+					});
+				}
+			})
+		);
 	}
 
 	componentWillMount() {
@@ -43,6 +65,14 @@ export default class Header extends Component {
 			// Show editing view options
 			headerMenu = <HeaderMenu task={this.state.task}/>;
 		}
+
+		// show the edit toolbar when we are editing
+		if(this.state.focused) {
+			return <EditToolbar taskId={this.state.focused}/>;
+		}
+
+		// switch the theme color
+		themeColor.setAttribute("content", green500);
 
 		return <AppBar
 			title={title}

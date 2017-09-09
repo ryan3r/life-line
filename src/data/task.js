@@ -62,6 +62,7 @@ export default class Task extends Events {
 		this.defineEvent("State", "state");
 		this.defineEvent("Children", "children");
 		this.defineEvent("HasGrandchildren", "hasGrandchildren");
+		this.defineEvent("Delete");
 
 		// start with a depth of 0
 		this.depth = 0;
@@ -197,6 +198,9 @@ export default class Task extends Events {
 		if(this.hideChildren) {
 			localforage.removeItem(`hideChildren-${this.id}`);
 		}
+
+		// trigger a delete event
+		this.emit("Delete");
 
 		// delete the task from tasks
 		this._tasks.delete(this.id);
