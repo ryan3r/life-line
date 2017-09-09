@@ -10,7 +10,7 @@ import IconButton from "material-ui/IconButton";
 import {focusController} from "./focus-controller";
 import TasksWidget from "./tasks";
 import currentTask from "../../../data/current-task";
-import {showCompleted} from "../../../stores/states";
+import {showCompleted, propDrawerTask} from "../../../stores/states";
 import isTaskVisible from "../../../util/is-task-visible";
 import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
 import ArrowForwardIcon from "material-ui/svg-icons/navigation/arrow-forward";
@@ -504,6 +504,7 @@ export default class EditTask extends TaskComponent {
 			<IconMenu
 				iconButtonElement={menuIcon}>
 					<MenuItem primaryText="Add subtask" onClick={this.create}/>
+					<MenuItem primaryText="Edit props" onClick={this.showSidebar}/>
 					<MenuItem primaryText="Delete" onClick={this.remove}/>
 			</IconMenu>
 			: null;

@@ -9,7 +9,8 @@ export const DEBOUNCE_TIMER = 500;
 
 // the sidebar sizing
 export const SIDEBAR_OPEN = 750;
-export const SIDEBAR_WIDTH = 300;
+export const SIDEBAR_WIDTH = 250;
+export const PROP_SIDEBAR_OPEN = 1000;
 export const PROP_SIDEBAR_WIDTH = 300;
 
 // the properties for a task
