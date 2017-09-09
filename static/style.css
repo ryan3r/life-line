@@ -40,6 +40,7 @@ html, body {
 
 /* Checkbox styles */
 .checkbox {
+	margin: 2px 0px;
 	margin-right: 13px;
 	fill: rgba(0, 0, 0, 0);
 	stroke: #2196F3;

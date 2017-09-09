@@ -21,6 +21,34 @@ export class FocusController extends Events {
 		this._start = start;
 		this._end = end;
 
+		// we should refocus for these
+		this.trueFocus = true;
+
+		// notify any listeners that we focused a task
+		this.emit("Focus");
+	}
+
+	lostFocus(id) {
+		if(this._id == id) {
+			this._id = undefined;
+
+			// we should not refocus for these
+			this.trueFocus = false;
+
+			// notify any listeners that we focused a task
+			this.emit("Focus");
+		}
+	}
+
+	gotFocus(id) {
+		// already got focus
+		if(this._id == id) return;
+
+		this._id = id;
+
+		// we should not refocus for these
+		this.trueFocus = false;
+
 		// notify any listeners that we focused a task
 		this.emit("Focus");
 	}

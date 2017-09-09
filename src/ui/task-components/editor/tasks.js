@@ -135,14 +135,7 @@ export default class TasksWidget extends TaskComponent {
 
 		// we can't add any more children
 		if(depth === 0) {
-			if(children.length > 0) {
-				return <TaskLink id={this.task.id} className="hidden">
-					{`${children.length} subtasks not shown`}
-				</TaskLink>;
-			}
-			else {
-				return null;
-			}
+			return null;
 		}
 
 		return <div>
