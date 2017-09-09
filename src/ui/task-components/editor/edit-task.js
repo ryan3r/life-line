@@ -13,11 +13,7 @@ import currentTask from "../../../data/current-task";
 import {showCompleted} from "../../../stores/states";
 import isTaskVisible from "../../../util/is-task-visible";
 import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
-<<<<<<< HEAD
-import {propDrawerTask} from "../../../stores/states";
-=======
 import ArrowForwardIcon from "material-ui/svg-icons/navigation/arrow-forward";
->>>>>>> master
 
 // if the keyboard is opened make sure it doesn't cover the current editor
 window.addEventListener("resize", () => {
@@ -519,18 +515,8 @@ export default class EditTask extends TaskComponent {
 				<Checkbox task={this.task}/>
 				<EditTaskName className="flex-fill" task={this.task} prop="name"
 					onKeyDown={this.handleKey}/>
-<<<<<<< HEAD
-				<IconMenu
-					iconButtonElement={menuIcon}>
-						<MenuItem primaryText="Open" onClick={this.open}/>
-						<MenuItem primaryText="Edit props" onClick={this.showSidebar}/>
-						<MenuItem primaryText="Add subtask" onClick={this.create}/>
-						<MenuItem primaryText="Delete" onClick={this.remove}/>
-				</IconMenu>
-=======
 				{editMenu}
 				{openArrow}
->>>>>>> master
 			</div>
 			<div className="subtasks">
 				{/* TODO: Fix TasksWidget.default */}
