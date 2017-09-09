@@ -48,7 +48,7 @@ export default class Header extends Component {
 			title={title}
 			onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
 			style={{flexShrink: 0}}
-			iconElementLeft={this.state.docked ? <span></span> : null}
+			showMenuIconButton={!this.state.docked}
 			iconElementRight={headerMenu}/>
 	}
 }
