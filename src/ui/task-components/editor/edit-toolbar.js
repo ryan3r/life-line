@@ -8,18 +8,32 @@ import AddIcon from "material-ui/svg-icons/content/add";
 import DeleteIcon from "material-ui/svg-icons/action/delete";
 import CloseIcon from "material-ui/svg-icons/navigation/close";
 import currentTask from "../../../data/current-task";
-import {propDrawerTask} from "../../../stores/states";
+import {propDrawerTask, dockedPropStore} from "../../../stores/states";
 import {router} from "../../../router";
 import {focusController} from "./focus-controller";
 import {outdent, indent, moveTo} from "./task-utils";
 import UpIcon from "material-ui/svg-icons/hardware/keyboard-arrow-up";
 import DownIcon from "material-ui/svg-icons/hardware/keyboard-arrow-down";
 import EditIcon from "material-ui/svg-icons/content/create";
+import {MIN_WIDE_TOOLBAR} from "../../../constants";
 
 // get the theme color meta
 const themeColor = document.querySelector("meta[name=theme-color]");
 
 export default class EditToolbar extends Component {
+	constructor() {
+		super();
+
+		dockedPropStore.bind(this, "docked");
+
+		// set the toolbar to wide/non-wide mode
+		this.state.wide = innerWidth > MIN_WIDE_TOOLBAR;
+
+		this.listen(window, "resize", () => {
+			this.setState({ wide: innerWidth > 430 });
+		});
+	}
+
 	// get the current task
 	getTask() {
 		return currentTask.tasks.get(this.props.taskId);
@@ -93,20 +107,33 @@ export default class EditToolbar extends Component {
 			color: "#fff"
 		};
 
+		// the editing icons that get are hidden in the menu
+		let moreBtns = [
+			{ name: "moveUp", icon: <UpIcon/>, text: "Move up" },
+			{ name: "moveDown", icon: <DownIcon/>, text: "Move down" },
+			{ name: "outdent", icon: <OutdentIcon/>, text: "Outdent" },
+			{ name: "indent", icon: <IndentIcon/>, text: "Indent" },
+		];
+
 		// the editing icons
-		const BTNS = [
+		let editingBtns = [
 			{ name: "create", icon: <AddIcon/> },
-			{ name: "moveUp", icon: <UpIcon/> },
-			{ name: "moveDown", icon: <DownIcon/> },
-			{ name: "outdent", icon: <OutdentIcon/> },
-			{ name: "indent", icon: <IndentIcon/> },
-			{ name: "showSidebar", icon: <EditIcon/> },
 			{ name: "delete", icon: <DeleteIcon/> }
 		];
 
+		// add the edit props button when the sidebar is undocked
+		if(!this.state.docked) {
+			editingBtns.splice(5, 0, { name: "showSidebar", icon: <EditIcon/> });
+		}
+
+		// show all icons if we have enough space
+		if(this.state.wide) {
+			editingBtns = moreBtns.concat(editingBtns);
+		}
+
 		// the build editing icons
 		const icons = <div>
-			{BTNS.map(({name, icon}) => {
+			{editingBtns.map(({name, icon}) => {
 				return <IconButton
 					onMouseDown={this[name]}
 					iconStyle={iconStyles}
@@ -122,7 +149,7 @@ export default class EditToolbar extends Component {
 		</IconButton>;
 
 		return <AppBar
-			showMenuIconButton={innerWidth > 400}
+			showMenuIconButton={true}
 			iconElementRight={icons}
 			iconElementLeft={closeBtn}
 			style={{backgroundColor: "#673AB7"}}/>

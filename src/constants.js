@@ -7,6 +7,9 @@ export const INDENT_SIZE = 30;
 // the time to wait from when a char is typed until we save
 export const DEBOUNCE_TIMER = 500;
 
+// the min width for the toolbar to show all the buttons
+export const MIN_WIDE_TOOLBAR = 430;
+
 // the sidebar sizing
 export const SIDEBAR_WIDTH = 250;
 export const PROP_SIDEBAR_WIDTH = 300;
