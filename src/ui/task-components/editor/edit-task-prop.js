@@ -40,7 +40,7 @@ export default class EditTaskProp extends TaskComponent {
 						value={this.state.value}
 						formatDate={date => moment(date).format("MM/DD/YYYY")}
 						firstDayOfWeek={0}/>
-					<FlatButton onClick={() => this.setValue("")}>
+					<FlatButton onClick={() => this.setValue(undefined)}>
 						Remove date
 					</FlatButton>
 				</div>;
@@ -64,6 +64,16 @@ export default class EditTaskProp extends TaskComponent {
 					onChange={this.setValue}/>;
 
 				break;
+
+			// show a textarea
+			case "textarea":
+				editor = <TextField
+					floatingLabelText={fieldName}
+					onChange={this.setValue}
+					value={this.state.value}
+					multiLine={true}
+					rows={1}/>
+				break
 
 			// other wise show a text field
 			default:

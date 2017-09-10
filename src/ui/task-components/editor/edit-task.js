@@ -74,6 +74,13 @@ export default class EditTask extends TaskComponent {
 		});
 	}
 
+	onTaskDescription() {
+		// save the current task
+		this.setState({
+			task: this.task
+		});
+	}
+
 	onTaskDelete() {
 		// if we have focus remove it
 		if(focusController.hasFocus(this.task.id)) {
@@ -300,13 +307,32 @@ export default class EditTask extends TaskComponent {
 
 		// display the due date
 		const dueStyles = {
-			marginLeft: indentTask ? 50 : 20,
+			marginLeft: indentTask || this.task.children.length > 0 ? 50 : 20,
 			color: "purple"
 		};
 
 		const dueDate = this.task.due ?
 			<div style={dueStyles}>due {moment(this.task.due).fromNow()}</div>
 			: null;
+
+		// display a description
+		let description = null;
+
+		if(this.task.description) {
+			// properly layout the description
+			const descStyle = {
+				marginLeft: indentTask || this.task.children.length > 0 ? 50 : 20,
+				marginTop: 5
+			};
+
+			// display the description
+			description = <div style={descStyle}>
+				{/* Make each line a div */}
+				{this.task.description.split("\n").map((line, i) => {
+					return <div key={i}>{line}</div>
+				})}
+			</div>;
+		}
 
 		return <div ref={base => this.base = base}>
 			<div className={`task flex flex-vcenter ${this.task.state.type} ${fadeClass}`}
@@ -319,6 +345,7 @@ export default class EditTask extends TaskComponent {
 			</div>
 			<div className="subtasks">
 				{dueDate}
+				{description}
 				{/* TODO: Fix TasksWidget.default */}
 				<TasksWidget.default editMode task={this.task} depth={this.props.depth}/>
 			</div>
