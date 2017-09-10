@@ -4,6 +4,7 @@ import DatePicker from "material-ui/DatePicker";
 import TimePicker from "material-ui/TimePicker";
 import TextField from "material-ui/TextField";
 import Toggle from "material-ui/Toggle";
+const moment = require("moment");
 
 // capitalize the first letter
 const capitalizeFirst = word => word.charAt(0).toUpperCase() + word.substr(1);
@@ -34,7 +35,9 @@ export default class EditTaskProp extends TaskComponent {
 				editor = <DatePicker
 					hintText={fieldName}
 					onChange={this.setValue}
-					value={this.state.value}/>;
+					value={this.state.value}
+					formatDate={date => moment(date).format("MM/DD/YYYY")}
+					firstDayOfWeek={0}/>;
 
 				break;
 

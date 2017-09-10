@@ -13,6 +13,7 @@ import {showCompleted} from "../../../stores/states";
 import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
 import ArrowForwardIcon from "material-ui/svg-icons/navigation/arrow-forward";
 import {previousVisibleTask, nextVisibleTask, outdent, indent, moveTo} from "./task-utils";
+const moment = require("moment");
 
 // if the keyboard is opened make sure it doesn't cover the current editor
 window.addEventListener("resize", () => {
@@ -62,6 +63,12 @@ export default class EditTask extends TaskComponent {
 	}
 
 	onTaskHideChildren() {
+		this.setState({
+			showChildrenToggle: this.task.children.length > 0
+		});
+	}
+
+	onTaskDue() {
 		this.setState({
 			showChildrenToggle: this.task.children.length > 0
 		});
@@ -291,6 +298,16 @@ export default class EditTask extends TaskComponent {
 			</IconButton>
 			: null;
 
+		// display the due date
+		const dueStyles = {
+			marginLeft: "50px",
+			color: "purple"
+		};
+
+		const dueDate = this.task.due ?
+			<div style={dueStyles}>due {moment(this.task.due).fromNow()}</div>
+			: null;
+
 		return <div ref={base => this.base = base}>
 			<div className={`task flex flex-vcenter ${this.task.state.type} ${fadeClass}`}
 				style={{marginLeft: indentTask ? 29 : 0}}>
@@ -301,6 +318,7 @@ export default class EditTask extends TaskComponent {
 				{openArrow}
 			</div>
 			<div className="subtasks">
+				{dueDate}
 				{/* TODO: Fix TasksWidget.default */}
 				<TasksWidget.default editMode task={this.task} depth={this.props.depth}/>
 			</div>

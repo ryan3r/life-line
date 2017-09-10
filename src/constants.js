@@ -20,7 +20,8 @@ export const PROP_SIDEBAR_OPEN = SIDEBAR_OPEN + PROP_SIDEBAR_WIDTH;
 // the properties for a task
 export const TASK_PROPS = [
 	{ name: "name", syncToFirebase: true, editor: "textarea" },
-	{ name: "hideChildren" }
+	{ name: "hideChildren" },
+	{ name: "due", syncToFirebase: true, editor: "date" }
 ];
 
 // calculate the max nesting depth

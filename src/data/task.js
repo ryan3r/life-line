@@ -38,7 +38,14 @@ export default class Task extends Events {
 
 		// set the props
 		for(const prop of TASK_PROPS) {
-			this["_" + prop.name] = raw[prop.name];
+			let value = raw[prop.name];
+
+			// parse the date
+			if(prop.editor == "date" && value) {
+				value = new Date(value);
+			}
+
+			this["_" + prop.name] = value;
 
 			// define the change event
 			this.defineEvent(capitalizeFirst(prop.name), prop.name);
@@ -95,7 +102,14 @@ export default class Task extends Events {
 		// update the properties
 		for(const prop of TASK_PROPS) {
 			if(prop.syncToFirebase) {
-				this._updateProp(prop.name, raw[prop.name]);
+				let value = raw[prop.name];
+
+				// parse the date
+				if(prop.editor == "date") {
+					value = new Date(value);
+				}
+
+				this._updateProp(prop.name, value);
 			}
 		}
 
@@ -519,7 +533,12 @@ export default class Task extends Events {
 	_makePropSave(name) {
 		return () => {
 			let promises = [];
-			const value = this[name];
+			let value = this[name];
+
+			// stringify the date
+			if(typeof value == "object") {
+				value = value.toISOString();
+			}
 
 			// save the value
 			const ref = this._tasks._ref.child(`${this.id}/${name}`);
