@@ -86,7 +86,7 @@ export default class BreadCrumbs extends Component {
 		// account for the collapsed menu
 		width -= ARROW_WIDTH + MENU_WIDTH;
 
-		return width;
+		return width * 0.70 | 0;
 	}
 
 	// get the crumb list
