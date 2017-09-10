@@ -1,6 +1,6 @@
 {
   "name": "life-line",
-  "version": "0.2.5-1",
+  "version": "0.2.5-2",
   "description": "",
   "main": "./src/server",
   "bin": "./bin/life-line.js",
