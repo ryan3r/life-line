@@ -10,6 +10,7 @@ import SaveStatus from "./save-status";
 import {pageTitle} from "../../../stores/states";
 import {router} from "../../../router";
 import PropsSidebar from "./props-sidebar";
+import TaskProp from "../task-prop";
 
 export default class Editor extends Component {
 	constructor() {
@@ -132,6 +133,10 @@ export default class Editor extends Component {
 					<BreadCrumbs task={this.state.task}/>
 					<SaveStatus/>
 					<div className="content">
+						<div className="task-info">
+							<TaskProp task={this.state.task} prop="due"/>
+							<TaskProp task={this.state.task} prop="description"/>
+						</div>
 						<TasksWidget task={this.state.task} toplevel/>
 					</div>
 				</div>

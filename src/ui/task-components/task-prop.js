@@ -1,5 +1,6 @@
 import TaskComponent from "./task-component";
 import React from "react";
+const moment = require("moment");
 
 // capitalize the first letter
 const capitalizeFirst = word => word.charAt(0).toUpperCase() + word.substr(1);
@@ -22,6 +23,26 @@ export default class TaskProp extends TaskComponent {
 	}
 
 	render() {
+		// nothing to show
+		if(!this.state.value) return null;
+
+		// display the description
+		if(this.props.prop == "description") {
+			return <div>
+				{/* Make each line a div */}
+				{this.state.value.split("\n").map((line, i) => {
+					return <div key={i}>{line}</div>
+				})}
+			</div>;
+		}
+
+		// display the date
+		if(this.props.prop == "due") {
+			return <div style={{color: "purple", marginBottom: 15}}>
+				due {moment(this.state.value).fromNow()}
+			</div>;
+		}
+
 		return <span>{this.state.value}</span>;
 	}
 }

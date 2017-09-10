@@ -13,7 +13,7 @@ import {showCompleted} from "../../../stores/states";
 import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
 import ArrowForwardIcon from "material-ui/svg-icons/navigation/arrow-forward";
 import {previousVisibleTask, nextVisibleTask, outdent, indent, moveTo} from "./task-utils";
-const moment = require("moment");
+import TaskProp from "../task-prop";
 
 // if the keyboard is opened make sure it doesn't cover the current editor
 window.addEventListener("resize", () => {
@@ -65,19 +65,6 @@ export default class EditTask extends TaskComponent {
 	onTaskHideChildren() {
 		this.setState({
 			showChildrenToggle: this.task.children.length > 0
-		});
-	}
-
-	onTaskDue() {
-		this.setState({
-			showChildrenToggle: this.task.children.length > 0
-		});
-	}
-
-	onTaskDescription() {
-		// save the current task
-		this.setState({
-			task: this.task
 		});
 	}
 
@@ -305,33 +292,6 @@ export default class EditTask extends TaskComponent {
 			</IconButton>
 			: null;
 
-		// display the due date
-		const dueStyles = {
-			color: "purple"
-		};
-
-		const dueDate = this.task.due ?
-			<div style={dueStyles}>due {moment(this.task.due).fromNow()}</div>
-			: null;
-
-		// display a description
-		let description = null;
-
-		if(this.task.description) {
-			// properly layout the description
-			const descStyle = {
-				marginTop: 5
-			};
-
-			// display the description
-			description = <div style={descStyle}>
-				{/* Make each line a div */}
-				{this.task.description.split("\n").map((line, i) => {
-					return <div key={i}>{line}</div>
-				})}
-			</div>;
-		}
-
 		// the indentation for the info section
 		const infoIndentation = indentTask || this.task.children.length > 0 ? 20 : 0;
 
@@ -340,8 +300,8 @@ export default class EditTask extends TaskComponent {
 
 		if(!this.task.hideChildren) {
 			info = <div style={{marginLeft: infoIndentation}} className="task-info">
-				{dueDate}
-				{description}
+				<TaskProp task={this.task} prop="due"/>
+				<TaskProp task={this.task} prop="description"/>
 			</div>;
 		}
 
