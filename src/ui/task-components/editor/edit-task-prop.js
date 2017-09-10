@@ -4,6 +4,7 @@ import DatePicker from "material-ui/DatePicker";
 import TimePicker from "material-ui/TimePicker";
 import TextField from "material-ui/TextField";
 import Toggle from "material-ui/Toggle";
+import FlatButton from "material-ui/FlatButton";
 const moment = require("moment");
 
 // capitalize the first letter
@@ -32,12 +33,17 @@ export default class EditTaskProp extends TaskComponent {
 		switch(this.props.type) {
 			// show a date picker
 			case "date":
-				editor = <DatePicker
-					hintText={fieldName}
-					onChange={this.setValue}
-					value={this.state.value}
-					formatDate={date => moment(date).format("MM/DD/YYYY")}
-					firstDayOfWeek={0}/>;
+				editor = <div>
+					<DatePicker
+						hintText={fieldName}
+						onChange={this.setValue}
+						value={this.state.value}
+						formatDate={date => moment(date).format("MM/DD/YYYY")}
+						firstDayOfWeek={0}/>
+					<FlatButton onClick={() => this.setValue("")}>
+						Remove date
+					</FlatButton>
+				</div>;
 
 				break;
 

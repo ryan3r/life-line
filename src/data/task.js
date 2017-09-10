@@ -105,7 +105,7 @@ export default class Task extends Events {
 				let value = raw[prop.name];
 
 				// parse the date
-				if(prop.editor == "date") {
+				if(prop.editor == "date" && value) {
 					value = new Date(value);
 				}
 
