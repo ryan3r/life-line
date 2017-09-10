@@ -300,7 +300,7 @@ export default class EditTask extends TaskComponent {
 
 		// display the due date
 		const dueStyles = {
-			marginLeft: "50px",
+			marginLeft: indentTask ? 50 : 20,
 			color: "purple"
 		};
 
