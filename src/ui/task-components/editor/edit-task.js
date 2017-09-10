@@ -307,7 +307,6 @@ export default class EditTask extends TaskComponent {
 
 		// display the due date
 		const dueStyles = {
-			marginLeft: indentTask || this.task.children.length > 0 ? 50 : 20,
 			color: "purple"
 		};
 
@@ -321,7 +320,6 @@ export default class EditTask extends TaskComponent {
 		if(this.task.description) {
 			// properly layout the description
 			const descStyle = {
-				marginLeft: indentTask || this.task.children.length > 0 ? 50 : 20,
 				marginTop: 5
 			};
 
@@ -331,6 +329,19 @@ export default class EditTask extends TaskComponent {
 				{this.task.description.split("\n").map((line, i) => {
 					return <div key={i}>{line}</div>
 				})}
+			</div>;
+		}
+
+		// the indentation for the info section
+		const infoIndentation = indentTask || this.task.children.length > 0 ? 20 : 0;
+
+		// show/hide the info
+		let info = null;
+
+		if(!this.task.hideChildren) {
+			info = <div style={{marginLeft: infoIndentation}} className="task-info">
+				{dueDate}
+				{description}
 			</div>;
 		}
 
@@ -344,8 +355,7 @@ export default class EditTask extends TaskComponent {
 				{openArrow}
 			</div>
 			<div className="subtasks">
-				{dueDate}
-				{description}
+				{info}
 				{/* TODO: Fix TasksWidget.default */}
 				<TasksWidget.default editMode task={this.task} depth={this.props.depth}/>
 			</div>

@@ -168,3 +168,9 @@ div.hidden {
 	transition: opacity 700ms;
 	opacity: 0;
 }
+
+/* Pad the task info */
+.task-info {
+	border-left: 3px solid #ccc;
+	padding-left: 15px;
+}
