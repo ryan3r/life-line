@@ -23,9 +23,6 @@ export default class PropDrawer extends Component {
 			focusController.onFocus(id => {
 				const task = currentTask.tasks.get(id);
 
-				// no task to switch to
-				if(!task) return;
-
 				this.setState({
 					hoveredTask: task
 				});
@@ -37,7 +34,9 @@ export default class PropDrawer extends Component {
 		let sidebar;
 
 		// get the task to render
-		const task = this.state.task || this.state.hoveredTask;
+		const task = this.state.task ||
+			this.state.hoveredTask ||
+			this.props.task;
 
 		// add the editors
 		if(task) {

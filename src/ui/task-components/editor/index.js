@@ -126,7 +126,7 @@ export default class Editor extends Component {
 		};
 
 		return <div style={{height: "calc(100% - 68px)"}}>
-			<PropsSidebar/>
+			<PropsSidebar task={this.state.task}/>
 			<ProgressBar task={this.state.task}/>
 			<div style={{height: "100%"}} className="flex">
 				<div className="scrollable flex-fill">
