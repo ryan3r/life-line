@@ -23,6 +23,11 @@ export default class PropDrawer extends Component {
 			focusController.onFocus(id => {
 				const task = currentTask.tasks.get(id);
 
+				// if our current task still exists stay on that one
+				if(!task &&
+					(!this.state.hoveredTask ||
+					currentTask.tasks.get(this.state.hoveredTask.id))) return;
+
 				this.setState({
 					hoveredTask: task
 				});
