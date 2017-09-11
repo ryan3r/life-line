@@ -6,9 +6,7 @@ import TextField from "material-ui/TextField";
 import Toggle from "material-ui/Toggle";
 import FlatButton from "material-ui/FlatButton";
 const moment = require("moment");
-
-// capitalize the first letter
-const capitalizeFirst = word => word.charAt(0).toUpperCase() + word.substr(1);
+import capitalizeFirst from "../../../util/capitalize-first";
 
 export default class EditTaskProp extends TaskComponent {
 	addListeners() {

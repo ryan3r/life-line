@@ -1,9 +1,7 @@
 import TaskComponent from "./task-component";
 import React from "react";
 const moment = require("moment");
-
-// capitalize the first letter
-const capitalizeFirst = word => word.charAt(0).toUpperCase() + word.substr(1);
+import capitalizeFirst from "../../util/capitalize-first";
 
 export default class TaskProp extends TaskComponent {
 	addListeners() {

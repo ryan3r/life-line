@@ -7,11 +7,9 @@ import {DEBOUNCE_TIMER} from "../constants";
 import Debouncer from "../util/debouncer";
 import localforage from "localforage";
 import {showCompleted} from "../stores/states";
+import capitalizeFirst from "../util/capitalize-first";
 
 const db = firebase.database();
-
-// capitalize the first letter
-const capitalizeFirst = word => word.charAt(0).toUpperCase() + word.substr(1);
 
 export default class Task extends Events {
 	constructor({id, raw, tasks}) {
