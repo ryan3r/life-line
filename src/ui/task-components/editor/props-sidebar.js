@@ -42,7 +42,9 @@ export default class PropDrawer extends Component {
 		if(task) {
 			const editors = TASK_PROPS
 				// remove any non editable props
-				.filter(prop => prop.editor)
+				.filter(prop => prop.editor &&
+					// remove the name property when we arn't looking at the root task
+					(this.props.task == task || prop.name != "name"))
 				// create the editor
 				.map(prop => {
 					return <EditTaskProp
