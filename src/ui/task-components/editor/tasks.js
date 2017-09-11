@@ -89,9 +89,8 @@ export default class TasksWidget extends TaskComponent {
 
 		if(this.props.toplevel && this.task.children.length === 0) {
 			return <div style={{ textAlign: "center" }}>
-				<h2 style={{ marginBottom: "50px" }}>No tasks yet</h2>
 				<RaisedButton
-					label="Create one"
+					label="Create task"
 					onClick={this.createChild}
 					primary={true}/>
 			</div>;

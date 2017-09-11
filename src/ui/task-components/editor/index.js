@@ -133,7 +133,7 @@ export default class Editor extends Component {
 					<BreadCrumbs task={this.state.task}/>
 					<SaveStatus/>
 					<div className="content">
-						<div className="task-info">
+						<div className="task-info" style={{marginBottom: 10}}>
 							<TaskProp task={this.state.task} prop="due"/>
 							<TaskProp task={this.state.task} prop="description"/>
 						</div>

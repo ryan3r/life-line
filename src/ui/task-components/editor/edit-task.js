@@ -51,7 +51,10 @@ export default class EditTask extends TaskComponent {
 		// save the current task
 		this.setState({
 			task: this.task,
-			showChildrenToggle: this.task.children.length > 0
+			showChildrenToggle:
+				this.task.children.length > 0 ||
+				this.task.description !== undefined ||
+				this.task.due !== undefined
 		});
 	}
 
@@ -62,9 +65,34 @@ export default class EditTask extends TaskComponent {
 		});
 	}
 
+	onTaskDue() {
+		// save the current task
+		this.setState({
+			task: this.task,
+			showChildrenToggle:
+				this.task.children.length > 0 ||
+				this.task.description !== undefined ||
+				this.task.due !== undefined
+		});
+	}
+
+	onTaskDescription() {
+		// save the current task
+		this.setState({
+			task: this.task,
+			showChildrenToggle:
+				this.task.children.length > 0 ||
+				this.task.description !== undefined ||
+				this.task.due !== undefined
+		});
+	}
+
 	onTaskHideChildren() {
 		this.setState({
-			showChildrenToggle: this.task.children.length > 0
+			showChildrenToggle:
+				this.task.children.length > 0 ||
+				this.task.description !== undefined ||
+				this.task.due !== undefined
 		});
 	}
 
@@ -283,7 +311,7 @@ export default class EditTask extends TaskComponent {
 		};
 
 		// show the open arrow for tasks with children
-		const openArrow = this.task.children.length > 0 ?
+		const openArrow = this.state.showChildrenToggle ?
 			<IconButton
 				onClick={this.open}
 				style={arrowStyles}
@@ -293,12 +321,12 @@ export default class EditTask extends TaskComponent {
 			: null;
 
 		// the indentation for the info section
-		const infoIndentation = indentTask || this.task.children.length > 0 ? 20 : 0;
+		const infoIndentation = indentTask || this.state.showChildrenToggle ? 20 : 0;
 
 		// show/hide the info
 		let info = null;
 
-		if(!this.task.hideChildren) {
+		if(!this.task.hideChildren && this.props.depth > 0) {
 			info = <div style={{marginLeft: infoIndentation}} className="task-info">
 				<TaskProp task={this.task} prop="due"/>
 				<TaskProp task={this.task} prop="description"/>

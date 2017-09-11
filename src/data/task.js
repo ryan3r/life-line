@@ -566,7 +566,9 @@ export default class Task extends Events {
 			// check if this child is visible
 			const hidden = !showCompleted.value && child.state.type == "done";
 
-			return child.children.length === 0 || hidden;
+			return (child.children.length === 0 || hidden) &&
+				!child.description &&
+				!child.due;
 		});
 
 		this.emit("HasGrandchildren");
