@@ -32,7 +32,9 @@ export const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) 
 		}
 
 		// keep searching
-		if(to.state.type !== "done" || showCompleted.value) break;
+		if((to.state.type !== "done" || showCompleted.value) && isTaskVisible(to)) {
+			break;
+		}
 	}
 
 	// return the task
@@ -96,7 +98,10 @@ export const previousVisibleTask = (fromTask, {getTask} = {}) => {
 		}
 
 		// keep searching
-		if(fromTask.state.type !== "done" || showCompleted.value) break;
+		if((fromTask.state.type !== "done" || showCompleted.value) &&
+			isTaskVisible(fromTask)) {
+			break;
+		}
 	}
 
 	// just return the task
