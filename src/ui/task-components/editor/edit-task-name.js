@@ -18,7 +18,7 @@ export default class EditTaskName extends TaskComponent {
 					}
 
 					// set the new value
-					this.el.innerText = value;
+					this.el.innerText = value || "";
 
 					// restore the previous selection
 					if(snapshot) {
