@@ -565,8 +565,7 @@ export default class Task extends Events {
 			const hidden = !showCompleted.value && child.state.type == "done";
 
 			return (child.children.length === 0 || hidden) &&
-				!child.description &&
-				!child.due;
+				!child.description;
 		});
 
 		this.emit("HasGrandchildren");
@@ -605,6 +604,11 @@ for(let prop of TASK_PROPS) {
 					saveTracker.addSaveJob(
 						this["_save" + prop.name].trigger()
 					);
+				}
+
+				// HACK: refresh the grandchildren prop
+				if(prop.name == "description") {
+					this._updateGrandchildren();
 				}
 
 				// save to localforage

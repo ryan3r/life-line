@@ -53,8 +53,7 @@ export default class EditTask extends TaskComponent {
 			task: this.task,
 			showChildrenToggle:
 				this.task.children.length > 0 ||
-				this.task.description !== undefined ||
-				this.task.due !== undefined
+				this.task.description !== undefined
 		});
 	}
 
@@ -71,8 +70,7 @@ export default class EditTask extends TaskComponent {
 			task: this.task,
 			showChildrenToggle:
 				this.task.children.length > 0 ||
-				this.task.description !== undefined ||
-				this.task.due !== undefined
+				this.task.description !== undefined
 		});
 	}
 
@@ -82,8 +80,7 @@ export default class EditTask extends TaskComponent {
 			task: this.task,
 			showChildrenToggle:
 				this.task.children.length > 0 ||
-				this.task.description !== undefined ||
-				this.task.due !== undefined
+				this.task.description !== undefined
 		});
 	}
 
@@ -91,8 +88,7 @@ export default class EditTask extends TaskComponent {
 		this.setState({
 			showChildrenToggle:
 				this.task.children.length > 0 ||
-				this.task.description !== undefined ||
-				this.task.due !== undefined
+				this.task.description !== undefined
 		});
 	}
 
