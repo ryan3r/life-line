@@ -30,7 +30,7 @@ export default class TaskProp extends TaskComponent {
 
 		// display the description
 		if(propDef.editor == "textarea") {
-			return <div>
+			return <div className={this.props.className}>
 				{/* Make each line a div */}
 				{this.state.value.split("\n").map((line, i) => {
 					return <div key={i}>{line}</div>
@@ -40,6 +40,8 @@ export default class TaskProp extends TaskComponent {
 
 		// display the date
 		if(propDef.editor == "date") {
+			let style = this.props.style || {};
+
 			const date = moment(this.state.value);
 			// pick the color for this date
 			let color = "black";
@@ -59,12 +61,15 @@ export default class TaskProp extends TaskComponent {
 				color = "#0dd";
 			}
 
+			// add the color
+			style.color = color;
+
 			// display the due date
-			return <div style={{color, marginBottom: 15}}>
+			return <div style={style} className={this.props.className}>
 				due {date.fromNow()}
 			</div>;
 		}
 
-		return <span>{this.state.value}</span>;
+		return <span className={this.props.className}>{this.state.value}</span>;
 	}
 }

@@ -328,7 +328,6 @@ export default class EditTask extends TaskComponent {
 
 		if(!this.task.hideChildren && this.props.depth > 0) {
 			info = <div style={{marginLeft: infoIndentation}} className="task-info">
-				<TaskProp task={this.task} prop="due"/>
 				<TaskProp task={this.task} prop="description"/>
 			</div>;
 		}
@@ -340,6 +339,7 @@ export default class EditTask extends TaskComponent {
 				<Checkbox task={this.task}/>
 				<EditTaskName className="flex-fill" task={this.task} prop="name"
 					onKeyDown={this.handleKey}/>
+				<TaskProp task={this.task} prop="due" style={{marginRight: 15}}/>
 				{openArrow}
 			</div>
 			<div className="subtasks">

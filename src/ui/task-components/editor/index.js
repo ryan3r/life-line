@@ -134,7 +134,10 @@ export default class Editor extends Component {
 					<SaveStatus/>
 					<div className="content">
 						<div className="task-info" style={{marginBottom: 10}}>
-							<TaskProp task={this.state.task} prop="due"/>
+							<TaskProp
+								task={this.state.task}
+								prop="due"
+								style={{marginBottom: 15}}/>
 							<TaskProp task={this.state.task} prop="description"/>
 						</div>
 						<TasksWidget task={this.state.task} toplevel/>
