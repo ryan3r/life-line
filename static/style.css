@@ -180,3 +180,8 @@ div.hidden {
 	border-left: 3px solid #ccc;
 	padding-left: 15px;
 }
+
+/* Color the description so it's clearly different */
+.description {
+	color: #888;
+}

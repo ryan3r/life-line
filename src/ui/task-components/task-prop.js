@@ -30,7 +30,7 @@ export default class TaskProp extends TaskComponent {
 
 		// display the description
 		if(propDef.editor == "textarea") {
-			return <div className={this.props.className}>
+			return <div className={`${this.props.className || ""} description`}>
 				{/* Make each line a div */}
 				{this.state.value.split("\n").map((line, i) => {
 					let parts = [];
