@@ -50,7 +50,14 @@ export default class TaskProp extends TaskComponent {
 						// get a link
 						if(match) {
 							parts.push(
-								<a className="blue" key={++j} href={match[0]}>{match[1]}</a>
+								<a
+									className="blue"
+									key={++j}
+									href={match[0]}
+									target="_blank"
+									rel="nofollow noopener noreferrer">
+										{match[1]}
+								</a>
 							);
 						}
 
