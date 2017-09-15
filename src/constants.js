@@ -19,7 +19,7 @@ export const PROP_SIDEBAR_OPEN = SIDEBAR_OPEN + PROP_SIDEBAR_WIDTH;
 
 // the properties for a task
 export const TASK_PROPS = [
-	{ name: "name", syncToFirebase: true },
+	{ name: "name", syncToFirebase: true, editor: "input" },
 	{ name: "hideChildren" },
 	{ name: "due", syncToFirebase: true, editor: "date" },
 	{ name: "description", syncToFirebase: true, editor: "textarea" }

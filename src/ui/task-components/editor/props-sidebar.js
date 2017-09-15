@@ -16,11 +16,11 @@ export default class PropDrawer extends Component {
 		propDrawerTask.bind(this, "task");
 		dockedPropStore.bind(this, "docked");
 
-		setTimeout(() => propsReady.set(true), 0);
+		setTimeout(() => propsReady.set(true), 10);
 	}
 
 	componentWillUnmount() {
-		setTimeout(() => propsReady.set(false), 0);
+		setTimeout(() => propsReady.set(false), 10);
 	}
 
 	componentWillMount() {
