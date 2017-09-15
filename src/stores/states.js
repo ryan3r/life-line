@@ -27,3 +27,6 @@ export let showCompleted = new Store("showCompleted");
 
 // the title for the current page
 export let pageTitle = new Store("pageTitle");
+
+// don't have a space for the props sidebar until it has been shown
+export let propsReady = new Store("propsReady");

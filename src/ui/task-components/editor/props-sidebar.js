@@ -2,7 +2,7 @@ import Component from "../../component";
 import React from "react";
 import Drawer from "material-ui/Drawer";
 import {PROP_SIDEBAR_WIDTH} from "../../../constants";
-import {propDrawerTask, dockedPropStore} from "../../../stores/states";
+import {propDrawerTask, dockedPropStore, propsReady} from "../../../stores/states";
 import {focusController} from "./focus-controller";
 import currentTask from "../../../data/current-task";
 import EditTaskProp from "./edit-task-prop";
@@ -15,6 +15,12 @@ export default class PropDrawer extends Component {
 
 		propDrawerTask.bind(this, "task");
 		dockedPropStore.bind(this, "docked");
+
+		setTimeout(() => propsReady.set(true), 0);
+	}
+
+	componentWillUnmount() {
+		setTimeout(() => propsReady.set(false), 0);
 	}
 
 	componentWillMount() {
