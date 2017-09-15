@@ -33,7 +33,32 @@ export default class TaskProp extends TaskComponent {
 			return <div className={this.props.className}>
 				{/* Make each line a div */}
 				{this.state.value.split("\n").map((line, i) => {
-					return <div key={i}>{line}</div>
+					let parts = [];
+					let j = -1;
+
+					while(line.length) {
+						// match a link
+						const match = line.match(/https?:\/\/(?:www\.)?([^\/]+)\S*/);
+						// the index at the end of the text
+						const endIndex = match ? match.index : line.length;
+
+						// get the text before the link
+						if(endIndex > 0) {
+							parts.push(<span key={++j}>{line.substr(0, endIndex)}</span>);
+						}
+
+						// get a link
+						if(match) {
+							parts.push(
+								<a className="blue" key={++j} href={match[0]}>{match[1]}</a>
+							);
+						}
+
+						// remove the line
+						line = line.substr(endIndex + (match ? match[0].length : 0));
+					}
+
+					return <div key={i}>{parts}</div>
 				})}
 			</div>;
 		}

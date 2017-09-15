@@ -107,6 +107,11 @@ a.hidden {
 	margin-left: 29px;
 }
 
+/* Make this link clearly a link */
+a.blue {
+	color: blue;
+}
+
 div.hidden {
 	padding: 5px 7px;
 }
