@@ -271,7 +271,6 @@ export default class EditTask extends TaskComponent {
 
 		// show a open/close arrow for the children
 		const hideShowChildren = showChildrenToggle ? <IconButton
-			className="no-print"
 			style={btnStyles}
 			iconStyle={iconArrow}
 			onClick={this.toggleHideChildren}>
