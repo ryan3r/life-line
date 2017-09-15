@@ -27,8 +27,7 @@ export default class App extends Component {
 		};
 
 		// show the app
-		return <div className="container"
-				style={margins}>
+		return <div className="container print-no-margin" style={margins}>
 			<Header/>
 			<ListsDrawer/>
 			<Editor/>

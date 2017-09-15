@@ -149,6 +149,7 @@ export default class EditToolbar extends Component {
 		</IconButton>;
 
 		return <AppBar
+			className="no-print"
 			showMenuIconButton={true}
 			iconElementRight={icons}
 			iconElementLeft={closeBtn}

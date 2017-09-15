@@ -32,6 +32,7 @@ export default class ListsDrawer extends Component {
 
 	render() {
 		return <Drawer
+				className="no-print"
 				docked={this.state.docked}
 				width={SIDEBAR_WIDTH}
 				open={this.state.drawerOpen}

@@ -185,3 +185,15 @@ div.hidden {
 .description {
 	color: #888;
 }
+
+
+/* print styles */
+@media print {
+	.no-print {
+		display: none !important;
+	}
+
+	.print-no-margin {
+		margin: 0px !important;
+	}
+}

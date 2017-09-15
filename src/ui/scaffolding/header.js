@@ -75,6 +75,7 @@ export default class Header extends Component {
 		themeColor.setAttribute("content", green500);
 
 		return <AppBar
+			className="no-print"
 			title={title}
 			onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
 			style={{flexShrink: 0}}

@@ -47,7 +47,7 @@ export default class SaveStatus extends Component {
 			saveStatus = "All changes saved.";
 		}
 
-		return <div className="save-status">
+		return <div className="save-status no-print">
 			{saveStatus}
 		</div>;
 	}

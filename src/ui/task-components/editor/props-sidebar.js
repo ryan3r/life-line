@@ -70,6 +70,7 @@ export default class PropDrawer extends Component {
 		}
 
 		return <Drawer
+			className="no-print"
 			docked={this.state.docked}
 			width={PROP_SIDEBAR_WIDTH}
 			open={open}
