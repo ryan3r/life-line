@@ -85,7 +85,7 @@ export default class Task extends Events {
 		// sort the children
 		this.children.sort((a, b) => a.index - b.index);
 
-		if(this.children.length > 0) {
+		if(this.children.length > 0 || this.description) {
 			// get the value of hideChildren
 			return localforage.getItem(`hideChildren-${this.id}`)
 
