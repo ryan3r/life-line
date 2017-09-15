@@ -40,9 +40,6 @@ export class FocusController extends Events {
 
 			// notify any listeners that we focused a task
 			this.emit("Focus");
-
-			// make sure that the task always gets focus
-			this._focusTracker();
 		}
 	}
 
