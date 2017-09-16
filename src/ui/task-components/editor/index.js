@@ -6,7 +6,6 @@ import BreadCrumbs from "./bread-crumbs";
 import ProgressBar from "./progress-bar";
 import React from "react";
 import CircularProgress from "material-ui/CircularProgress";
-import SaveStatus from "./save-status";
 import {pageTitle} from "../../../stores/states";
 import {router} from "../../../router";
 import PropsSidebar from "./props-sidebar";
@@ -131,7 +130,6 @@ export default class Editor extends Component {
 			<div style={{height: "100%"}} className="flex">
 				<div className="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
-					<SaveStatus/>
 					<div className="content">
 						<div className="task-info" style={{marginBottom: 10}}>
 							<TaskProp

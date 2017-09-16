@@ -9,6 +9,7 @@ import {dockedStore, drawerOpen, pageTitle} from "../../stores/states";
 import {focusController} from "../task-components/editor/focus-controller";
 import EditToolbar from "../task-components/editor/edit-toolbar";
 import {green500} from "material-ui/styles/colors";
+import SaveStatus from "../task-components/editor/save-status";
 
 // get the theme color meta
 const themeColor = document.querySelector("meta[name=theme-color]");
@@ -63,7 +64,10 @@ export default class Header extends Component {
 				prop="name"/>;
 
 			// Show editing view options
-			headerMenu = <HeaderMenu task={this.state.task}/>;
+			headerMenu = <div>
+				<SaveStatus/>
+				<HeaderMenu task={this.state.task}/>
+			</div>;
 		}
 
 		// show the edit toolbar when we are editing

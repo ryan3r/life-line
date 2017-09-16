@@ -82,7 +82,7 @@ html, body {
 
 /* The page content */
 .content {
-	padding: 15px;
+	padding: 0px 15px;
 }
 
 /* Scrollable content */
@@ -185,7 +185,6 @@ div.hidden {
 .description {
 	color: #888;
 }
-
 
 /* print styles */
 @media print {

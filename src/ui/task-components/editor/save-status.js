@@ -1,6 +1,10 @@
 import saveTracker from "../../../util/save-tracker";
 import Component from "../../component";
 import React from "react";
+import DoneIcon from "material-ui/svg-icons/file/cloud-done";
+import OfflineIcon from "material-ui/svg-icons/file/cloud-off";
+import CircularProgress from "material-ui/CircularProgress";
+import IconButton from "material-ui/IconButton";
 
 export default class SaveStatus extends Component {
 	constructor() {
@@ -34,21 +38,25 @@ export default class SaveStatus extends Component {
 	render() {
 		let saveStatus;
 
+		const iconStyles = {
+			color: "#fff"
+		};
+
 		// offline
 		if(!this.state.online) {
-			saveStatus = "Offline";
+			saveStatus = <OfflineIcon style={iconStyles}/>;
 		}
 		// unsaved changes
 		else if(this.state.dirty) {
-			saveStatus = "Saving...";
+			saveStatus = <CircularProgress size={20} thickness={2} color="#fff"/>;
 		}
 		// online, all saved
 		else {
-			saveStatus = "All changes saved.";
+			saveStatus = <DoneIcon style={iconStyles}/>;
 		}
 
-		return <div className="save-status no-print">
+		return <span className="save-status no-print">
 			{saveStatus}
-		</div>;
+		</span>;
 	}
 }
