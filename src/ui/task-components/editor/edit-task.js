@@ -284,13 +284,13 @@ export default class EditTask extends TaskComponent {
 		});
 
 		// Indent the task if we are not showing the collapse toggle.
-		// If we are at the top level and either we are low on space or
-		// none of our siblings have children don't indenet.
+		// If we are at the top level or none of our silings are showing children
+		// or descriptions.
 		const indentTask =
 			!showChildrenToggle &&
 			(!this.props.toplevel ||
-				(!this.state.siblingsHaveChildren &&
-					(this.props.depth > 0 || !this.task.parent._hasGranddescs)));
+				((this.state.siblingsHaveChildren && this.props.depth > 0) ||
+					this.task.parent._hasGranddescs));
 
 		// save the indented state
 		this._wasIndented = indentTask;

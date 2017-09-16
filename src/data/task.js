@@ -571,8 +571,8 @@ export default class Task extends Events {
 		});
 
 		// separate out grand children and descriptions
-		this._hasGrandchildren = results.every(result => result[0]);
-		this._hasGranddescs = results.every(result => result[1]);
+		this._hasGrandchildren = !results.every(result => result[0]);
+		this._hasGranddescs = !results.every(result => result[1]);
 
 		this.emit("HasGrandchildren");
 
