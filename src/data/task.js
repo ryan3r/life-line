@@ -542,7 +542,7 @@ export default class Task extends Events {
 			const ref = this._tasks._ref.child(`${this.id}/${name}`);
 
 			promises.push(
-				!value ?
+				value === undefined ?
 					ref.remove() : // firebase does not support undefined
 					ref.set(value)
 			);
