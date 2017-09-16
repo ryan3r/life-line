@@ -86,36 +86,8 @@ self.addEventListener("fetch", function(e) {
 	else if(CONTROLLED_ORIGINS.indexOf(parsed.origin) === -1) {
 		e.respondWith(fetch(e.request));
 	}
-	// go to the network first then hit the cache
+	// send the index page
 	else {
-		e.respondWith(
-			fetch(e.request)
-
-			// cache the response
-			.then(res => {
-				// bad response or nothing new
-				if(!res.ok || res.status !== 200) {
-					return res;
-				}
-
-				// clone the response to save later
-				let clone = res.clone();
-
-				return caches.open("offline")
-
-				// save the new version to the cache
-				.then(cache => {
-					return cache.put(new Request("/index.html"), clone);
-				})
-
-				// make sure the original response is returned
-				.then(() => res);
-			})
-
-			// network failed use the cached version
-			.catch(() => {
-				return caches.match(new Request("/index.html"));
-			})
-		)
+		e.respondWith(caches.match(new Request("/index.html")));
 	}
 });
