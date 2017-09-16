@@ -37,7 +37,8 @@ export default class PropDrawer extends Component {
 					currentTask.tasks.get(this.state.hoveredTask.id))) return;
 
 				this.setState({
-					hoveredTask: task
+					hoveredTask: task,
+					task: undefined
 				});
 			})
 		);
