@@ -560,13 +560,19 @@ export default class Task extends Events {
 
 	// check if we have any grandchildren
 	_updateGrandchildren({propagate = true} = {}) {
-		this._hasGrandchildren = this.children.every(child => {
+		const results = this.children.map(child => {
 			// check if this child is visible
 			const hidden = !showCompleted.value && child.state.type == "done";
 
-			return (child.children.length === 0 || hidden) &&
-				!child.description;
+			return [
+				child.children.length === 0 || hidden,
+				!child.description
+			];
 		});
+
+		// separate out grand children and descriptions
+		this._hasGrandchildren = results.every(result => result[0]);
+		this._hasGranddescs = results.every(result => result[1]);
 
 		this.emit("HasGrandchildren");
 

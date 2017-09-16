@@ -267,7 +267,8 @@ export default class EditTask extends TaskComponent {
 			marginRight: 5
 		};
 
-		const showChildrenToggle = this.props.depth > 0 && this.state.showChildrenToggle;
+		const showChildrenToggle = this.state.showChildrenToggle &&
+			(this.props.depth > 0 || this.task.description);
 
 		// show a open/close arrow for the children
 		const hideShowChildren = showChildrenToggle ? <IconButton
@@ -288,7 +289,8 @@ export default class EditTask extends TaskComponent {
 		const indentTask =
 			!showChildrenToggle &&
 			(!this.props.toplevel ||
-				(!this.state.siblingsHaveChildren && this.props.depth > 0));
+				(!this.state.siblingsHaveChildren &&
+					(this.props.depth > 0 || !this.task.parent._hasGranddescs)));
 
 		// save the indented state
 		this._wasIndented = indentTask;
@@ -323,7 +325,7 @@ export default class EditTask extends TaskComponent {
 		// show/hide the info
 		let info = null;
 
-		if(!this.task.hideChildren && this.props.depth > 0) {
+		if(!this.task.hideChildren && (this.props.depth > 0 || this.task.description)) {
 			info = <div style={{marginLeft: infoIndentation}} className="task-info">
 				<TaskProp task={this.task} prop="description"/>
 			</div>;
