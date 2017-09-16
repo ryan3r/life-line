@@ -32,6 +32,7 @@ export default class Tasks {
 			for(let [id, pending] of this._pending) {
 				// remove the promise
 				this._pending.delete(id);
+				console.log("Resolve", id);
 
 				// resolve the promise
 				pending.resolve();
@@ -107,9 +108,18 @@ export default class Tasks {
 		}
 		// wait for the task to load
 		else {
-			let deferred = defer();
+			let deferred;
 
-			this._pending.set(id, deferred);
+			// get an existing deferred
+			if(this._pending.has(id)) {
+				deferred = this._pending.get(id);
+			}
+			// add a new deferred
+			else {
+				deferred = defer();
+
+				this._pending.set(id, deferred);
+			}
 
 			return deferred.promise;
 		}
