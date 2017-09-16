@@ -15,6 +15,7 @@ import {outdent, indent, moveTo} from "./task-utils";
 import UpIcon from "material-ui/svg-icons/hardware/keyboard-arrow-up";
 import DownIcon from "material-ui/svg-icons/hardware/keyboard-arrow-down";
 import EditIcon from "material-ui/svg-icons/content/create";
+import MoreIcon from "material-ui/svg-icons/navigation/more-horiz";
 import {MIN_WIDE_TOOLBAR} from "../../../constants";
 
 // get the theme color meta
@@ -98,6 +99,15 @@ export default class EditToolbar extends Component {
 		moveTo(this.getTask(), false);
 	}
 
+	// show more options
+	more = e => {
+		e.preventDefault();
+
+		this.setState({
+			moreShown: !this.state.moreShown
+		});
+	}
+
 	render() {
 		// switch themes
 		themeColor.setAttribute("content", "#673AB7");
@@ -129,6 +139,16 @@ export default class EditToolbar extends Component {
 		// show all icons if we have enough space
 		if(this.state.wide) {
 			editingBtns = moreBtns.concat(editingBtns);
+		}
+		// show the extra options
+		else if(this.state.moreShown) {
+			editingBtns = moreBtns;
+
+			editingBtns.unshift({ name: "more", icon: <MoreIcon/> });
+		}
+		// show the show more button
+		else {
+			editingBtns.push({ name: "more", icon: <MoreIcon/> });
 		}
 
 		// the build editing icons
