@@ -66,6 +66,9 @@ self.addEventListener("activate", function(e) {
 				);
 			});
 		})
+
+		// take control of the page
+		.then(() => clients.claim())
 	);
 });
 

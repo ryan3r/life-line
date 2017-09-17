@@ -7,6 +7,7 @@ import CurrentUser from "../user/current-user";
 import {Tabs, Tab} from "material-ui/Tabs";
 import Lists from "./lists";
 import {dockedStore, drawerOpen} from "../../stores/states";
+import Version from "./version";
 
 export default class ListsDrawer extends Component {
 	constructor() {
@@ -51,7 +52,7 @@ export default class ListsDrawer extends Component {
 					</Tab>
 				</Tabs>*/}
 			</div>
-			<div className="version">Life line v{VERSION}</div>
+			<Version/>
 		</Drawer>;
 	}
 }
