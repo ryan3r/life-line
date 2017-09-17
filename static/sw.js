@@ -30,11 +30,8 @@ self.addEventListener("install", function(e) {
 					return cache.match(new Request(url))
 
 					.then(match => {
-						console.log(url);
 						// we already cached this
 						if(match && url != "/index.html") return;
-
-						console.log("Update", url);
 
 						// cache the resource
 						return cache.add(url);
