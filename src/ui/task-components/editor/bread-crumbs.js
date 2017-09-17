@@ -7,6 +7,7 @@ import IconMenu from "material-ui/IconMenu";
 import MoreIcon from "material-ui/svg-icons/navigation/more-horiz";
 import IconButton from "material-ui/IconButton";
 import {router} from "../../../router";
+import {hideBreadCrumbs} from "../../../stores/states";
 import {
 	SIDEBAR_WIDTH,
 	PROP_SIDEBAR_WIDTH,
@@ -27,6 +28,8 @@ const _canvas = document.createElement("canvas").getContext("2d");
 export default class BreadCrumbs extends Component {
 	constructor() {
 		super();
+
+		hideBreadCrumbs.bind(this);
 
 		this.state.width = innerWidth;
 
@@ -128,7 +131,7 @@ export default class BreadCrumbs extends Component {
 
 	render() {
 		// don't display anything on the root
-		if(!this.props.task.parent) return null;
+		if(!this.props.task.parent || this.state.hideBreadCrumbs) return null;
 
 		// get the tasks to display
 		const tasks = this.getTasks();

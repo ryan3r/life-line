@@ -17,6 +17,9 @@ export const PROP_SIDEBAR_WIDTH = 300;
 export const SIDEBAR_OPEN = 450 + SIDEBAR_WIDTH;
 export const PROP_SIDEBAR_OPEN = SIDEBAR_OPEN + PROP_SIDEBAR_WIDTH;
 
+// the size to start show the bread crumbs at
+export const BREAD_CRUMBS = 500;
+
 // the properties for a task
 export const TASK_PROPS = [
 	{ name: "name", syncToFirebase: true, editor: "input" },

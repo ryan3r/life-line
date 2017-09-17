@@ -5,11 +5,15 @@ import React from "react";
 import {SIDEBAR_OPEN} from "../../constants";
 import Component from "../component";
 import HeaderMenu from "./header-menu";
-import {dockedStore, drawerOpen, pageTitle} from "../../stores/states";
+import {dockedStore, drawerOpen, pageTitle, hideBreadCrumbs} from "../../stores/states";
 import {focusController} from "../task-components/editor/focus-controller";
 import EditToolbar from "../task-components/editor/edit-toolbar";
 import {green500} from "material-ui/styles/colors";
 import SaveStatus from "../task-components/editor/save-status";
+import {router} from "../../router";
+import ArrowBackwardIcon from "material-ui/svg-icons/navigation/arrow-back";
+import MenuIcon from "material-ui/svg-icons/navigation/menu";
+import IconButton from "material-ui/IconButton";
 
 // get the theme color meta
 const themeColor = document.querySelector("meta[name=theme-color]");
@@ -20,6 +24,7 @@ export default class Header extends Component {
 
 		dockedStore.bind(this);
 		pageTitle.bind(this);
+		hideBreadCrumbs.bind(this, "small");
 
 		// show the editing menu when we are editing
 		this.addSub(
@@ -47,6 +52,17 @@ export default class Header extends Component {
 				});
 			})
 		);
+	}
+
+	leftBtnClick = () => {
+		// open the drawer
+		if(!this.state.task || !this.state.task.parent || !this.state.small) {
+			drawerOpen.set(true);
+		}
+		// go to a parent task
+		else {
+			router.openTask(this.state.task.parent.id);
+		}
 	}
 
 	render() {
@@ -78,12 +94,22 @@ export default class Header extends Component {
 		// switch the theme color
 		themeColor.setAttribute("content", green500);
 
+		// the left icon button
+		const leftBtn = <IconButton>
+			{
+				(!this.state.task || !this.state.task.parent || !this.state.small) ?
+					<MenuIcon/> :
+					<ArrowBackwardIcon/>
+			}
+		</IconButton>;
+
 		return <AppBar
 			className="no-print"
 			title={title}
-			onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
+			onLeftIconButtonTouchTap={this.leftBtnClick}
 			style={{flexShrink: 0}}
 			showMenuIconButton={!this.state.docked}
-			iconElementRight={headerMenu}/>
+			iconElementRight={headerMenu}
+			iconElementLeft={leftBtn}/>
 	}
 }
