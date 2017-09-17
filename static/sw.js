@@ -86,6 +86,10 @@ self.addEventListener("fetch", function(e) {
 	else if(CONTROLLED_ORIGINS.indexOf(parsed.origin) === -1) {
 		e.respondWith(fetch(e.request));
 	}
+	// send the login page
+	else if(url == "/login.html") {
+		e.respondWith(fetch(e.request));
+	}
 	// send the index page
 	else {
 		e.respondWith(caches.match(new Request("/index.html")));
