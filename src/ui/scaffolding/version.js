@@ -30,10 +30,16 @@ export default class Version extends Component {
 							// show that we are updating
 							this.setState({ updating: true });
 
+							// check if we already have a service worker
+							const firstInstall = registration.active === null;
+
 							// wait until the service worker has been installed
 							registration.installing.onstatechange = e => {
-								if(e.currentTarget.state == "activated") {
-									this.setState({ updating: false });
+								if(e.currentTarget.state == "installed") {
+									this.setState({
+										updating: false,
+										reload: !firstInstall
+									});
 								}
 							};
 						}
@@ -65,6 +71,10 @@ export default class Version extends Component {
 		}
 	}
 
+	reload = () => {
+		location.reload();
+	}
+
 	render() {
 		// show the service worker status
 		if(this.state.swEnabled) {
@@ -75,6 +85,14 @@ export default class Version extends Component {
 					<span style={{marginLeft: 10}}>
 						{this.state.updating ? "Updating" : "Checking"}
 					</span>
+				</div>;
+			}
+			// reload to update
+			else if(this.state.reload) {
+				return <div className="flex flex-center flex-vcenter">
+					<FlatButton onClick={this.reload}>
+						Reload to update
+					</FlatButton>
 				</div>;
 			}
 			// show the version and an update button
