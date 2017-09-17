@@ -87,7 +87,7 @@ self.addEventListener("fetch", function(e) {
 		e.respondWith(fetch(e.request));
 	}
 	// send the login page
-	else if(url == "/login.html") {
+	else if(url == "/login.html" || url.substr(1, 2) == "__") {
 		e.respondWith(fetch(e.request));
 	}
 	// send the index page
