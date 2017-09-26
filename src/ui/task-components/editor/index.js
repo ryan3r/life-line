@@ -131,7 +131,7 @@ export default class Editor extends Component {
 				<div className="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
 					<div className="content">
-						<div className="task-info" style={{marginBottom: 10}}>
+						<div className="task-info" style={{marginBottom: 10, marginTop: 10}}>
 							<TaskProp
 								task={this.state.task}
 								prop="due"
