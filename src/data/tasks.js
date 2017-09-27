@@ -32,7 +32,6 @@ export default class Tasks {
 			for(let [id, pending] of this._pending) {
 				// remove the promise
 				this._pending.delete(id);
-				console.log("Resolve", id);
 
 				// resolve the promise
 				pending.resolve();
