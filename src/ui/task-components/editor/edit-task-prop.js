@@ -74,7 +74,7 @@ export default class EditTaskProp extends TaskComponent {
 				editor = <TextField
 					floatingLabelText={fieldName}
 					onChange={this.setValue}
-					value={this.state.value}
+					value={this.state.value || ""}
 					multiLine={true}
 					rows={1}/>
 				break
