@@ -31,7 +31,7 @@ self.addEventListener("install", function(e) {
 
 					.then(match => {
 						// we already cached this
-						if(match && url != "/index.html") return;
+						if(match) return;
 
 						// cache the resource
 						return cache.add(url);
@@ -67,7 +67,11 @@ self.addEventListener("activate", function(e) {
 						}
 					})
 				);
-			});
+			})
+
+			// recache index
+			.then(() => cache.delete("/index.html"))
+			.then(() => cache.add("/index.html"));
 		})
 
 		// take control of the page
@@ -89,7 +93,8 @@ self.addEventListener("fetch", function(e) {
 		e.respondWith(caches.match(new Request("/{{offline.html}}")));
 	}
 	// pass the websocket and authentication through
-	else if(CONTROLLED_ORIGINS.indexOf(parsed.origin) === -1) {
+	// as well as the service worker
+	else if(CONTROLLED_ORIGINS.indexOf(parsed.origin) === -1 || url == "/sw.js") {
 		e.respondWith(fetch(e.request));
 	}
 	// send the login page

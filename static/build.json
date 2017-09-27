@@ -4,8 +4,8 @@
 	{ "name": "favicon.png", "hash": true, "binary": true },
 	{ "name": "login.html" },
 	{ "name": "style.css", "hash": true },
-	{ "name": "sw.js" },
 	{ "name": "manifest.json", "hash": true },
+	{ "name": "sw.js" },
 	{ "name": "offline.html", "hash": true },
 	{ "name": "tests.html", "devOnly": true  },
 	{ "name": "index.html" }

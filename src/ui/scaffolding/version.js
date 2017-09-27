@@ -58,13 +58,19 @@ export default class Version extends Component {
 	update = () => {
 		// force an update
 		if(this.registration) {
-			this.registration.update()
-
-			// catch any service worker errors
-			.catch(() => {})
+			// fetch the service worker to force the browser to recache it
+			fetch("/sw.js").then(res => res.text())
 
 			.then(() => {
-				this.setState({ checking: false });
+				// tell the browser to check for updates
+				this.registration.update()
+
+				// catch any service worker errors
+				.catch(() => {})
+
+				.then(() => {
+					this.setState({ checking: false });
+				});
 			});
 
 			this.setState({ checking: true });
