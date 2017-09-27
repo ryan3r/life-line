@@ -23,6 +23,17 @@ export default class EditTaskProp extends TaskComponent {
 		this.task[this.props.prop] = value;
 	}
 
+	// take the date value from a field
+	setDate = (_, value) => {
+		const oldDate = this.task[this.props.prop];
+
+		// save the old time
+		value.setHours(oldDate.getHours());
+		value.setMinutes(oldDate.getMinutes());
+
+		this.task[this.props.prop] = value;
+	}
+
 	render() {
 		let editor;
 		// the pretty name for the field
@@ -33,24 +44,19 @@ export default class EditTaskProp extends TaskComponent {
 			case "date":
 				editor = <div>
 					<DatePicker
-						hintText={fieldName}
-						onChange={this.setValue}
+						hintText={fieldName + " date"}
+						onChange={this.setDate}
 						value={this.state.value}
 						formatDate={date => moment(date).format("MM/DD/YYYY")}
 						firstDayOfWeek={0}/>
+					<TimePicker
+						hintText={fieldName + " time"}
+						onChange={this.setValue}
+						value={this.state.value}/>
 					<FlatButton onClick={() => this.setValue(undefined)}>
 						Remove date
 					</FlatButton>
 				</div>;
-
-				break;
-
-			// show a time picker
-			case "time":
-				editor = <TimePicker
-					hintText={fieldName}
-					onChange={this.setValue}
-					value={this.state.value}/>;
 
 				break;
 
