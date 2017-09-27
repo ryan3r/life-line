@@ -28,8 +28,10 @@ export default class EditTaskProp extends TaskComponent {
 		const oldDate = this.task[this.props.prop];
 
 		// save the old time
-		value.setHours(oldDate.getHours());
-		value.setMinutes(oldDate.getMinutes());
+		if(oldDate) {
+			value.setHours(oldDate.getHours());
+			value.setMinutes(oldDate.getMinutes());
+		}
 
 		this.task[this.props.prop] = value;
 	}
