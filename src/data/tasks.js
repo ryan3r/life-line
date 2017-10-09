@@ -139,7 +139,7 @@ export default class Tasks {
 	// create a new task
 	create(raw) {
 		// generate an id for the new task
-		const id = genId();
+		const id = raw.id || genId();
 
 		const task = new Task({
 			id,

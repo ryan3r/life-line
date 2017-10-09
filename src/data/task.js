@@ -8,6 +8,7 @@ import Debouncer from "../util/debouncer";
 import localforage from "localforage";
 import {showCompleted} from "../stores/states";
 import capitalizeFirst from "../util/capitalize-first";
+import undoManager from "./undo-manager";
 
 const db = firebase.database();
 
@@ -195,8 +196,14 @@ export default class Task extends Events {
 
 	// delete this task
 	delete() {
+		// tell the undo manager we are making a change
+		let transaction = undoManager.transaction(`${this.name} was deleted.`);
+
 		// mark this task as deleted
 		this._deleted = true;
+
+		// tell the undo manager how to undo this delete
+		transaction.delete(this);
 
 		// update the indexes of all the other tasks
 		this.parent._updateChildIndexes("decrement", this.index);
@@ -220,6 +227,8 @@ export default class Task extends Events {
 		// Delete all the children as well
 		// I iterate backwards because children will be deleting themselves from this array
 		for(let i = this.children.length - 1; i >= 0; --i) {
+			transaction.delete(this);
+
 			this.children[i].delete();
 		}
 	}
