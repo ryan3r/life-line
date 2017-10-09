@@ -10,6 +10,7 @@ import {lists} from "../../data/lists";
 import {dockedStore, dockedPropStore, propsReady} from "../../stores/states";
 import Editor from "../task-components/editor";
 import UnsavedChanges from "./unsaved-changes";
+import UndoToast from "./undo-toast";
 
 export default class App extends Component {
 	constructor() {
@@ -35,6 +36,7 @@ export default class App extends Component {
 			<ListsDrawer/>
 			<Editor/>
 			<UnsavedChanges/>
+			<UndoToast/>
 		</div>;
 	}
 }
