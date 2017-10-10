@@ -195,9 +195,11 @@ export default class Task extends Events {
 	}
 
 	// delete this task
-	delete() {
+	delete({transaction} = {}) {
+		console.log("Delete", this.name, "with the parent", this.parent && this.parent.name);
+
 		// tell the undo manager we are making a change
-		let transaction = undoManager.transaction(`${this.name} was deleted.`);
+		transaction || (transaction = undoManager.transaction(`${this.name} was deleted.`));
 
 		// mark this task as deleted
 		this._deleted = true;
@@ -227,9 +229,7 @@ export default class Task extends Events {
 		// Delete all the children as well
 		// I iterate backwards because children will be deleting themselves from this array
 		for(let i = this.children.length - 1; i >= 0; --i) {
-			transaction.delete(this);
-
-			this.children[i].delete();
+			this.children[i].delete({ transaction });
 		}
 	}
 
@@ -481,17 +481,20 @@ export default class Task extends Events {
 	}
 
 	// delete all the children that have been completed
-	deleteCompleted() {
+	deleteCompleted({transaction} = {}) {
+		// tell the undo manager we are deleting stuff
+		transaction || (transaction = undoManager.transaction("Delete completed tasks."));
+
 		for(let i = this.children.length - 1; i >= 0; --i) {
 			const child = this.children[i];
 
 			// delete any children that are done
 			if(child.state.type == "done") {
-				child.delete();
+				child.delete({ transaction });
 			}
 			// delete that child's completed tasks
 			else {
-				child.deleteCompleted();
+				child.deleteCompleted({ transaction });
 			}
 		}
 	}

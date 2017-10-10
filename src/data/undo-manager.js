@@ -43,8 +43,8 @@ class Transaction {
 		}
 
 		// copy unlisted properties
-		raw.state = task._state;
-		raw.parent = task.parent.id;
+		if(task._state !== undefined) raw.state = task._state;
+		if(task.parent !== undefined) raw.parent = task.parent.id;
 
 		// save the id
 		raw.id = task.id;
