@@ -196,8 +196,6 @@ export default class Task extends Events {
 
 	// delete this task
 	delete({transaction} = {}) {
-		console.log("Delete", this.name, "with the parent", this.parent && this.parent.name);
-
 		// tell the undo manager we are making a change
 		transaction || (transaction = undoManager.transaction(`${this.name} was deleted.`));
 
