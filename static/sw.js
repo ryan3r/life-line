@@ -39,6 +39,9 @@ self.addEventListener("install", function(e) {
 				})
 			);
 		})
+
+		// replace the old service worker
+		.then(() => self.skipWaiting())
 	);
 });
 
@@ -64,8 +67,15 @@ self.addEventListener("activate", function(e) {
 						}
 					})
 				);
-			});
+			})
+
+			// recache index
+			.then(() => cache.delete("/index.html"))
+			.then(() => cache.add("/index.html"));
 		})
+
+		// take control of the page
+		.then(() => clients.claim())
 	);
 });
 
@@ -83,39 +93,16 @@ self.addEventListener("fetch", function(e) {
 		e.respondWith(caches.match(new Request("/{{offline.html}}")));
 	}
 	// pass the websocket and authentication through
-	else if(CONTROLLED_ORIGINS.indexOf(parsed.origin) === -1) {
+	// as well as the service worker
+	else if(CONTROLLED_ORIGINS.indexOf(parsed.origin) === -1 || url == "/sw.js") {
 		e.respondWith(fetch(e.request));
 	}
-	// go to the network first then hit the cache
+	// send the login page
+	else if(url == "/login.html" || url.substr(1, 2) == "__") {
+		e.respondWith(fetch(e.request));
+	}
+	// send the index page
 	else {
-		e.respondWith(
-			fetch(e.request)
-
-			// cache the response
-			.then(res => {
-				// bad response or nothing new
-				if(!res.ok || res.status !== 200) {
-					return res;
-				}
-
-				// clone the response to save later
-				let clone = res.clone();
-
-				return caches.open("offline")
-
-				// save the new version to the cache
-				.then(cache => {
-					return cache.put(new Request("/index.html"), clone);
-				})
-
-				// make sure the original response is returned
-				.then(() => res);
-			})
-
-			// network failed use the cached version
-			.catch(() => {
-				return caches.match(new Request("/index.html"));
-			})
-		)
+		e.respondWith(caches.match(new Request("/index.html")));
 	}
 });

@@ -34,7 +34,7 @@ export default class Debouncer {
 		if(this._deferred) {
 			this._deferred.resolve();
 		}
-		
+
 		clearTimeout(this._timeout);
 	}
 }

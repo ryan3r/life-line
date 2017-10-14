@@ -107,9 +107,18 @@ export default class Tasks {
 		}
 		// wait for the task to load
 		else {
-			let deferred = defer();
+			let deferred;
 
-			this._pending.set(id, deferred);
+			// get an existing deferred
+			if(this._pending.has(id)) {
+				deferred = this._pending.get(id);
+			}
+			// add a new deferred
+			else {
+				deferred = defer();
+
+				this._pending.set(id, deferred);
+			}
 
 			return deferred.promise;
 		}
@@ -130,7 +139,7 @@ export default class Tasks {
 	// create a new task
 	create(raw) {
 		// generate an id for the new task
-		const id = genId();
+		const id = raw.id || genId();
 
 		const task = new Task({
 			id,

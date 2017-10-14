@@ -10,6 +10,7 @@ export default class ProgressBar extends TaskComponent {
 
 	render() {
 		return <LinearProgress
+			className="no-print"
 			mode="determinate"
 			value={this.state.percentDone * 100 | 0}
 			style={{borderRadius: "0px"}}

@@ -26,6 +26,9 @@ export class FocusController extends Events {
 
 		// notify any listeners that we focused a task
 		this.emit("Focus");
+
+		// make sure that the task always gets focus
+		this._focusTracker();
 	}
 
 	lostFocus(id) {
@@ -38,6 +41,16 @@ export class FocusController extends Events {
 			// notify any listeners that we focused a task
 			this.emit("Focus");
 		}
+	}
+
+	// make sure that a task takes the focus
+	_focusTracker() {
+		setTimeout(() => {
+			// the task we tried to focus has not claimed its focus revoke it
+			if(document.activeElement == document.body) {
+				this.lostFocus(this._id);
+			}
+		}, 50);
 	}
 
 	gotFocus(id) {

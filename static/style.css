@@ -1,6 +1,7 @@
 html, body {
 	height: 100%;
 	margin: 0px;
+	overflow: hidden;
 }
 
 .app-wrapper {
@@ -81,7 +82,7 @@ html, body {
 
 /* The page content */
 .content {
-	padding: 15px;
+	padding: 0px 15px;
 }
 
 /* Scrollable content */
@@ -104,6 +105,11 @@ a.hidden {
 	color: #777;
 	font-style: italic;
 	margin-left: 29px;
+}
+
+/* Make this link clearly a link */
+a.blue {
+	color: blue;
 }
 
 div.hidden {
@@ -151,7 +157,6 @@ div.hidden {
 
 /* Put the version at the bottom of the page */
 .version {
-	padding: 10px;
 	color: #aaa;
 	text-align: center;
 }
@@ -167,4 +172,26 @@ div.hidden {
 .fadeout-task {
 	transition: opacity 700ms;
 	opacity: 0;
+}
+
+/* Pad the task info */
+.task-info {
+	border-left: 3px solid #ccc;
+	padding-left: 15px;
+}
+
+/* Color the description so it's clearly different */
+.description {
+	color: #888;
+}
+
+/* print styles */
+@media print {
+	.no-print {
+		display: none !important;
+	}
+
+	.print-no-margin {
+		margin: 0px !important;
+	}
 }

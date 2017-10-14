@@ -7,14 +7,25 @@ export const INDENT_SIZE = 30;
 // the time to wait from when a char is typed until we save
 export const DEBOUNCE_TIMER = 500;
 
+// the min width for the toolbar to show all the buttons
+export const MIN_WIDE_TOOLBAR = 430;
+
 // the sidebar sizing
-export const SIDEBAR_OPEN = 750;
-export const SIDEBAR_WIDTH = 300;
+export const SIDEBAR_WIDTH = 250;
+export const PROP_SIDEBAR_WIDTH = 300;
+
+export const SIDEBAR_OPEN = 450 + SIDEBAR_WIDTH;
+export const PROP_SIDEBAR_OPEN = SIDEBAR_OPEN + PROP_SIDEBAR_WIDTH;
+
+// the size to start show the bread crumbs at
+export const BREAD_CRUMBS = 500;
 
 // the properties for a task
 export const TASK_PROPS = [
-	{ name: "name", syncToFirebase: true },
-	{ name: "hideChildren" }
+	{ name: "name", syncToFirebase: true, editor: "input" },
+	{ name: "hideChildren" },
+	{ name: "due", syncToFirebase: true, editor: "date" },
+	{ name: "description", syncToFirebase: true, editor: "textarea" }
 ];
 
 // calculate the max nesting depth

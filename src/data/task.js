@@ -7,11 +7,10 @@ import {DEBOUNCE_TIMER} from "../constants";
 import Debouncer from "../util/debouncer";
 import localforage from "localforage";
 import {showCompleted} from "../stores/states";
+import capitalizeFirst from "../util/capitalize-first";
+import undoManager from "./undo-manager";
 
 const db = firebase.database();
-
-// capitalize the first letter
-const capitalizeFirst = word => word.charAt(0).toUpperCase() + word.substr(1);
 
 export default class Task extends Events {
 	constructor({id, raw, tasks}) {
@@ -38,7 +37,14 @@ export default class Task extends Events {
 
 		// set the props
 		for(const prop of TASK_PROPS) {
-			this["_" + prop.name] = raw[prop.name];
+			let value = raw[prop.name];
+
+			// parse the date
+			if(prop.editor == "date" && value) {
+				value = new Date(value);
+			}
+
+			this["_" + prop.name] = value;
 
 			// define the change event
 			this.defineEvent(capitalizeFirst(prop.name), prop.name);
@@ -62,6 +68,7 @@ export default class Task extends Events {
 		this.defineEvent("State", "state");
 		this.defineEvent("Children", "children");
 		this.defineEvent("HasGrandchildren", "hasGrandchildren");
+		this.defineEvent("Delete");
 
 		// start with a depth of 0
 		this.depth = 0;
@@ -79,7 +86,7 @@ export default class Task extends Events {
 		// sort the children
 		this.children.sort((a, b) => a.index - b.index);
 
-		if(this.children.length > 0) {
+		if(this.children.length > 0 || this.description) {
 			// get the value of hideChildren
 			return localforage.getItem(`hideChildren-${this.id}`)
 
@@ -94,7 +101,14 @@ export default class Task extends Events {
 		// update the properties
 		for(const prop of TASK_PROPS) {
 			if(prop.syncToFirebase) {
-				this._updateProp(prop.name, raw[prop.name]);
+				let value = raw[prop.name];
+
+				// parse the date
+				if(prop.editor == "date" && value) {
+					value = new Date(value);
+				}
+
+				this._updateProp(prop.name, value);
 			}
 		}
 
@@ -106,7 +120,7 @@ export default class Task extends Events {
 			this._updateParent(this._tasks.get(raw.parent), raw.index);
 		}
 		// update the index
-		else if(this.index !== raw.index) {
+		else if(raw.index !== undefined && this.index !== raw.index && this.parent) {
 			// remove this from its old locaiton
 			if(this.parent.children[this.index] == this) {
 				this.parent.children.splice(this.index, 1);
@@ -181,9 +195,19 @@ export default class Task extends Events {
 	}
 
 	// delete this task
-	delete() {
+	delete({transaction} = {}) {
+		const newTrans = !transaction;
+
+		// tell the undo manager we are making a change
+		if(newTrans) {
+			transaction = undoManager.transaction(`${this.name} was deleted.`);
+		}
+
 		// mark this task as deleted
 		this._deleted = true;
+
+		// tell the undo manager how to undo this delete
+		transaction.delete(this);
 
 		// update the indexes of all the other tasks
 		this.parent._updateChildIndexes("decrement", this.index);
@@ -198,13 +222,21 @@ export default class Task extends Events {
 			localforage.removeItem(`hideChildren-${this.id}`);
 		}
 
+		// trigger a delete event
+		this.emit("Delete");
+
 		// delete the task from tasks
 		this._tasks.delete(this.id);
 
 		// Delete all the children as well
 		// I iterate backwards because children will be deleting themselves from this array
 		for(let i = this.children.length - 1; i >= 0; --i) {
-			this.children[i].delete();
+			this.children[i].delete({ transaction });
+		}
+
+		// tell the transaction manager we are done
+		if(newTrans) {
+			transaction.finalize();
 		}
 	}
 
@@ -393,10 +425,10 @@ export default class Task extends Events {
 		// set the default state
 		this._cachedState = {
 			type: "done",
-			percentDone: 0,
-			completed: 0,
-			total: 0
+			percentDone: 0
 		};
+
+		const TASK_STATE_WEIGHT = 1 / this.children.length;
 
 		// combine the state of our children
 		for(const child of this.children) {
@@ -410,18 +442,12 @@ export default class Task extends Events {
 
 			// add the child's percentDone
 			if(child.children.length > 0) {
-				this._cachedState.completed += child.state.completed;
-				this._cachedState.total += child.state.total;
+				this._cachedState.percentDone += child.state.percentDone * TASK_STATE_WEIGHT;
 			}
 			else {
-				this._cachedState.completed += child.state.type == "done";
-				++this._cachedState.total;
+				this._cachedState.percentDone += (child.state.type == "done") * TASK_STATE_WEIGHT;
 			}
 		}
-
-		// calculate the percent done
-		this._cachedState.percentDone =
-			this._cachedState.completed / this._cachedState.total;
 
 		// round to the 5th decimal place to avild floating point errors
 		this._cachedState.percentDone =
@@ -456,18 +482,29 @@ export default class Task extends Events {
 	}
 
 	// delete all the children that have been completed
-	deleteCompleted() {
+	deleteCompleted({transaction} = {}) {
+		// tell the undo manager we are deleting stuff
+		const newTrans = !transaction;
+
+		if(newTrans) {
+			transaction = undoManager.transaction("Delete completed tasks.");
+		}
+
 		for(let i = this.children.length - 1; i >= 0; --i) {
 			const child = this.children[i];
 
 			// delete any children that are done
 			if(child.state.type == "done") {
-				child.delete();
+				child.delete({ transaction });
 			}
 			// delete that child's completed tasks
 			else {
-				child.deleteCompleted();
+				child.deleteCompleted({ transaction });
 			}
+		}
+
+		if(newTrans) {
+			transaction.finalize();
 		}
 	}
 
@@ -515,7 +552,12 @@ export default class Task extends Events {
 	_makePropSave(name) {
 		return () => {
 			let promises = [];
-			const value = this[name];
+			let value = this[name];
+
+			// stringify the date
+			if(typeof value == "object") {
+				value = value.toISOString();
+			}
 
 			// save the value
 			const ref = this._tasks._ref.child(`${this.id}/${name}`);
@@ -539,12 +581,19 @@ export default class Task extends Events {
 
 	// check if we have any grandchildren
 	_updateGrandchildren({propagate = true} = {}) {
-		this._hasGrandchildren = this.children.every(child => {
+		const results = this.children.map(child => {
 			// check if this child is visible
 			const hidden = !showCompleted.value && child.state.type == "done";
 
-			return child.children.length === 0 || hidden;
+			return [
+				child.children.length === 0 || hidden,
+				!child.description
+			];
 		});
+
+		// separate out grand children and descriptions
+		this._hasGrandchildren = !results.every(result => result[0]);
+		this._hasGranddescs = !results.every(result => result[1]);
 
 		this.emit("HasGrandchildren");
 
@@ -573,6 +622,11 @@ for(let prop of TASK_PROPS) {
 
 		// store the value of the property
 		set(value) {
+			// remove any new line chars from name
+			if(prop.name == "name") {
+				value = value.replace(/\r|\n/g, "");
+			}
+
 			// update our internal version of prop
 			const changed = this._updateProp(prop.name, value);
 
@@ -582,6 +636,11 @@ for(let prop of TASK_PROPS) {
 					saveTracker.addSaveJob(
 						this["_save" + prop.name].trigger()
 					);
+				}
+
+				// HACK: refresh the grandchildren prop
+				if(prop.name == "description") {
+					this._updateGrandchildren();
 				}
 
 				// save to localforage

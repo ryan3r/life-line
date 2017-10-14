@@ -1,12 +1,13 @@
 import Component from "../component";
 import React from "react";
 import Drawer from "material-ui/Drawer";
-import {SIDEBAR_WIDTH, SIDEBAR_OPEN} from "../../constants";
+import {SIDEBAR_WIDTH} from "../../constants";
 import AppBar from "material-ui/AppBar";
 import CurrentUser from "../user/current-user";
 import {Tabs, Tab} from "material-ui/Tabs";
 import Lists from "./lists";
 import {dockedStore, drawerOpen} from "../../stores/states";
+import Version from "./version";
 
 export default class ListsDrawer extends Component {
 	constructor() {
@@ -32,6 +33,7 @@ export default class ListsDrawer extends Component {
 
 	render() {
 		return <Drawer
+				className="no-print"
 				docked={this.state.docked}
 				width={SIDEBAR_WIDTH}
 				open={this.state.drawerOpen}
@@ -50,7 +52,7 @@ export default class ListsDrawer extends Component {
 					</Tab>
 				</Tabs>*/}
 			</div>
-			<div className="version">Life line v{VERSION}</div>
+			<Version/>
 		</Drawer>;
 	}
 }

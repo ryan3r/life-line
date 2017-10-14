@@ -1,11 +1,22 @@
-import EditTaskName from "../task-components/editor/edit-task-name";
+import TaskProp from "../task-components/task-prop";
 import AppBar from "material-ui/AppBar";
 import currentTask from "../../data/current-task";
 import React from "react";
 import {SIDEBAR_OPEN} from "../../constants";
 import Component from "../component";
 import HeaderMenu from "./header-menu";
-import {dockedStore, drawerOpen, pageTitle} from "../../stores/states";
+import {dockedStore, drawerOpen, pageTitle, hideBreadCrumbs} from "../../stores/states";
+import {focusController} from "../task-components/editor/focus-controller";
+import EditToolbar from "../task-components/editor/edit-toolbar";
+import {green500} from "material-ui/styles/colors";
+import SaveStatus from "../task-components/editor/save-status";
+import {router} from "../../router";
+import ArrowBackwardIcon from "material-ui/svg-icons/navigation/arrow-back";
+import MenuIcon from "material-ui/svg-icons/navigation/menu";
+import IconButton from "material-ui/IconButton";
+
+// get the theme color meta
+const themeColor = document.querySelector("meta[name=theme-color]");
 
 export default class Header extends Component {
 	constructor() {
@@ -13,6 +24,23 @@ export default class Header extends Component {
 
 		dockedStore.bind(this);
 		pageTitle.bind(this);
+		hideBreadCrumbs.bind(this, "small");
+
+		// show the editing menu when we are editing
+		this.addSub(
+			focusController.onFocus(id => {
+				// set the initial state
+				if(!this.updater.isMounted(this)) {
+					this.state.focused = id;
+				}
+				// update the state
+				else {
+					this.setState({
+						focused: id
+					});
+				}
+			})
+		);
 	}
 
 	componentWillMount() {
@@ -26,6 +54,17 @@ export default class Header extends Component {
 		);
 	}
 
+	leftBtnClick = () => {
+		// open the drawer
+		if(!this.state.task || !this.state.task.parent || !this.state.small) {
+			drawerOpen.set(true);
+		}
+		// go to a parent task
+		else {
+			router.openTask(this.state.task.parent.id);
+		}
+	}
+
 	render() {
 		let title = null;
 		let headerMenu = null;
@@ -36,20 +75,41 @@ export default class Header extends Component {
 		}
 		else if(this.state.task) {
 			// edit the current task
-			title = <EditTaskName
-				className="invisible"
+			title = <TaskProp
 				task={this.state.task}
 				prop="name"/>;
 
 			// Show editing view options
-			headerMenu = <HeaderMenu task={this.state.task}/>;
+			headerMenu = <div>
+				<SaveStatus/>
+				<HeaderMenu task={this.state.task}/>
+			</div>;
 		}
 
+		// show the edit toolbar when we are editing
+		if(this.state.focused) {
+			return <EditToolbar taskId={this.state.focused}/>;
+		}
+
+		// switch the theme color
+		themeColor.setAttribute("content", green500);
+
+		// the left icon button
+		const leftBtn = <IconButton>
+			{
+				(!this.state.task || !this.state.task.parent || !this.state.small) ?
+					<MenuIcon/> :
+					<ArrowBackwardIcon/>
+			}
+		</IconButton>;
+
 		return <AppBar
+			className="no-print"
 			title={title}
-			onLeftIconButtonTouchTap={() => drawerOpen.set(true)}
+			onLeftIconButtonTouchTap={this.leftBtnClick}
 			style={{flexShrink: 0}}
-			iconElementLeft={this.state.docked ? <span></span> : null}
-			iconElementRight={headerMenu}/>
+			showMenuIconButton={!this.state.docked}
+			iconElementRight={headerMenu}
+			iconElementLeft={leftBtn}/>
 	}
 }

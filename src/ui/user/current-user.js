@@ -196,14 +196,6 @@ export default class CurrentUser extends Component {
 						primaryText="Delete account"
 						onClick={this.showDialog("delete")}/>
 			</IconMenu>
-
-			{/* <IconButton>
-				<img
-					src={this.state.photoUrl}
-					width="30"
-					height="30"
-					onClick={this.logoutDialog(true)}/>
-			</IconButton> */}
 		</div>;
 	}
 }

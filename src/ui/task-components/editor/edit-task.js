@@ -9,11 +9,11 @@ import MenuItem from "material-ui/MenuItem";
 import IconButton from "material-ui/IconButton";
 import {focusController} from "./focus-controller";
 import TasksWidget from "./tasks";
-import currentTask from "../../../data/current-task";
 import {showCompleted} from "../../../stores/states";
-import isTaskVisible from "../../../util/is-task-visible";
 import KeyboardArrowRightIcon from "material-ui/svg-icons/hardware/keyboard-arrow-right";
 import ArrowForwardIcon from "material-ui/svg-icons/navigation/arrow-forward";
+import {previousVisibleTask, nextVisibleTask, outdent, indent, moveTo} from "./task-utils";
+import TaskProp from "../task-prop";
 
 // if the keyboard is opened make sure it doesn't cover the current editor
 window.addEventListener("resize", () => {
@@ -31,140 +31,6 @@ const splitSelectedText = () => {
 		range.startContainer.textContent.substr(0, range.startOffset),
 		range.endContainer.textContent.substr(range.endOffset)
 	];
-};
-
-// focus the next visible task
-const nextVisibleTask = (fromTask, {keepSelection, startIndex, getTask}) => {
-	let to = fromTask;
-
-	for(;;) {
-		// find our position in the current parent
-		const index = to.parent.children.indexOf(to);
-
-		if(index === 0) {
-			// the parent is not visible
-			if(to.id == router.taskId) {
-				return;
-			}
-			// move to the parent
-			else {
-				to = to.parent;
-			}
-		}
-		else {
-			// go to the previous child
-			to = to.parent.children[index - 1];
-
-			while(to.children.length > 0 && !to.hideChildren && isTaskVisible(to)) {
-				// go to the last child
-				to = to.children[to.children.length - 1];
-			}
-		}
-
-		// keep searching
-		if(to.state.type !== "done" || showCompleted.value) break;
-	}
-
-	// return the task
-	if(getTask) {
-		return to;
-	}
-	// focus the task with the current selection
-	else if(keepSelection) {
-		focusController.focusTaskWithCurrentRange(to.id, {
-			length: fromTask.name.length
-		});
-	}
-	// move to the next task
-	else {
-		focusController.focusTask(to.id, startIndex);
-	}
-};
-
-// find the task that is visually below the current task
-const previousVisibleChild = (fromTask, {getTask} = {}) => {
-	// save the length of the current task
-	const currentLength = fromTask.name.length;
-
-	for(;;) {
-		// find our position in the current parent
-		const index = fromTask.parent.children.indexOf(fromTask);
-
-		// move to our first child if it is visible
-		if(fromTask.children.length > 0 &&
-			!fromTask.hideChildren &&
-			isTaskVisible(fromTask.children[0])) {
-				fromTask = fromTask.children[0];
-		}
-		// go to the previous child
-		else if(fromTask.parent.children.length - 1 > index) {
-			fromTask = fromTask.parent.children[index + 1];
-		}
-		// go to the parent and try again
-		else {
-			for(;;) {
-				// no more tasks
-				if(!fromTask.parent || !fromTask.parent.parent) return;
-
-				// find the parent
-				const index = fromTask.parent.parent.children.indexOf(
-					fromTask.parent
-				);
-
-				// this parent has no siblings after it repeat this setp
-				if(fromTask.parent.parent.children.length - 1 === index) {
-					fromTask = fromTask.parent;
-
-					continue;
-				}
-
-				// go to the sibling after our parent
-				fromTask = fromTask.parent.parent.children[index + 1];
-
-				break;
-			}
-		}
-
-		// keep searching
-		if(fromTask.state.type !== "done" || showCompleted.value) break;
-	}
-
-	// just return the task
-	if(getTask) {
-		return fromTask;
-	}
-	// jump to the task
-	else {
-		focusController.focusTaskWithCurrentRange(fromTask.id, {
-			length: currentLength
-		});
-	}
-};
-
-// get the next task in this parent
-const nextInParent = fromTask => {
-	const {children} = fromTask.parent;
-
-	for(let i = children.indexOf(fromTask) - 1; i >= 0; --i) {
-		// we found the task to jump to
-		if(showCompleted.value ||
-			children[i].state.type != "done") {
-			return children[i];
-		}
-	}
-};
-
-// go to the previous task in this parent
-const previousInParent = fromTask => {
-	const {children} = fromTask.parent;
-
-	for(let i = children.indexOf(fromTask) + 1; i < children.length; ++i) {
-		// we found the task to jump to
-		if(showCompleted.value ||
-			children[i].state.type != "done") {
-			return children[i];
-		}
-	}
 };
 
 export default class EditTask extends TaskComponent {
@@ -185,7 +51,9 @@ export default class EditTask extends TaskComponent {
 		// save the current task
 		this.setState({
 			task: this.task,
-			showChildrenToggle: this.task.children.length > 0
+			showChildrenToggle:
+				this.task.children.length > 0 ||
+				this.task.description !== undefined
 		});
 	}
 
@@ -196,26 +64,39 @@ export default class EditTask extends TaskComponent {
 		});
 	}
 
-	onTaskHideChildren() {
+	onTaskDue() {
+		// save the current task
 		this.setState({
-			showChildrenToggle: this.task.children.length > 0
+			task: this.task,
+			showChildrenToggle:
+				this.task.children.length > 0 ||
+				this.task.description !== undefined
 		});
 	}
 
-	create = () => {
-		// we need to change the view
-		if(this.props.depth <= 0) {
-			router.openTask(this.task.id);
-		}
-
-		let newTask = this.task.create();
-
-		// focus the new task
-		focusController.focusTask(newTask.id, 0);
+	onTaskDescription() {
+		// save the current task
+		this.setState({
+			task: this.task,
+			showChildrenToggle:
+				this.task.children.length > 0 ||
+				this.task.description !== undefined
+		});
 	}
 
-	remove = () => {
-		this.task.delete();
+	onTaskHideChildren() {
+		this.setState({
+			showChildrenToggle:
+				this.task.children.length > 0 ||
+				this.task.description !== undefined
+		});
+	}
+
+	onTaskDelete() {
+		// if we have focus remove it
+		if(focusController.hasFocus(this.task.id)) {
+			focusController.lostFocus(this.task.id);
+		}
 	}
 
 	open = () => {
@@ -259,6 +140,9 @@ export default class EditTask extends TaskComponent {
 				// add the content of this task to the new task
 				toTask.name += this.task.name;
 
+				// clear the name of this task so the undo manager will ignore it
+				this.task._name = "";
+
 				// go to the current end of the to task
 				focusController.focusTask(toTask.id, index);
 
@@ -268,59 +152,15 @@ export default class EditTask extends TaskComponent {
 		}
 		// outdent tasks on tab
 		else if(e.keyCode == 9 && e.shiftKey) {
-			// get our current parent
-			const {parent} = this.task;
-
-			// no grandparent to add this to
-			if(!parent.parent) return;
-
-			// make sure we foucs this task when we rerender
-			focusController.focusTaskWithCurrentRange(this.task.id);
-
-			// the task we are being moved to is not shown
-			if(parent.id == router.taskId) {
-				router.openTask(parent.parent.id);
-			}
-
-			// attach this task to its grandparent after the current parent
-			this.task.attachTo(parent.parent, parent.index + 1);
+			outdent(this.task);
 		}
 		// indent tasks on tab
 		else if(e.keyCode == 9) {
-			// get the sibling that will become the parent
-			let attachTo = nextInParent(this.task);
-
-			if(attachTo) {
-				// make sure we foucs this task when we rerender
-				focusController.focusTaskWithCurrentRange(this.task.id);
-
-				this.task.attachTo(attachTo);
-
-				// check if the current task is visible
-				if(!isTaskVisible(this.task)) {
-					router.openTask(this.task.parent.id);
-				}
-			}
+			indent(this.task);
 		}
 		// switch places with the next logical task
 		else if((e.keyCode == 38 || e.keyCode == 40) && e.ctrlKey) {
-			let toTask;
-
-			// find the next visible task
-			if(e.keyCode == 38) {
-				toTask = nextInParent(this.task);
-			}
-			else {
-				toTask = previousInParent(this.task);
-			}
-
-			// switch with in the same parent
-			if(toTask && toTask.parent == this.task.parent) {
-				toTask.switchWith(this.task);
-			}
-
-			// refocus this task
-			focusController.focusTaskWithCurrentRange(this.task.id);
+			moveTo(this.task, e.keyCode == 38);
 		}
 		// up arrow move to the next task
 		else if(e.keyCode == 38) {
@@ -330,7 +170,7 @@ export default class EditTask extends TaskComponent {
 		}
 		// down arrow move to the last task
 		else if(e.keyCode == 40) {
-			previousVisibleChild(this.task);
+			previousVisibleTask(this.task);
 		}
 		// if none of our handlers were called go with the brower default
 		else {
@@ -344,17 +184,7 @@ export default class EditTask extends TaskComponent {
 
 	componentDidMount() {
 		this.listen(this.base.querySelector(".editor"), "blur", () => {
-			setTimeout(() => {
-				// make sure the focus is not taken from us by material-ui
-				if(document.activeElement.getAttribute("role") == "menuitem" &&
-					this.base) {
-					this.base.querySelector(".editor").focus();
-				}
-				// notify the focus controller of the change
-				else {
-					focusController.lostFocus(this.task.id);
-				}
-			}, 0);
+			focusController.lostFocus(this.task.id);
 		});
 
 		// this task just got focus tell everyone
@@ -364,11 +194,6 @@ export default class EditTask extends TaskComponent {
 
 		this.addSub(
 			focusController.onFocus(id => {
-				// update the task in focus state
-				this.setState({
-					taskFocused: id !== undefined
-				});
-
 				// not a focus for this task
 				if(this.task.id !== id || !this.base) return;
 
@@ -411,7 +236,7 @@ export default class EditTask extends TaskComponent {
 				selection.addRange(range);
 
 				// make sure this task is in view
-				this.base.scrollIntoViewIfNeeded();
+				this.base.querySelector(".editor").scrollIntoViewIfNeeded();
 			})
 		);
 	}
@@ -445,7 +270,8 @@ export default class EditTask extends TaskComponent {
 			marginRight: 5
 		};
 
-		const showChildrenToggle = this.props.depth > 0 && this.state.showChildrenToggle;
+		const showChildrenToggle = this.state.showChildrenToggle &&
+			(this.props.depth > 0 || this.task.description);
 
 		// show a open/close arrow for the children
 		const hideShowChildren = showChildrenToggle ? <IconButton
@@ -461,12 +287,13 @@ export default class EditTask extends TaskComponent {
 		});
 
 		// Indent the task if we are not showing the collapse toggle.
-		// If we are at the top level and either we are low on space or
-		// none of our siblings have children don't indenet.
+		// If we are at the top level or none of our silings are showing children
+		// or descriptions.
 		const indentTask =
 			!showChildrenToggle &&
 			(!this.props.toplevel ||
-				(!this.state.siblingsHaveChildren && this.props.depth > 0));
+				((this.state.siblingsHaveChildren && this.props.depth > 0) ||
+					this.task.parent._hasGranddescs));
 
 		// save the indented state
 		this._wasIndented = indentTask;
@@ -485,8 +312,9 @@ export default class EditTask extends TaskComponent {
 		};
 
 		// show the open arrow for tasks with children
-		const openArrow = this.task.children.length > 0 && !this.state.taskFocused ?
+		const openArrow = this.state.showChildrenToggle ?
 			<IconButton
+				className="no-print"
 				onClick={this.open}
 				style={arrowStyles}
 				iconStyle={arrowStyles}>
@@ -494,14 +322,17 @@ export default class EditTask extends TaskComponent {
 			</IconButton>
 			: null;
 
-		// show the editing menu when we are focused
-		const editMenu = this.state.taskFocused ?
-			<IconMenu
-				iconButtonElement={menuIcon}>
-					<MenuItem primaryText="Add subtask" onClick={this.create}/>
-					<MenuItem primaryText="Delete" onClick={this.remove}/>
-			</IconMenu>
-			: null;
+		// the indentation for the info section
+		const infoIndentation = indentTask || this.state.showChildrenToggle ? 20 : 0;
+
+		// show/hide the info
+		let info = null;
+
+		if(!this.task.hideChildren && (this.props.depth > 0 || this.task.description)) {
+			info = <div style={{marginLeft: infoIndentation}} className="task-info">
+				<TaskProp task={this.task} prop="description"/>
+			</div>;
+		}
 
 		return <div ref={base => this.base = base}>
 			<div className={`task flex flex-vcenter ${this.task.state.type} ${fadeClass}`}
@@ -510,10 +341,11 @@ export default class EditTask extends TaskComponent {
 				<Checkbox task={this.task}/>
 				<EditTaskName className="flex-fill" task={this.task} prop="name"
 					onKeyDown={this.handleKey}/>
-				{editMenu}
+				<TaskProp task={this.task} prop="due" style={{marginRight: 15}}/>
 				{openArrow}
 			</div>
 			<div className="subtasks">
+				{info}
 				{/* TODO: Fix TasksWidget.default */}
 				<TasksWidget.default editMode task={this.task} depth={this.props.depth}/>
 			</div>

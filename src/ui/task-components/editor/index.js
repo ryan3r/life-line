@@ -6,9 +6,11 @@ import BreadCrumbs from "./bread-crumbs";
 import ProgressBar from "./progress-bar";
 import React from "react";
 import CircularProgress from "material-ui/CircularProgress";
-import SaveStatus from "./save-status";
 import {pageTitle} from "../../../stores/states";
 import {router} from "../../../router";
+import PropsSidebar from "./props-sidebar";
+import TaskProp from "../task-prop";
+import RaisedButton from "material-ui/RaisedButton";
 
 export default class Editor extends Component {
 	constructor() {
@@ -44,7 +46,14 @@ export default class Editor extends Component {
 		// get the loading state of the current task
 		this.addSub(
 			currentTask.onLoading(loading => {
-				this.setState({ loading });
+				let toState = { loading };
+
+				// clear the previous error
+				if(loading) {
+					toState.errorType = undefined;
+				}
+
+				this.setState(toState);
 			})
 		);
 	}
@@ -65,6 +74,11 @@ export default class Editor extends Component {
 				</div>
 			</div>
 		</div>;
+	}
+
+	// go to the login page
+	login = () => {
+		location.href = "/login.html";
 	}
 
 	render() {
@@ -95,8 +109,16 @@ export default class Editor extends Component {
 		if(!this.state.loggedIn && !router.listId) {
 			return this.message(
 				"Nothing here",
-				`Please either sign in/sign up or type the full url
-				 for the list you are looking for.`
+				<div>
+					{`Please either sign in/sign up or type the full url
+				 	for the list you are looking for.`}
+					<div style={{ marginTop: "15px", textAlign: "center" }}>
+						<RaisedButton
+							onClick={this.login}
+							label="Sign in/Sign up"
+							primary={true}/>
+					</div>
+				</div>
 			);
 		}
 
@@ -124,12 +146,19 @@ export default class Editor extends Component {
 		};
 
 		return <div style={{height: "calc(100% - 68px)"}}>
+			<PropsSidebar task={this.state.task}/>
 			<ProgressBar task={this.state.task}/>
 			<div style={{height: "100%"}} className="flex">
 				<div className="scrollable flex-fill">
 					<BreadCrumbs task={this.state.task}/>
-					<SaveStatus/>
 					<div className="content">
+						<div className="task-info" style={{marginBottom: 10, marginTop: 10}}>
+							<TaskProp
+								task={this.state.task}
+								prop="due"
+								style={{marginBottom: 15}}/>
+							<TaskProp task={this.state.task} prop="description"/>
+						</div>
 						<TasksWidget task={this.state.task} toplevel/>
 					</div>
 				</div>

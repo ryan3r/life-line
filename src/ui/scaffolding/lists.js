@@ -7,6 +7,8 @@ import ClearIcon from "material-ui/svg-icons/content/clear";
 import AddIcon from "material-ui/svg-icons/content/add";
 import TextField from "material-ui/TextField";
 import {lists} from "../../data/lists";
+import FlatButton from "material-ui/FlatButton";
+import Dialog from "material-ui/Dialog";
 import LinearProgress from "material-ui/LinearProgress";
 
 export default class Lists extends Component {
@@ -39,9 +41,9 @@ export default class Lists extends Component {
 		);
 	}
 
-	removeList(id) {
+	removeList(list) {
 		// delete the list
-		return () => lists.delete(id);
+		return () => this.setState({ deleteList: list });
 	}
 
 	// update the state with changes to the new list name
@@ -86,6 +88,20 @@ export default class Lists extends Component {
 		};
 	}
 
+	// close the delete confirmation dialog
+	closeDialog = () => {
+		this.setState({
+			deleteList: undefined
+		});
+	}
+
+	// delete the current list
+	deleteCurrent = () => {
+		lists.delete(this.state.deleteList.id);
+
+		this.closeDialog();
+	}
+
 	render() {
 		// show the loader
 		if(this.state.loading) {
@@ -99,10 +115,31 @@ export default class Lists extends Component {
 			</div>;
 		}
 
+		// the delete dialog actions
+		const actions = <div>
+			<FlatButton
+				label="Cancel"
+				onClick={this.closeDialog}/>
+			<FlatButton
+				label="Delete"
+				onClick={this.deleteCurrent}
+				primary={true}/>
+		</div>;
+
 		return <div>
+			<Dialog
+				actions={actions}
+				title="Delete list"
+				modal={false}
+				open={!!this.state.deleteList}
+				onRequestClose={this.closeDialog}>
+				Are you sure you want to delete {
+					this.state.deleteList ? this.state.deleteList.name : null
+				}.
+			</Dialog>
 			<List>
 				{this.state.lists.map(list => {
-					const deleteBtn = <IconButton onClick={this.removeList(list.id)}>
+					const deleteBtn = <IconButton onClick={this.removeList(list)}>
 						<ClearIcon/>
 					</IconButton>;
 
