@@ -140,6 +140,9 @@ export default class EditTask extends TaskComponent {
 				// add the content of this task to the new task
 				toTask.name += this.task.name;
 
+				// clear the name of this task so the undo manager will ignore it
+				this.task._name = "";
+
 				// go to the current end of the to task
 				focusController.focusTask(toTask.id, index);
 
