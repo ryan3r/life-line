@@ -87,15 +87,6 @@ export default class TasksWidget extends TaskComponent {
 		// no task yet
 		if(!this.task) return;
 
-		if(this.props.toplevel && this.task.children.length === 0) {
-			return <div style={{ textAlign: "center" }}>
-				<RaisedButton
-					label="Create task"
-					onClick={this.createChild}
-					primary={true}/>
-			</div>;
-		}
-
 		// our children are hidden
 		if(this.task.hideChildren && !this.props.toplevel) {
 			return null;
@@ -134,6 +125,15 @@ export default class TasksWidget extends TaskComponent {
 		// we can't add any more children
 		if(depth === 0) {
 			return null;
+		}
+
+		if(this.props.toplevel && children.length === 0) {
+			return <div style={{ textAlign: "center" }}>
+				<RaisedButton
+					label="Create task"
+					onClick={this.createChild}
+					primary={true}/>
+			</div>;
 		}
 
 		return <div>
