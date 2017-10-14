@@ -20,7 +20,7 @@ export default class EditTaskProp extends TaskComponent {
 
 	// take the value from a field
 	setValue = (_, value) => {
-		this.task[this.props.prop] = value;
+		this.task[this.props.prop] = value || undefined;
 	}
 
 	// take the date value from a field
