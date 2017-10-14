@@ -622,6 +622,11 @@ for(let prop of TASK_PROPS) {
 
 		// store the value of the property
 		set(value) {
+			// remove any new line chars from name
+			if(prop.name == "name") {
+				value = value.replace(/\r|\n/g, "");
+			}
+
 			// update our internal version of prop
 			const changed = this._updateProp(prop.name, value);
 
