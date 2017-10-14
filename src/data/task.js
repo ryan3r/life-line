@@ -120,7 +120,7 @@ export default class Task extends Events {
 			this._updateParent(this._tasks.get(raw.parent), raw.index);
 		}
 		// update the index
-		else if(this.index !== raw.index && this.parent) {
+		else if(raw.index !== undefined && this.index !== raw.index && this.parent) {
 			// remove this from its old locaiton
 			if(this.parent.children[this.index] == this) {
 				this.parent.children.splice(this.index, 1);
