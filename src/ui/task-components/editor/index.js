@@ -46,7 +46,14 @@ export default class Editor extends Component {
 		// get the loading state of the current task
 		this.addSub(
 			currentTask.onLoading(loading => {
-				this.setState({ loading });
+				let toState = { loading };
+
+				// clear the previous error
+				if(loading) {
+					toState.errorType = undefined;
+				}
+
+				this.setState(toState);
 			})
 		);
 	}
