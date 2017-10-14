@@ -15,7 +15,7 @@ export default class UndoToast extends Component {
 		this.addSub(
 			undoManager.onCurrent(transaction => {
 				// no transaction to get
-				if(!transaction) return;
+				if(!transaction || !transaction.hasTasks()) return;
 
 				// open for a new transaction
 				this.setState({

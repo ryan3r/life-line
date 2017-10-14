@@ -15,7 +15,7 @@ class UndoManager extends Events {
 		this.current = new Transaction(name);
 
 		// notify any listeners that we have a new transaction
-		this.emit("Current");
+		this.current.finalize = () => this.emit("Current");
 
 		return this.current;
 	}
@@ -32,6 +32,9 @@ class Transaction {
 	 * Preserve any infomation necessary to recreate this task
 	 */
 	delete(task) {
+		// ignore tasks with no name
+		if(task.name == "") return;
+
 		let raw = {};
 
 		// copy over properties
@@ -71,6 +74,13 @@ class Transaction {
 
 		// make this transaction as undone
 		this.undone = true;
+	}
+
+	/**
+	 * Check if this transation has any deleted tasks
+	 */
+	hasTasks() {
+		return this._deletedTasks.length > 0;
 	}
 }
 
