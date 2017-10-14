@@ -10,6 +10,7 @@ import {pageTitle} from "../../../stores/states";
 import {router} from "../../../router";
 import PropsSidebar from "./props-sidebar";
 import TaskProp from "../task-prop";
+import RaisedButton from "material-ui/RaisedButton";
 
 export default class Editor extends Component {
 	constructor() {
@@ -68,6 +69,11 @@ export default class Editor extends Component {
 		</div>;
 	}
 
+	// go to the login page
+	login = () => {
+		location.href = "/login.html";
+	}
+
 	render() {
 		// show any errors
 		if(this.state.errorType == "access") {
@@ -96,8 +102,16 @@ export default class Editor extends Component {
 		if(!this.state.loggedIn && !router.listId) {
 			return this.message(
 				"Nothing here",
-				`Please either sign in/sign up or type the full url
-				 for the list you are looking for.`
+				<div>
+					{`Please either sign in/sign up or type the full url
+				 	for the list you are looking for.`}
+					<div style={{ marginTop: "15px", textAlign: "center" }}>
+						<RaisedButton
+							onClick={this.login}
+							label="Sign in/Sign up"
+							primary={true}/>
+					</div>
+				</div>
 			);
 		}
 
