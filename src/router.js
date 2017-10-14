@@ -9,18 +9,42 @@ class Router extends Events {
 
 		this._parseUrl();
 
+		let listIdLoaded = Promise.resolve();
+
 		// no list in the url
 		if(!this.listId) {
-			localforage.getItem("last-list")
+			listIdLoaded = localforage.getItem("last-list")
 
 			.then(listId => {
 				// make sure we haven't navigated yet
 				if(!this.listId) {
 					this.listId = listId;
-
-					this.emit("Location");
 				}
-			})
+			});
+		}
+
+		listIdLoaded.then(() => {
+			this._maybeLoadTaskId();
+		});
+	}
+
+	// if we don't have a task id load the one for this list and refresh either way
+	_maybeLoadTaskId() {
+		// load the previous task
+		if(!this.taskId) {
+			return localforage.getItem(`last-task-${this.listId}`)
+
+			.then(taskId => {
+				if(!this.taskId) {
+					this.taskId = taskId;
+				}
+
+				this.emit("Location");
+			});
+		}
+		// we have our task show it
+		else {
+			this.emit("Location");
 		}
 	}
 
@@ -39,6 +63,11 @@ class Router extends Events {
 		if(this.listId) {
 			localforage.setItem("last-list", this.listId);
 		}
+
+		// save the new task as well
+		if(this.taskId) {
+			localforage.setItem(`last-task-${this.listId}`, this.taskId);
+		}
 	}
 
 	// switch tasks
@@ -55,6 +84,9 @@ class Router extends Events {
 		this.listId = listId;
 		// clear the task id
 		this.taskId = undefined;
+
+		// try to load the task for this list
+		this._maybeLoadTaskId();
 
 		this._updateUrl();
 
