@@ -46,7 +46,7 @@ module.exports = function(dev) {
 		files[entry.name] = outName;
 
 		// save the file
-		fs.writeFile(path.join(__dirname, "public", outName), rawFile);
+		fs.writeFile(path.join(__dirname, "public", outName), rawFile, () => {});
 	}
 };
 
