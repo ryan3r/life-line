@@ -20,6 +20,9 @@ export const PROP_SIDEBAR_OPEN = SIDEBAR_OPEN + PROP_SIDEBAR_WIDTH;
 // the size to start show the bread crumbs at
 export const BREAD_CRUMBS = 500;
 
+// the maximum number of characters to display in a list (for description)
+export const PROP_MAX_CHARS = 150;
+
 // the properties for a task
 export const TASK_PROPS = [
 	{ name: "name", syncToFirebase: true, editor: "input" },

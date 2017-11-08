@@ -2,7 +2,7 @@ import TaskComponent from "./task-component";
 import React from "react";
 const moment = require("moment");
 import capitalizeFirst from "../../util/capitalize-first";
-import {TASK_PROPS} from "../../constants";
+import {TASK_PROPS, PROP_MAX_CHARS} from "../../constants";
 
 export default class TaskProp extends TaskComponent {
 	addListeners() {
@@ -30,9 +30,16 @@ export default class TaskProp extends TaskComponent {
 
 		// display the description
 		if(propDef.editor == "textarea") {
+			let value = this.state.value;
+
+			// cut off the description
+			if(value.length > PROP_MAX_CHARS && this.props.small) {
+				value = value.substr(0, value.indexOf(" ", PROP_MAX_CHARS)) + "...";
+			}
+
 			return <div className={`${this.props.className || ""} description`}>
 				{/* Make each line a div */}
-				{this.state.value.split("\n").map((line, i) => {
+				{value.split("\n").map((line, i) => {
 					let parts = [];
 					let j = -1;
 

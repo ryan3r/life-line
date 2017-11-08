@@ -330,7 +330,7 @@ export default class EditTask extends TaskComponent {
 
 		if(!this.task.hideChildren && (this.props.depth > 0 || this.task.description)) {
 			info = <div style={{marginLeft: infoIndentation}} className="task-info">
-				<TaskProp task={this.task} prop="description"/>
+				<TaskProp task={this.task} prop="description" small/>
 			</div>;
 		}
 
