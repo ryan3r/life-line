@@ -8,14 +8,23 @@ If(!$bumpType) {
 	exit 1
 }
 
-# Push from Github
-git pull
+If($bumpType -ne "beta") {
+	# Make sure we deploy to life line
+	firebase use default
 
-# Bump the version
-npm version $bumpType
+	# Push from Github
+	git pull
 
-# Push to Github
-git push
+	# Bump the version
+	npm version $bumpType
+
+	# Push to Github
+	git push
+}
+Else {
+	# Make sure we deploy to life line beta
+	firebase use beta
+}
 
 # Clear the dev build
 trash public/*
@@ -24,7 +33,7 @@ trash public/*
 gulp prod
 
 # Hash the files
-node build prod
+node build prod $bumpType
 
 # Remove the bundle
 trash public/bundle.js

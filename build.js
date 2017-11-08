@@ -2,6 +2,9 @@ const fs = require("fs");
 const crypto = require("crypto");
 const path = require("path");
 
+// check beta version
+let IS_BETA = process.argv[3] == "beta";
+
 module.exports = function(dev) {
 	// load the build config
 	const build = JSON.parse(
@@ -11,12 +14,17 @@ module.exports = function(dev) {
 	// the file registry
 	let files = {};
 
+	files.appTitle = IS_BETA ? "Life line" : "Life line beta";
+
 	for(let entry of build) {
 		// only build this in dev mode
 		if(!dev && entry.devOnly) continue;
 
 		// do nothing in the to files in public in dev mode
 		if(entry.publicDir && dev) continue;
+
+		// show specific files in beta mode
+		if(entry.beta !== undefined && entry.beta !== IS_BETA) continue;
 
 		const dir = entry.publicDir ? "public" : "static";
 		// load the file
@@ -34,16 +42,18 @@ module.exports = function(dev) {
 		hash.update(rawFile);
 		const hashStr = hash.digest("hex");
 
+		let destName = entry.rename || entry.name;
+
 		// get the file extension
-		const ext = path.extname(entry.name);
+		const ext = path.extname(destName);
 		// get the name before the extension
-		const baseName = entry.name.substr(0, entry.name.length - ext.length);
+		const baseName = destName.substr(0, destName.length - ext.length);
 
 		// get the name for the file
-		const outName = entry.hash && !dev ? `${baseName}.${hashStr}${ext}` : entry.name;
+		const outName = entry.hash && !dev ? `${baseName}.${hashStr}${ext}` : destName;
 
 		// save the file name
-		files[entry.name] = outName;
+		files[destName] = outName;
 
 		// save the file
 		fs.writeFile(path.join(__dirname, "public", outName), rawFile, () => {});

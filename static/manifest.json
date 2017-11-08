@@ -1,5 +1,5 @@
 {
-	"name": "Life line",
+	"name": "{{appTitle}}",
 	"start_url": "/",
 	"display": "standalone",
 	"theme_color": "#4CAF50",

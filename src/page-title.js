@@ -1,5 +1,7 @@
 import currentTask from "./data/current-task";
 
+const DEFAULT_TITLE = document.title;
+
 // the old name change subscription
 let changeSub;
 
@@ -17,6 +19,6 @@ currentTask.onTask(task => {
 		changeSub = task.onName(name => document.title = name);
 	}
 	else {
-		document.title = "Life line";
+		document.title = DEFAULT_TITLE;
 	}
 });
