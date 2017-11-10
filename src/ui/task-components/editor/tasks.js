@@ -100,7 +100,7 @@ export default class TasksWidget extends TaskComponent {
 
 			children = children.filter(task => {
 				// calculate the time since the state change
-				const doneTime = Date.now() - task._stateModified;
+				const doneTime = Date.now() - task.stateLastModified;
 
 				if(task.state.type == "done" && doneTime < 500) {
 					hasAnimatingChildren = true;

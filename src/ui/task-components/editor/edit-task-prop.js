@@ -7,6 +7,7 @@ import Toggle from "material-ui/Toggle";
 import FlatButton from "material-ui/FlatButton";
 const moment = require("moment");
 import capitalizeFirst from "../../../util/capitalize-first";
+import {DAY_LETTER} from "../../../constants";
 
 export default class EditTaskProp extends TaskComponent {
 	addListeners() {
@@ -34,6 +35,13 @@ export default class EditTaskProp extends TaskComponent {
 		}
 
 		this.task[this.props.prop] = value;
+	}
+
+	// toggle the state of a day
+	toggleState = i => {
+		return () => {
+			this.task[this.props.prop] = +this.state.value ^ (1 << i);
+		};
 	}
 
 	render() {
@@ -67,7 +75,27 @@ export default class EditTaskProp extends TaskComponent {
 				editor = <Toggle
 					label={fieldName}
 					defaultToggled={this.state.value}
-					onChange={this.setValue}/>;
+					onToggle={this.setValue}/>;
+
+				break;
+
+			// pick days of the week
+			case "days":
+				let days = [];
+				const value = +this.state.value;
+
+				// render the day buttons
+				for(let i = 1; i <= 7; ++i) {
+					days.push(
+						<FlatButton
+							primary={!!(value & (1 << i))}
+							key={i}
+							label={DAY_LETTER[i - 1]}
+							onClick={this.toggleState(i)}/>
+					);
+				}
+
+				editor = <div>{days}</div>;
 
 				break;
 

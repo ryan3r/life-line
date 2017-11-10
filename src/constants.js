@@ -30,9 +30,11 @@ export const TASK_PROPS = [
 	{ name: "due", syncToFirebase: true, editor: "date" },
 	{ name: "description", syncToFirebase: true, editor: "textarea" },
 	{ name: "stateLastModified", syncToFirebase: true },
-	{ name: "repeat", syncToFirebase: true },
-	{ name: "repeatDay", syncToFirebase: true }
+	{ name: "repeatDay", syncToFirebase: true, editor: "days" }
 ];
+
+// letters for each day of the week
+export const DAY_LETTER = ["Su", "M", "T", "W", "R", "F", "Sa"];
 
 // calculate the max nesting depth
 // NOTE: the + 1 is because the first row of tasks are not indented

@@ -395,7 +395,7 @@ export default class Task extends Events {
 		// check for state listeners
 		if(this.hasListeners("State")) {
 			// save the time that we modified the state
-			this._stateModified = Date.now();
+			this.stateLastModified = Date.now();
 
 			this._calculateState();
 
@@ -536,7 +536,7 @@ export default class Task extends Events {
 		// get the state of a childless task
 		if(this.children.length === 0) {
 			// save the time that we modified the state
-			this.stateLastModified = this._stateModified = Date.now();
+			this.stateLastModified = Date.now();
 
 			// update the state
 			this._updateState(state);
@@ -624,7 +624,7 @@ export default class Task extends Events {
 	// handle repeat properties
 	_repeatState() {
 		// repeat is disabled or we are not done
-		if(!this.repeat || this.state.type != "done") return;
+		if(this.repeatDay === 0 || this.state.type != "done") return;
 
 		let repeatDate = new Date();
 
