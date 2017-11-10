@@ -633,13 +633,13 @@ export default class Task extends Events {
 
 		do {
 			// we found a day we repeat on
-			if(this.repeatDay & (1 << nextDay)) break;
+			if(this.repeatDay & (1 << (nextDay + 1))) break;
 
 			if(++nextDay > 6) nextDay = 0;
 		} while(nextDay != day);
 
 		// no days marked for repeating
-		if(!(this.repeatDay & (1 << nextDay))) return;
+		if(!(this.repeatDay & (1 << (nextDay + 1)))) return;
 
 		// advance to the repeat day
 		let dateDiff = nextDay < day ? 7 - (day - nextDay) : nextDay - day;
