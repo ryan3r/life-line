@@ -79,6 +79,9 @@ export default class Task extends Events {
 				this._updateGrandchildren({ propagate: false });
 			})
 		);
+
+		// reset the state
+		this._repeatState();
 	}
 
 	// all tasks have been loaded
@@ -101,6 +104,9 @@ export default class Task extends Events {
 		// update the properties
 		for(const prop of TASK_PROPS) {
 			if(prop.syncToFirebase) {
+				// we are waiting for a change to save
+				if(this["_save" + prop.name].pending) continue;
+
 				let value = raw[prop.name];
 
 				// parse the date
@@ -530,7 +536,7 @@ export default class Task extends Events {
 		// get the state of a childless task
 		if(this.children.length === 0) {
 			// save the time that we modified the state
-			this._stateModified = Date.now();
+			this.stateLastModified = this._stateModified = Date.now();
 
 			// update the state
 			this._updateState(state);
@@ -539,6 +545,9 @@ export default class Task extends Events {
 			saveTracker.addSaveJob(
 				this._tasks._ref.child(`${this.id}/state`).set(this._state)
 			);
+
+			// reset the state
+			this._repeatState();
 		}
 		// pass this change on to our children
 		else {
@@ -610,6 +619,47 @@ export default class Task extends Events {
 		}
 
 		return this._hasGrandchildren;
+	}
+
+	// handle repeat properties
+	_repeatState() {
+		// repeat is disabled or we are not done
+		if(!this.repeat || this.state.type != "done") return;
+
+		let repeatDate = new Date();
+
+		let nextDay, day;
+		nextDay = day = repeatDate.getDay();
+
+		do {
+			// we found a day we repeat on
+			if(this.repeatDay & (1 << nextDay)) break;
+
+			if(++nextDay > 6) nextDay = 0;
+		} while(nextDay != day);
+
+		// no days marked for repeating
+		if(!(this.repeatDay & (1 << nextDay))) return;
+
+		// advance to the repeat day
+		let dateDiff = nextDay < day ? 7 - (day - nextDay) : nextDay - day;
+
+		repeatDate.setDate(repeatDate.getDate() + dateDiff);
+
+		// move to midnight
+		repeatDate.setHours(0);
+		repeatDate.setMinutes(0);
+
+		// find the time until we should repeat
+		let repeatTime = repeatDate.getTime() - Date.now();
+
+		// reset the task
+		this._repeatTimer = setTimeout(() => {
+			// make sure no changes have occured since the repeat date
+			if((this.stateLastModified || 0)  < repeatDate.getTime()) {
+				this.state = "none";
+			}
+		}, repeatTime);
 	}
 }
 

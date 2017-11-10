@@ -28,7 +28,10 @@ export const TASK_PROPS = [
 	{ name: "name", syncToFirebase: true, editor: "input" },
 	{ name: "hideChildren" },
 	{ name: "due", syncToFirebase: true, editor: "date" },
-	{ name: "description", syncToFirebase: true, editor: "textarea" }
+	{ name: "description", syncToFirebase: true, editor: "textarea" },
+	{ name: "stateLastModified", syncToFirebase: true },
+	{ name: "repeat", syncToFirebase: true },
+	{ name: "repeatDay", syncToFirebase: true }
 ];
 
 // calculate the max nesting depth

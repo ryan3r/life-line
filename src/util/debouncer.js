@@ -4,6 +4,7 @@ export default class Debouncer {
 	constructor(fn, time) {
 		this._fn = fn;
 		this._time = time;
+		this.pending = false;
 	}
 
 	trigger() {
@@ -15,10 +16,14 @@ export default class Debouncer {
 		// clear the old timer
 		clearTimeout(this._timeout);
 
+		this.pending = true;
+
 		// create a deferred for when this call is executed or canceled
 		this._deferred = defer();
 
 		this._timeout = setTimeout(() => {
+			this.pending = false;
+
 			// trigger the function
 			this._deferred.resolve(
 				this._fn()
@@ -36,5 +41,7 @@ export default class Debouncer {
 		}
 
 		clearTimeout(this._timeout);
+
+		this.pending = false;
 	}
 }
