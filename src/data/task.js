@@ -500,7 +500,7 @@ export default class Task extends Events {
 			const child = this.children[i];
 
 			// delete any children that are done
-			if(child.state.type == "done" && child.repeatDay === 0) {
+			if(child.state.type == "done" && child.repeatDay !== 0) {
 				child.delete({ transaction });
 			}
 			// delete that child's completed tasks

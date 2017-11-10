@@ -49,3 +49,8 @@ gulp
 
 # Set up the dev env
 node build
+
+# Switch back to beta
+If($bumpType -ne "beta") {
+	firebase use beta
+}
