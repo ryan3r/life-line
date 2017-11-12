@@ -76,6 +76,8 @@ class Router extends Events {
 		this.taskId = taskId;
 
 		this._updateUrl();
+
+		localforage.setItem(`last-task-${this.listId}`, this.taskId);
 	}
 
 	// switch lists
