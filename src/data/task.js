@@ -493,14 +493,14 @@ export default class Task extends Events {
 		const newTrans = !transaction;
 
 		if(newTrans) {
-			transaction = undoManager.transaction("Delete completed tasks.");
+			transaction = undoManager.transaction("Deleted completed tasks.");
 		}
 
 		for(let i = this.children.length - 1; i >= 0; --i) {
 			const child = this.children[i];
 
 			// delete any children that are done
-			if(child.state.type == "done" && child.repeatDay === 0) {
+			if(child.state.type == "done" && !child.repeatDay) {
 				child.delete({ transaction });
 			}
 			// delete that child's completed tasks
