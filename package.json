@@ -2,19 +2,12 @@
   "name": "life-line",
   "version": "0.6.3",
   "description": "",
-  "main": "./src/server",
-  "bin": "./bin/life-line.js",
-  "scripts": {
-    "test": "mocha tests/**/*.js --reporter min",
-    "build": "node build -p",
-    "start": "node bin/life-line --devMode --port=8080 --localhost --dataDir=../life-line-data"
-  },
   "repository": "ryan3r/life-line",
   "author": "Ryan Ray <ryan314r@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "moment": "^2.19.2",
-    "sinon": "^3.2.1"
+    "sinon": "^4.1.2"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -29,8 +22,6 @@
     "gulp-webpack": "^1.5.0",
     "localforage": "^1.5.0",
     "material-ui": "^0.19.0",
-    "preact": "^8.2.1",
-    "preact-compat": "^3.17.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "webpack": "^3.5.5"
