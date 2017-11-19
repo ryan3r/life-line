@@ -13,6 +13,7 @@
   "author": "Ryan Ray <ryan314r@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "moment": "^2.19.2",
     "sinon": "^3.2.1"
   },
   "devDependencies": {
