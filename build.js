@@ -14,7 +14,7 @@ module.exports = function(dev) {
 	// the file registry
 	let files = {};
 
-	files.appTitle = IS_BETA ? "Life line" : "Life line beta";
+	files.appTitle = IS_BETA ? "Life line beta" : "Life line";
 
 	for(let entry of build) {
 		// only build this in dev mode
