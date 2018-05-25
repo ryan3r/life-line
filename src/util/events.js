@@ -28,7 +28,7 @@ export default class Events {
 				// resolve the promise them send the value
 				if(value instanceof Promise) {
 					value.then(value => {
-						// check that we still wan this value
+						// check that we still want this value
 						if(subscription.active) {
 							fn(value);
 						}
